@@ -1,0 +1,8 @@
+{
+  "app": {
+    "name": "Quivr App",
+    "short_description": "Use Quivr to reformulate your responses",
+    "long_description": "Quivr App helps you to reformulate your responses effectively and efficiently.",
+    "installation_instructions": "Simply click install and add your API key to get started."
+  }
+}
