@@ -1,0 +1,7 @@
+#instruction {
+    border: none; 
+    overflow: hidden; 
+    width: 100%; 
+    resize: none; 
+    height: auto;
+}

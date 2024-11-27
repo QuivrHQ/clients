@@ -5,6 +5,7 @@ client.invoke('resize', { width: '100%', height: '600px' });
 const quivrApiKeyPromise = client.metadata().then(function(metadata) {
     return metadata.settings.quivr_api_key;
 });
+
 // Function Definition
 //--------------------
 
@@ -114,70 +115,66 @@ function getRequesterName(client) {
 }
 
 //--------------------
+document.addEventListener("DOMContentLoaded", function() {
+    // Access the Objects
+    const textareaObject = document.querySelector('#textarea-wrapper object');
+    const responseBlockObject = document.querySelector('#response_block_wrapper object');
+    const buttonObject = document.querySelector('#button-wrapper object');
 
-document.addEventListener("DOMContentLoaded", function () {
-    const textarea = document.getElementById("instruction");
-    textarea.style.height = ''; // Reset height
-    textarea.style.height = textarea.scrollHeight + 'px'; // Adjust height based on content
-  });
+    // Ensure the Objects are loaded before accessing their content
+    textareaObject.addEventListener('load', function() {
+        const textareaDoc = textareaObject.contentDocument || textareaObject.contentWindow.document;
+        const instructionElement = textareaDoc.getElementById('instruction');
 
-document.addEventListener("DOMContentLoaded", () => {
-    let clicked = false;
+        buttonObject.addEventListener('load', function() {
+            const buttonDoc = buttonObject.contentDocument || buttonObject.contentWindow.document;
+            const submitButton = buttonDoc.getElementById('submit');
+            const buttonTextWrapper = buttonDoc.getElementById('button-text-wrapper');
+            const loader = buttonDoc.getElementById('button-loader');
 
-    const button = document.getElementById("submit");
-    const pasteButton = document.getElementById("paste");
-    const buttonTextWrapper = document.getElementById("button-text-wrapper"); 
-    const buttonText = document.getElementById("button-text");
-    const responseWrapper = document.getElementById("response_block_wrapper");
-    const responseText = document.getElementById("quivr_response");
-    const loader = document.getElementById("button-loader");
+            if (submitButton) {
+                submitButton.addEventListener('click', async function() {
+                    try {
+                        // Show the loader
+                        loader.style.display = "inline-block"; // Show the loader
+                        buttonTextWrapper.style.display = "none";
+                        const instructionValue = instructionElement.value;
+                        // Example of using the instruction value in a function
+                        const response = await reformulate(client, instructionValue);
+                        const responseBlockDoc = responseBlockObject.contentDocument || responseBlockObject.contentWindow.document;
+                        const responseWrapper = responseBlockDoc.getElementById('quivr_response');
+                        responseWrapper.innerText = response;
 
-
-    button.addEventListener("click", async () => {
-        try {
-            console.log("Reformulating text...");
-            loader.style.display = "inline-block"; // Show the loader
-            buttonTextWrapper.style.display = "none"; // Hide the button text
-            button.disabled = true
-            var instruction = document.getElementById("instruction").value;
-
-            const reformulatedText = await reformulate(client, instruction);
-            let formattedText = reformulatedText.replace(/^/gm, '<br>');
-            formattedText = formattedText.replace(/^<br>/, '');
-            responseText.innerHTML = formattedText;
-
-        
-        if (!clicked) {
-            // Change button text
-            buttonText.textContent = "Regénérer";
-
-            // Make the response block wrapper visible
-            if (responseWrapper) {
-                responseWrapper.style.display = "block";
-            } else {
-                console.warn("Element with ID 'response-div' not found.");
+                        buttonTextWrapper.textContent = "Regénérer";
+                    } catch (error) {
+                        console.error("Error reformulating text:", error);
+                        const responseBlockDoc = responseBlockObject.contentDocument || responseBlockObject.contentWindow.document;
+                        const responseWrapper = responseBlockDoc.getElementById('quivr_response');
+                        responseWrapper.textContent = "An error occurred while reformulating the text.";
+                    } finally {
+                        loader.style.display = "none"; // Hide the loader
+                        buttonTextWrapper.style.display = "inline"; // Show the button text again
+                        submitButton.disabled = false;
+                    }
+                });
             }
-
-            clicked = true;
-        }}
-        catch (error) {
-                console.error("Error reformulating text:", error);
-                responseWrapper.textContent = "An error occurred while reformulating the text.";
-            } finally {
-        loader.style.display = "none"; // Hide the loader
-        buttonTextWrapper.style.display = "inline"; // Show the button text again
-        button.disabled = false;
-
-    }
+        });
     });
 
-    pasteButton.addEventListener("click", async () => {
-        try {
-            const reformulatedText = responseText.innerHTML;
-            console.log("Pasting reformulated text in editor...");
-            await pasteInEditor(client, reformulatedText);
-        } catch (error) {
-            console.error("Error pasting text in editor:", error);
+    responseBlockObject.addEventListener('load', function() {
+        const responseBlockDoc = responseBlockObject.contentDocument || responseBlockObject.contentWindow.document;
+        const pasteButton = responseBlockDoc.getElementById('paste');
+
+        if (pasteButton) {
+            pasteButton.addEventListener('click', async function() {
+                try {
+                    const responseText = responseBlockDoc.getElementById('quivr_response').innerHTML;
+                    console.log("Pasting reformulated text in editor...");
+                    await pasteInEditor(client, responseText);
+                } catch (error) {
+                    console.error("Error pasting text in editor:", error);
+                }
+            });
         }
     });
 });

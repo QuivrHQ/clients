@@ -1,0 +1,30 @@
+#response_block {
+    background-color: #E7E9EC;
+    border-radius: 8px;
+    padding: 20px 0px;
+    margin-bottom: 10px;
+}
+.response-div {
+    color: black;
+    padding: 20px;
+    margin-bottom: 5px;
+    text-align: center;
+    overflow-y: auto;
+    max-height: 300px;
+}
+
+/* Paste button styling inside response block */
+#paste_button_wrapper button {
+    background-color: #CBCBCB;
+    border: none;
+    padding: 10px 15px;
+    color: black;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+#paste_button_wrapper button:hover {
+    background-color: #A9A9A9;
+}
