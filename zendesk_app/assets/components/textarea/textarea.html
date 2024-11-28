@@ -1,10 +1,17 @@
-<div class="d-flex justify-content-center" style="padding: 20px;">
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="components/textarea/textarea.css">
+</head>
+<body>
+  <div class="textarea_wrapper">
     <textarea 
-      class="u-semibold u-fs-xl text-center" 
-      id="instruction" 
-      style="border: none; overflow: hidden; width: 100%; resize: none; height: auto;" 
-      oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px';">
-  Vous êtes un assistant attentionné de LocService, et votre objectif est de satisfaire la demande du client.
+      class="textarea"
+      id="instruction"
+      placeholder="Enter instructions here...">
     </textarea>
   </div>
-  
+</body>
+</html>

@@ -1,0 +1,24 @@
+.paste_button_wrapper button {
+    background-color: #CBCBCB;
+    border: none;
+    padding: 10px 15px;
+    color: black;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.paste_button_wrapper button:hover {
+    background-color: #A9A9A9;
+}
+
+#response_block_wrapper {
+    background-color: #E7E9EC;
+    display: none;
+    color: black;
+    padding: 20px;
+    text-align: center;
+    overflow-y: auto;
+    max-height: 300px;
+}

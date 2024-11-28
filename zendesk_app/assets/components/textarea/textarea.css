@@ -1,0 +1,23 @@
+.textarea_wrapper {
+    display: flex;
+    width: 100%;
+    border-block: 1px solid lightgrey;
+    padding-block: 8px;
+    flex: 1;
+}
+
+.textarea {
+    width: 100%;
+    resize: none;
+    display: flex;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
