@@ -173,7 +173,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const responseText = document.getElementById("quivr_response");
     const loader = document.getElementById("button-loader");
 
-    if (button) {
+    console.info(responseWrapper, responseText);
+
+    if (button && responseText) {
       button.addEventListener("click", async () => {
         try {
           loader.style.display = "block";
