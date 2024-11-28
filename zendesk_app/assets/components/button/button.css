@@ -16,6 +16,11 @@
     cursor: pointer;
 }
 
+.button_wrapper:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
 .button_icon {
     width: 16px;
     height: 16px;

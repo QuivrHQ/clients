@@ -134,6 +134,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   loadComponent(
+    "response-block-placeholder",
+    "components/response_block/response_block.html"
+  );
+
+  loadComponent(
     "textarea-placeholder",
     "components/textarea/textarea.html",
     () => {
@@ -159,65 +164,62 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   );
 
-  loadComponent(
-    "response-block-placeholder",
-    "components/response_block/response_block.html"
-  );
+  setTimeout(() => {
+    loadComponent("button-placeholder", "components/button/button.html", () => {
+      const button = document.getElementById("submit");
+      const pasteButton = document.getElementById("paste");
+      const buttonTextWrapper = document.getElementById("button-icon");
+      const buttonText = document.getElementById("button-text");
+      const responseWrapper = document.getElementById("response_block_wrapper");
+      const responseText = document.getElementById("quivr_response");
+      const loader = document.getElementById("button-loader");
 
-  loadComponent("button-placeholder", "components/button/button.html", () => {
-    const button = document.getElementById("submit");
-    const pasteButton = document.getElementById("paste");
-    const buttonTextWrapper = document.getElementById("button-icon");
-    const buttonText = document.getElementById("button-text");
-    const responseWrapper = document.getElementById("response_block_wrapper");
-    const responseText = document.getElementById("quivr_response");
-    const loader = document.getElementById("button-loader");
+      if (button) {
+        button.addEventListener("click", async () => {
+          try {
+            loader.style.display = "block";
+            buttonTextWrapper.style.display = "none";
+            button.disabled = true;
+            const instruction = document.getElementById("instruction").value;
 
-    console.info(responseWrapper, responseText);
+            const reformulatedText = await reformulate(client, instruction);
+            let formattedText = reformulatedText.replace(/^/gm, "<br>");
+            formattedText = formattedText.replace(/^<br>/, "");
+            responseText.innerHTML = formattedText;
 
-    if (button && responseText) {
-      button.addEventListener("click", async () => {
-        try {
-          loader.style.display = "block";
-          buttonTextWrapper.style.display = "none";
-          button.disabled = true;
-          const instruction = document.getElementById("instruction").value;
-
-          const reformulatedText = await reformulate(client, instruction);
-          let formattedText = reformulatedText.replace(/^/gm, "<br>");
-          formattedText = formattedText.replace(/^<br>/, "");
-          responseText.innerHTML = formattedText;
-
-          if (!clicked) {
-            buttonText.textContent = "Regénérer";
-            if (responseWrapper) responseWrapper.style.display = "block";
-            clicked = true;
+            if (!clicked) {
+              buttonText.textContent = "Regénérer";
+              if (responseWrapper) {
+                responseWrapper.style.display = "block";
+              }
+              clicked = true;
+            }
+          } catch (error) {
+            console.error("Error reformulating text:", error);
+            responseWrapper.textContent =
+              "An error occurred while reformulating the text.";
+          } finally {
+            loader.style.display = "none";
+            buttonTextWrapper.style.display = "inline";
+            button.disabled = false;
           }
-        } catch (error) {
-          console.error("Error reformulating text:", error);
-          responseWrapper.textContent =
-            "An error occurred while reformulating the text.";
-        } finally {
-          loader.style.display = "none";
-          buttonTextWrapper.style.display = "inline";
-          button.disabled = false;
-        }
-      });
-    } else {
-      console.warn("Button with ID 'submit' not found.");
-    }
+        });
+      } else {
+        console.warn("Button with ID 'submit' not found.");
+      }
 
-    if (pasteButton) {
-      pasteButton.addEventListener("click", async () => {
-        try {
-          const reformulatedText = responseText.innerHTML;
-          await pasteInEditor(client, reformulatedText);
-        } catch (error) {
-          console.error("Error pasting text in editor:", error);
-        }
-      });
-    } else {
-      console.warn("Paste button with ID 'paste' not found.");
-    }
-  });
+      if (pasteButton) {
+        pasteButton.addEventListener("click", async () => {
+          try {
+            const reformulatedText = responseText.innerHTML;
+            await pasteInEditor(client, reformulatedText);
+          } catch (error) {
+            console.error("Error pasting text in editor:", error);
+          }
+        });
+      } else {
+        console.warn("Paste button with ID 'paste' not found.");
+      }
+    });
+  }, 1000);
 });
