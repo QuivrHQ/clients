@@ -11,46 +11,11 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
- <div class="d-flex justify-content-center" style="padding: 20px;">
-  <textarea 
-    class="u-semibold u-fs-xl text-center" 
-    id="instruction" 
-    style="border: none; overflow: hidden; width: 100%; resize: none; height: auto;" 
-    oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px';">
-Vous êtes un assistant attentionné de LocService, et votre objectif est de satisfaire la demande du client.
-  </textarea>
-</div>
-  <div>
-    <!-- Response block wrapper initially hidden -->
-    <div id="response_block_wrapper">
-      <div id="response_block" class="d-flex flex-column">
-        <div id= "quivr_response" class="response-div">
-        </div>
-        <!-- Paste button inside the response block -->
-        <div id="paste_button_wrapper">
-          <button id="paste">
-            Coller dans le brouillon
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="d-flex justify-content-center">
-    <button 
-      id="submit" 
-      class="c-btn d-flex align-items-center justify-content-center button">
-      <div id="button-text-wrapper">
-      <img 
-        src="./brain.svg" 
-        alt="icon" 
-        style="width: 19px; height: 19px;"
-      >
-      <span id="button-text" style="margin-left: 8px;">Reformuler</span>
-      </div>
-      <span class="loader" id="button-loader" style="display: none;"></span>
-    </button>
-  </div>
-  <!-- JavaScript dependencies -->
+
+  <div id="textarea-placeholder"></div>
+  <div id="response-block-placeholder"></div>
+  <div id="button-placeholder"></div>
+
   <script src="https://static.zdassets.com/zendesk_app_framework_sdk/2.0/zaf_sdk.min.js"></script>
   <script src="main.js"></script>
 </body>

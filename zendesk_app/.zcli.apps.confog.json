@@ -1,0 +1,7 @@
+{
+  "name": "Quivr",
+  "id": "quivr_app",
+  "parameters": {
+    "quivr_api_key": "a9bbb448b43e9e4b4acd875851278372"
+  }
+}
