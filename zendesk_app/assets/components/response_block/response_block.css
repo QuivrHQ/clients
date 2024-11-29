@@ -1,0 +1,28 @@
+.response_block_wrapper {
+    background-color: #E7E9EC;
+    display: none;
+    color: black;
+    text-align: center;
+    overflow-y: auto;
+    max-height: 300px;
+    font-size: 13px;
+    padding-block: 16px;
+}
+
+.quivr_response {
+    padding: 16px;
+}
+
+.paste_button_wrapper button {
+    background-color: #CBCBCB;
+    border: none;
+    padding: 10px 15px;
+    color: black;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.paste_button_wrapper button:hover {
+    background-color: #A9A9A9;
+}

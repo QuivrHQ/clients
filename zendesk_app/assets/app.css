@@ -1,0 +1,8 @@
+.app_wrapper {
+    display: flex;
+    gap: 16px;
+    flex-direction: column;
+    width: 100%;
+    font-size: 14px;
+    font-family: system-ui, sans-serif;
+}
