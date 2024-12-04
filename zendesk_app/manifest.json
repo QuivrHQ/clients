@@ -20,7 +20,7 @@
       "name": "quivr_api_key",
       "type": "text",
       "required": true,
-      "secure": true
+      "secure": false
     }
   ],
   "version": "1.0.0",

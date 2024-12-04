@@ -19,11 +19,12 @@ function getHistoric(client) {
 }
 
 async function getNewChat() {
-  const response = await fetch("https://api.quivr.app/chat", {
+  const quivrApiKey = await quivrApiKeyPromise;
+  const response = await fetch("https://api-gobocom.quivr.app/chat", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Bearer 2a0c1a4534922227914a562ab30a166f",
+      Authorization: `Bearer ${quivrApiKey}`,
       accept: "application/json",
     },
     body: JSON.stringify({
@@ -42,7 +43,7 @@ async function getNewChat() {
 async function getQuivrResponse(prompt, chat_id) {
   const quivrApiKey = await quivrApiKeyPromise;
   const response = await fetch(
-    `https://api.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
+    `https://api-gobocom.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
     {
       method: "POST",
       headers: {
@@ -91,7 +92,7 @@ async function reformulate(client, instruction) {
     You are reformulation bot, you only reformulate what the agent wrote.
     Here is the tone instruction:\n${instruction}\n
     Stick to the agent content. Client name : ${clientName} \nAgent Name : ${agentName} Here is the chat history: \n\n
-    ${historic}\n\nReformulate this agent draft answer \n: ${input} \n\n Respond only with the reformulation in the same language as the draft answer : `;
+    ${historic}\n\nReformulate this agent draft answer \n: ${input} \n\n Respond only with the reformulation in the same language as the draft answer, the text must me natural without bullet points, tables. Do not greet or sign the message : `;
 
   return getQuivrResponse(prompt, chat_id);
 }
