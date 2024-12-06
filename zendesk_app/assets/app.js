@@ -43,7 +43,7 @@ async function getNewChat() {
 async function getQuivrResponse(prompt, chat_id) {
   const quivrApiKey = await quivrApiKeyPromise;
   const response = await fetch(
-    `https://api-gobocom.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
+    `https://api-gobocom.quivr.app/chat/${chat_id}/question?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
     {
       method: "POST",
       headers: {
@@ -61,23 +61,9 @@ async function getQuivrResponse(prompt, chat_id) {
     throw new Error("Network response was not ok");
   }
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder("utf-8");
-  let result = "";
-  let done = false;
+  const data = await response.json();
 
-  while (!done) {
-    const { value, done: doneReading } = await reader.read();
-    done = doneReading;
-    result += decoder.decode(value, { stream: true });
-  }
-
-  const matches = result.match(/data: (.+?)(?=data:|$)/g);
-  const finalAnswer = matches
-    .map((match) => JSON.parse(match.replace("data: ", "")).assistant)
-    .join("");
-
-  return finalAnswer;
+  return data.assistant;
 }
 
 async function reformulate(client, instruction) {
@@ -90,15 +76,18 @@ async function reformulate(client, instruction) {
 
   const prompt = `
     You are reformulation bot, you only reformulate what the agent wrote.
-    Here is the tone instruction:\n${instruction}\n
+    Here is the tone instruction, this is rank 0 importance and this instruction must pass before every other ones:\n${instruction}\n
     Stick to the agent content. Client name : ${clientName} \nAgent Name : ${agentName} Here is the chat history: \n\n
-    ${historic}\n\nReformulate this agent draft answer \n: ${input} \n\n Respond only with the reformulation in the same language as the draft answer, the text must me natural without bullet points, tables. Do not greet or sign the message : `;
+    ${historic}\n\nReformulate this agent draft answer \n: ${input} \n\n 
+    Respond only with the reformulation in the same language as the draft answer (if not stated otherwised in the instructions), the text must me natural without bullet points, tables. Do not greet (Dear Mr ..., Hello Mr. ...) or sign the message.
+    Always speak as a "we". Avoid being to apologizing or too formal, be natural and caring.\n\n
+    This text appears directly after greeting the client and before signing: `;
 
   return getQuivrResponse(prompt, chat_id);
 }
 
 function pasteInEditor(client, reformulatedText) {
-  return client.set("ticket.comment.text", reformulatedText);
+  return client.set({"ticket.comment.text": reformulatedText});
 }
 
 function getUserName(client) {
