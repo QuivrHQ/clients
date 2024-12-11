@@ -1,5 +1,6 @@
 const client = ZAFClient.init();
 client.invoke("resize", { width: "100%", height: "600px" });
+let responseTextHistory = [];
 
 const quivrApiKeyPromise = client.metadata().then(function (metadata) {
   return metadata.settings.quivr_api_key;
@@ -70,7 +71,6 @@ async function reformulate(client, instruction) {
   const historic = await getHistoric(client);
   const input = await getInput(client);
 
-  chat_id = await getNewChat(client);
   //const clientName = await getRequesterName(client);
   //const agentName = await getUserName(client);
 
@@ -111,6 +111,7 @@ Your goal is to reformulate this answer while adhering to the following guidelin
 2. Format: 
    - If the draft answer contains bullet points or tables, preserve this format in your reformulation.
    - If the draft answer does not contain bullet points or tables, use natural, flowing text without introducing them.
+   - If the drft answer contains links, keep them in your reformulation.
 3. Tone: Apply the tone instructions provided earlier consistently throughout your reformulation.
 4. Perspective: Always speak as "we" to represent the company or team.
 5. Style:
@@ -121,9 +122,18 @@ Your goal is to reformulate this answer while adhering to the following guidelin
    - Do not include any instructions or guidelines in your output.
    - Do not personalize the response with the name of the user or the agent.
 
-Present your reformulated answer without any additional commentary or explanations. The reformulated text should appear as if it's a direct response to the customer, ready to be sent.
+Present your reformulated answer without any additional commentary or explanations. The reformulated text should appear as if it's a direct response to the customer in html format contained in a <p>, ready to be sent.
   `;
 
+  return getQuivrResponse(prompt, chat_id);
+}
+
+async function reformulate_editor(draft, instruction){
+  const prompt = `
+  Edit this draft answer : ${draft} \n\n
+  According to those instructions: \n${instruction}\n\n
+Present your reformulated answer without any additional commentary or explanations. The reformulated text should appear as if it's a direct response to the customer in html format contained in a <p>, ready to be sent.
+  `;
   return getQuivrResponse(prompt, chat_id);
 }
 
@@ -143,8 +153,15 @@ function getRequesterName(client) {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async function() {
   let clicked = false;
+
+  try {
+    chat_id = await getNewChat();
+    console.log("New chat ID:", chat_id);
+  } catch (error) {
+    console.error("Error getting new chat ID:", error);
+  }
 
   function adjustTextareaHeight(textarea) {
     textarea.style.height = "26px";
@@ -204,6 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const responseWrapper = document.getElementById("response_block_wrapper");
       const responseText = document.getElementById("quivr_response");
       const loader = document.getElementById("button-loader");
+      const button_icon = document.getElementById("button-icon");
 
       if (button) {
         button.addEventListener("click", async () => {
@@ -212,14 +230,22 @@ document.addEventListener("DOMContentLoaded", () => {
             buttonTextWrapper.style.display = "none";
             button.disabled = true;
             const instruction = document.getElementById("instruction").value;
+            let reformulatedText;
 
-            const reformulatedText = await reformulate(client, instruction);
-            let formattedText = reformulatedText.replace(/^/gm, "<br>");
-            formattedText = formattedText.replace(/^<br>/, "");
-            responseText.innerHTML = formattedText;
+            if (clicked){
+              reformulatedText = await reformulate_editor(responseText.innerHTML, instruction);
+            }
+            else{
+              reformulatedText = await reformulate(client, instruction);
+            }
+
+            responseText.innerHTML = reformulatedText;
+            responseTextHistory.push(reformulatedText);
+
 
             if (!clicked) {
-              buttonText.textContent = "Regénérer";
+              buttonText.textContent = "Réécrire";
+              button_icon.src = "./ressources/reecrire.svg";
               if (responseWrapper) {
                 responseWrapper.style.display = "block";
               }
@@ -251,6 +277,26 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         console.warn("Paste button with ID 'paste' not found.");
       }
+
+      // Add the keydown event listener here
+      document.addEventListener('keydown', function (event) {
+        if ((event.ctrlKey || event.metaKey) && event.key === 'z') {
+          event.preventDefault();
+          console.log(`Response history ${responseTextHistory}`);
+
+
+          if (responseTextHistory.length > 0 && responseText) {
+            if (responseTextHistory.length > 1) {
+              responseTextHistory.pop();
+              responseText.innerHTML = responseTextHistory[responseTextHistory.length - 1];
+            } else {
+              console.warn("No more history to undo.");
+            }
+          } else {
+            console.warn("responseText is not available.");
+          }
+        }
+      });
     });
   }, 1000);
 });

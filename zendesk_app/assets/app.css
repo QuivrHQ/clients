@@ -6,3 +6,32 @@
     font-size: 14px;
     font-family: system-ui, sans-serif;
 }
+
+.footer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+}
+
+#cancel_button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+/* Change cursor to pointer on hover */
+.hover-button {
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+/* Change SVG color on hover */
+.hover-button #cancel_svg path {
+    fill: currentColor;
+    transition: fill 0.3s;
+}
+
+.hover-button:hover #cancel_svg path {
+    fill: #6142d4;
+}
