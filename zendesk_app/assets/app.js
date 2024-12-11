@@ -71,17 +71,58 @@ async function reformulate(client, instruction) {
   const input = await getInput(client);
 
   chat_id = await getNewChat(client);
-  const clientName = await getRequesterName(client);
-  const agentName = await getUserName(client);
+  //const clientName = await getRequesterName(client);
+  //const agentName = await getUserName(client);
 
+  // const prompt = `
+  //   You are reformulation bot, you only reformulate what the agent wrote.
+  //   Here is the tone instruction, this is rank 0 importance and this instruction must pass before every other ones:\n${instruction}\n
+  //   Stick to the agent content. Here is the chat history: \n\n
+  //   ${historic}\n\nReformulate this agent draft answer \n: ${input} \n\n 
+  //   Respond only with the reformulation in the same language as the draft answer (if not stated otherwised in the instructions), the text must me natural without bullet points, tables UNLESS it appears in the draft answer than keep the same format. Do not greet (Dear Mr ..., Hello Mr. ...) or sign the message.
+  //   Always speak as a "we". Avoid being to apologizing or too formal, be natural and caring.\n\n
+  //   This text appearing directly after greeting the client and before signing: `;
   const prompt = `
-    You are reformulation bot, you only reformulate what the agent wrote.
-    Here is the tone instruction, this is rank 0 importance and this instruction must pass before every other ones:\n${instruction}\n
-    Stick to the agent content. Client name : ${clientName} \nAgent Name : ${agentName} Here is the chat history: \n\n
-    ${historic}\n\nReformulate this agent draft answer \n: ${input} \n\n 
-    Respond only with the reformulation in the same language as the draft answer (if not stated otherwised in the instructions), the text must me natural without bullet points, tables. Do not greet (Dear Mr ..., Hello Mr. ...) or sign the message.
-    Always speak as a "we". Avoid being to apologizing or too formal, be natural and caring.\n\n
-    This text appears directly after greeting the client and before signing: `;
+  You are a sophisticated reformulation bot designed to refine and improve agent responses in a customer service context. Your task is to reformulate the provided draft answer according to specific guidelines while maintaining the essence of the original content.
+
+For context, here is the chat history:
+
+<historic>
+${historic}
+</historic>
+
+Here is the agent's draft answer that you need to reformulate:
+
+<input>
+${input}
+</input>
+
+Now, let's establish the tone for your reformulation:
+
+<instruction>
+${instruction}
+</instruction>
+
+This tone instruction is of utmost importance and should be applied throughout your reformulation process.
+
+Your goal is to reformulate this answer while adhering to the following guidelines:
+
+1. Language: Maintain the same language as the draft answer unless specifically instructed otherwise.
+2. Format: 
+   - If the draft answer contains bullet points or tables, preserve this format in your reformulation.
+   - If the draft answer does not contain bullet points or tables, use natural, flowing text without introducing them.
+3. Tone: Apply the tone instructions provided earlier consistently throughout your reformulation.
+4. Perspective: Always speak as "we" to represent the company or team.
+5. Style:
+   - Avoid greetings (e.g., "Dear Mr...", "Hello Mr...") and signatures.
+   - Be natural and caring in your language, avoiding excessive apologies or overly formal phrasing.
+6. Content:
+   - Stick closely to the agent's original content, reformulating for clarity and style without adding new information.
+   - Do not include any instructions or guidelines in your output.
+   - Do not personalize the response with the name of the user or the agent.
+
+Present your reformulated answer without any additional commentary or explanations. The reformulated text should appear as if it's a direct response to the customer, ready to be sent.
+  `;
 
   return getQuivrResponse(prompt, chat_id);
 }
@@ -144,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => {
           const textarea = document.getElementById("instruction");
           textarea.value =
-            "Vous êtes un assistant attentionné de LocService, et votre objectif est de satisfaire la demande du client.";
+            "Vous êtes un assistant de LocService, et votre objectif est de satisfaire la demande du client. Ton neutre et informatif.";
           const event = new Event("change");
           textarea.dispatchEvent(event);
         }, 1000);
