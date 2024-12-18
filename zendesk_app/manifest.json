@@ -12,6 +12,10 @@
       "ticket_sidebar": {
         "url": "assets/app.html",
         "flexible": true
+      },
+      "new_ticket_sidebar": {
+        "url": "assets/app.html",
+        "flexible": true
       }
     }
   },
