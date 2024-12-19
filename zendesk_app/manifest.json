@@ -25,6 +25,11 @@
       "type": "text",
       "required": true,
       "secure": false
+    },
+    {
+      "name": "default_prompt",
+      "type": "text",
+      "required": false
     }
   ],
   "version": "1.0.0",

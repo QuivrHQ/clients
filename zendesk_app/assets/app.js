@@ -1,9 +1,19 @@
 const client = ZAFClient.init();
 client.invoke("resize", { width: "100%", height: "600px" });
 let responseTextHistory = [];
+let responseText = null; // Declare responseText in a higher scope
+let chat_id = null; // Declare chat_id in a higher scope
 
 const quivrApiKeyPromise = client.metadata().then(function (metadata) {
   return metadata.settings.quivr_api_key;
+});
+
+const defaultPromptPromise = client.metadata().then(function (metadata) {
+  default_prompt = metadata.settings.default_prompt;
+  if (default_prompt) {
+    return default_prompt;
+  }
+  return "You are an Agent for customer service, your goal is to satisfy the client. Keep a neutral and informative tone.";
 });
 
 function getInput(client) {
@@ -44,58 +54,98 @@ async function getNewChat() {
 async function getQuivrResponse(prompt, chat_id) {
   const quivrApiKey = await quivrApiKeyPromise;
   const response = await fetch(
-    `https://api-gobocom.quivr.app/chat/${chat_id}/question?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
+    `https://api-gobocom.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${quivrApiKey}`,
-        accept: "application/json",
+        Accept: "text/event-stream",
       },
       body: JSON.stringify({
         question: prompt,
         brain_id: "7890ba8a-d45c-fd1e-3d36-347c61264e15",
+        streaming: true, // Enable streaming
       }),
     }
   );
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
+
+  if (!response.ok || !response.body) {
+    throw new Error("Network response was not ok or streaming not supported.");
   }
 
-  const data = await response.json();
+  // Disable editing while generating
+  if (responseText) {
+    responseText.contentEditable = "false";
+    responseText.textContent = ""; // Clear previous content
+  }
 
-  return data.assistant;
+  
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder("utf-8");
+  let result = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    let new_message = decoder.decode(value, { stream: true });
+
+    // Split the messages by 'data: ' delimiter
+    const newMessages = new_message.split('data: ');
+    newMessages.forEach((msg) => {
+      if (msg.trim()) {
+        try {
+          // Parse the JSON message
+          const jsonResponse = JSON.parse(msg);
+          const assistantMessage = jsonResponse.assistant;
+
+          // Update the response text during streaming
+          if (responseText) {
+            responseText.textContent += assistantMessage;
+          }
+
+          result += assistantMessage;
+        } catch (e) {
+          console.error("Error parsing JSON message:", e);
+        }
+      }
+    });
+  }
+
+  // After streaming, convert the plain text to HTML
+  if (responseText) {
+    // Convert Markdown to HTML
+    let htmlContent = marked.parse(result);
+    // Sanitize the HTML content
+    responseText.innerHTML = DOMPurify.sanitize(htmlContent);
+
+    // Push the initial content onto the history stack
+    responseTextHistory.push(responseText.innerHTML);
+    // Limit the history stack size
+    if (responseTextHistory.length > 500) {
+      responseTextHistory.shift(); // Remove the oldest entry
+    }
+
+    // Re-enable editing
+    responseText.contentEditable = "true";
+  }
+
+  return result;
 }
 
 async function reformulate(client, instruction) {
   const historic = await getHistoric(client);
   const input = await getInput(client);
 
-  //const clientName = await getRequesterName(client);
-  //const agentName = await getUserName(client);
-
-  // const prompt = `
-  //   You are reformulation bot, you only reformulate what the agent wrote.
-  //   Here is the tone instruction, this is rank 0 importance and this instruction must pass before every other ones:\n${instruction}\n
-  //   Stick to the agent content. Here is the chat history: \n\n
-  //   ${historic}\n\nReformulate this agent draft answer \n: ${input} \n\n 
-  //   Respond only with the reformulation in the same language as the draft answer (if not stated otherwised in the instructions), the text must me natural without bullet points, tables UNLESS it appears in the draft answer than keep the same format. Do not greet (Dear Mr ..., Hello Mr. ...) or sign the message.
-  //   Always speak as a "we". Avoid being to apologizing or too formal, be natural and caring.\n\n
-  //   This text appearing directly after greeting the client and before signing: `;
   const prompt = `
-  You are a sophisticated reformulation bot designed to refine and improve agent responses in a customer service context. Your task is to reformulate the provided draft answer according to specific guidelines while maintaining the essence of the original content.
+You are a sophisticated reformulation bot designed to refine and improve agent responses in a customer service context. Your task is to reformulate the provided draft answer according to specific guidelines while maintaining the essence of the original content.
 
 For context, here is the chat history:
 
 <historic>
 ${historic}
 </historic>
-
-Here is the agent's draft answer that you need to reformulate:
-
-<input>
-${input}
-</input>
 
 Now, let's establish the tone for your reformulation:
 
@@ -110,8 +160,9 @@ Your goal is to reformulate this answer while adhering to the following guidelin
 1. Language: Maintain the same language as the draft answer unless specifically instructed otherwise.
 2. Format: 
    - If the draft answer contains bullet points or tables, preserve this format in your reformulation.
-   - If the draft answer does not contain bullet points or tables, use natural, flowing well formatted text without introducing them.
-   - If the draft answer contains links, keep them in your reformulation.
+   - If the draft answer does not contain bullet points or tables, use natural, flowing well-formatted text without introducing them.
+   - If the draft answer contains links, keep them in your reformulation with the same format (embedded or not embedded).
+   - If the draft answer contains bold/italic text, maintain this formatting in your reformulation.
 3. Tone: Apply the tone instructions provided earlier consistently throughout your reformulation.
 4. Perspective: Always speak as "we" to represent the company or team.
 5. Style:
@@ -119,29 +170,43 @@ Your goal is to reformulate this answer while adhering to the following guidelin
    - Be natural and caring in your language, avoiding excessive apologies or overly formal phrasing.
 6. Content:
    - Stick closely to the agent's original content, reformulating for clarity and style without adding new information.
-   - Personnalize a bit the response to the specific context of the customer's query.
+   - Do not invent an answer or provide new information that was not present in the original agent draft.
+   - Personalize a bit the response to the specific context of the customer's query.
    - Do not include any instructions or guidelines in your output.
    - Do not personalize the response with the name of the user or the agent.
+7. Concluding phrases:
+  - If a concluding phrase is required, keep it simple and inspire yourself from these exemples :
+   * Nous espérons que vous trouverez rapidement le logement que vous souhaitez.
+   * Nous continuons à transmettre votre candidature aux propriétaires de biens correspondant à vos critères et espérons que vous recevrez rapidement des propositions qui vous conviendront.
+   * Nous restons à votre disposition et nous espérons que vous recevrez rapidement des offres qui vous satisferont.
+   * Nous vous remercions de votre compréhension et restons à votre disposition.
 
-Present your reformulated answer without any additional commentary or explanations. The reformulated text should appear as if it's a direct response to the customer in html format contained in a single <p> with <br>, ready to be sent.
-Reformulation : ...
+  Here is the agent's draft answer that you need to reformulate:
+
+<draft answer>
+${input}
+</draft answer>
+Stay close to the original draft, don't make it too long or too short.
+Respond directly with the message to send to the customer, ready to be sent:
   `;
 
   return getQuivrResponse(prompt, chat_id);
 }
 
-async function reformulate_editor(draft, instruction){
+async function reformulate_editor(draft, instruction) {
   const prompt = `
-  Edit this draft answer : ${draft} \n\n
-  According to those instructions: \n${instruction}\n\n
-Present your reformulated answer without any additional commentary or explanations. The reformulated text should appear as if it's a direct response to the customer in html format contained in a single <p> with <br>, ready to be sent.
-Reformulation : ...
+Edit this draft answer: ${draft}
+
+According to these instructions: ${instruction}
+
+Present your reformulated answer without any additional commentary or explanations. The reformulated text should appear as if it's a direct response to the customer in Markdown format.
+Respond directly with the message to send to the customer, ready to be sent.
   `;
   return getQuivrResponse(prompt, chat_id);
 }
 
 function pasteInEditor(client, reformulatedText) {
-  return client.set({"ticket.comment.text": reformulatedText});
+  return client.set({ "ticket.comment.text": reformulatedText });
 }
 
 function getUserName(client) {
@@ -156,7 +221,7 @@ function getRequesterName(client) {
   });
 }
 
-document.addEventListener("DOMContentLoaded", async function() {
+document.addEventListener("DOMContentLoaded", async function () {
   let clicked = false;
 
   try {
@@ -203,11 +268,13 @@ document.addEventListener("DOMContentLoaded", async function() {
         });
 
         setTimeout(() => {
-          const textarea = document.getElementById("instruction");
-          textarea.value =
-            "Vous êtes un assistant de LocService, et votre objectif est de satisfaire la demande du client. Ton neutre et informatif.";
-          const event = new Event("change");
-          textarea.dispatchEvent(event);
+          defaultPromptPromise.then((default_prompt) => {
+            textarea.value = default_prompt;
+            const event = new Event("change");
+            textarea.dispatchEvent(event);
+          });
+            //"Vous êtes un assistant de LocService, et votre objectif est de satisfaire la demande du client. Ton neutre et informatif.";
+          
         }, 1000);
       } else {
         console.warn("Textarea with ID 'instruction' not found.");
@@ -222,9 +289,26 @@ document.addEventListener("DOMContentLoaded", async function() {
       const buttonTextWrapper = document.getElementById("button-icon");
       const buttonText = document.getElementById("button-text");
       const responseWrapper = document.getElementById("response_block_wrapper");
-      const responseText = document.getElementById("quivr_response");
       const loader = document.getElementById("button-loader");
       const button_icon = document.getElementById("button-icon");
+      responseText = document.getElementById("quivr_response"); // Assign to the higher scope variable
+
+      if (responseText) {
+        // Add event listener to capture user edits
+        let debounceTimer;
+        responseText.addEventListener('input', function() {
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            // Push the current content onto the history stack
+            responseTextHistory.push(responseText.innerHTML);
+            // Limit the history stack size
+            if (responseTextHistory.length > 500) {
+              responseTextHistory.shift(); // Remove the oldest entry
+            }
+          }, 500); // Adjust debounce delay as needed
+        });
+      }
+
 
       if (button) {
         button.addEventListener("click", async () => {
@@ -232,36 +316,49 @@ document.addEventListener("DOMContentLoaded", async function() {
             loader.style.display = "block";
             buttonTextWrapper.style.display = "none";
             button.disabled = true;
-            const instruction = document.getElementById("instruction").value;
-            let reformulatedText;
 
-            if (clicked){
-              reformulatedText = await reformulate_editor(responseText.innerHTML, instruction);
+            const instructionElement = document.getElementById("instruction");
+            const instruction = instructionElement ? instructionElement.value : "";
+
+            if (responseText) {
+              // Push the current content onto the history stack
+              responseTextHistory.push(responseText.innerHTML);
+              // Limit the history stack size
+              if (responseTextHistory.length > 20) {
+                responseTextHistory.shift(); // Remove the oldest entry
+              }
+
+              responseText.textContent = ""; // Clear previous response
+              responseText.contentEditable = "false"; // Disable editing
             }
-            else{
-              reformulatedText = await reformulate(client, instruction);
+
+            if (clicked) {
+              // For subsequent clicks
+              await reformulate_editor(responseText.innerHTML, instruction);
+            } else {
+              // For the first click
+              if (responseWrapper) {
+                responseWrapper.style.display = "block";
+              }
+              await reformulate(client, instruction);
             }
-
-            responseText.innerHTML = reformulatedText;
-            responseTextHistory.push(reformulatedText);
-
 
             if (!clicked) {
               buttonText.textContent = "Réécrire";
               button_icon.src = "./ressources/reecrire.svg";
-              if (responseWrapper) {
-                responseWrapper.style.display = "block";
-              }
               clicked = true;
             }
           } catch (error) {
             console.error("Error reformulating text:", error);
-            responseWrapper.textContent =
-              "An error occurred while reformulating the text.";
+            if (responseWrapper) {
+              responseWrapper.textContent =
+                "An error occurred while reformulating the text.";
+            }
           } finally {
+            // Re-enable the button and hide loader after generation completes
+            button.disabled = false;
             loader.style.display = "none";
             buttonTextWrapper.style.display = "inline";
-            button.disabled = false;
           }
         });
       } else {
@@ -271,7 +368,8 @@ document.addEventListener("DOMContentLoaded", async function() {
       if (pasteButton) {
         pasteButton.addEventListener("click", async () => {
           try {
-            const reformulatedText = responseText.innerHTML;
+            let reformulatedText = responseText ? responseText.innerHTML : "";
+            reformulatedText = reformulatedText.replace(/<\/p>\s*<p>/g, "</p><br><p>");
             await pasteInEditor(client, reformulatedText);
           } catch (error) {
             console.error("Error pasting text in editor:", error);
@@ -281,22 +379,16 @@ document.addEventListener("DOMContentLoaded", async function() {
         console.warn("Paste button with ID 'paste' not found.");
       }
 
-      // Add the keydown event listener here
-      document.addEventListener('keydown', function (event) {
-        if ((event.ctrlKey || event.metaKey) && event.key === 'z') {
+      // Add the keydown event listener for undo functionality
+      document.addEventListener("keydown", function (event) {
+        if ((event.ctrlKey || event.metaKey) && event.key === "z") {
           event.preventDefault();
-          console.log(`Response history ${responseTextHistory}`);
 
-
-          if (responseTextHistory.length > 0 && responseText) {
-            if (responseTextHistory.length > 1) {
-              responseTextHistory.pop();
-              responseText.innerHTML = responseTextHistory[responseTextHistory.length - 1];
-            } else {
-              console.warn("No more history to undo.");
-            }
+          if (responseTextHistory.length > 1 && responseText) {
+            const previousResponse = responseTextHistory.pop();
+            responseText.innerHTML = previousResponse;
           } else {
-            console.warn("responseText is not available.");
+            console.warn("No more history to undo or responseText is not available.");
           }
         }
       });
