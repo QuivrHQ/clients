@@ -65,73 +65,131 @@ async function getQuivrResponse(prompt, chat_id) {
       body: JSON.stringify({
         question: prompt,
         brain_id: "7890ba8a-d45c-fd1e-3d36-347c61264e15",
-        streaming: true, // Enable streaming
+        streaming: true,
       }),
     }
   );
 
   if (!response.ok || !response.body) {
-    throw new Error("Network response was not ok or streaming not supported.");
+    throw new Error("Network response not ok or streaming not supported.");
   }
 
-  // Disable editing while generating
   if (responseText) {
     responseText.contentEditable = "false";
-    responseText.textContent = ""; // Clear previous content
+    responseText.textContent = "";
+  }
+  let quivrResponse = "";
+  const { assistant } = await processStream(response.body, (chunk) => {
+    if (responseText) {
+      responseText.textContent += chunk;
+      quivrResponse += chunk;
+    }
+  });
+
+  if (responseText) {``
+
+    let htmlContent = marked.parse(quivrResponse);
+    responseText.innerHTML = DOMPurify.sanitize(htmlContent);
+    responseTextHistory.push(responseText.innerHTML);
+    if (responseTextHistory.length > 500) {
+      responseTextHistory.shift();
+    }
+    responseText.contentEditable = "true";
   }
 
-  
-  const reader = response.body.getReader();
+  return assistant;
+}
+
+// Inspired by your snippet:
+async function processStream(
+  body,
+  onStreamMessage
+) {
+  const reader = body.getReader();
   const decoder = new TextDecoder("utf-8");
-  let result = "";
+  let buffer = "";
+  let accumulatedMessage = "";
+  let lastResponse = null;
 
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
 
-    let new_message = decoder.decode(value, { stream: true });
+    buffer += decoder.decode(value, { stream: true });
 
-    // Split the messages by 'data: ' delimiter
-    const newMessages = new_message.split('data: ');
-    newMessages.forEach((msg) => {
-      if (msg.trim()) {
-        try {
-          // Parse the JSON message
-          const jsonResponse = JSON.parse(msg);
-          const assistantMessage = jsonResponse.assistant;
-
-          // Update the response text during streaming
-          if (responseText) {
-            responseText.textContent += assistantMessage;
-          }
-
-          result += assistantMessage;
-        } catch (e) {
-          console.error("Error parsing JSON message:", e);
-        }
-      }
-    });
+    ({ buffer, accumulatedMessage, lastResponse } = processBuffer(
+      buffer,
+      accumulatedMessage,
+      lastResponse,
+      onStreamMessage
+    ));
   }
 
-  // After streaming, convert the plain text to HTML
-  if (responseText) {
-    // Convert Markdown to HTML
-    let htmlContent = marked.parse(result);
-    // Sanitize the HTML content
-    responseText.innerHTML = DOMPurify.sanitize(htmlContent);
+  reader.releaseLock();
+  return (
+    lastResponse ?? {
+      assistant: accumulatedMessage,
+    }
+  );
+}
 
-    // Push the initial content onto the history stack
-    responseTextHistory.push(responseText.innerHTML);
-    // Limit the history stack size
-    if (responseTextHistory.length > 500) {
-      responseTextHistory.shift(); // Remove the oldest entry
+function processBuffer(
+  buffer,
+  accumulatedMessage,
+  lastResponse,
+  onStreamMessage
+) {
+  const dataPrefix = "data: ";
+
+  // Keep parsing as long as we have another "data: " prefix in the buffer
+  while (true) {
+    const startIdx = buffer.indexOf(dataPrefix);
+    if (startIdx === -1) {
+      // No more prefixes; we’re done for now
+      break;
     }
 
-    // Re-enable editing
-    responseText.contentEditable = "true";
+    // Look for the next "data: " after this one
+    const nextIdx = buffer.indexOf(dataPrefix, startIdx + dataPrefix.length);
+
+    // If we don't find another prefix, we only have a *potentially partial* JSON
+    let jsonString;
+    if (nextIdx === -1) {
+      // Extract from after the prefix to the end of buffer; keep for parse attempt
+      jsonString = buffer.slice(startIdx + dataPrefix.length);
+      // Clear everything up to that prefix from the buffer
+      buffer = buffer.slice(0, startIdx);
+    } else {
+      // We found another prefix, so the JSON chunk ends right before it
+      jsonString = buffer.slice(startIdx + dataPrefix.length, nextIdx);
+      // Remove everything up to nextIdx from the buffer
+      buffer = buffer.slice(nextIdx);
+    }
+
+    // Attempt to parse
+    try {
+      const parsed = JSON.parse(jsonString.trim());
+      const newContent = parsed.assistant || "";
+
+      accumulatedMessage = newContent;
+      onStreamMessage(newContent);
+
+      lastResponse = {
+        assistant: accumulatedMessage,
+      };
+    } catch (error) {
+      console.warn("[Streaming] Failed to parse message, possibly partial chunk:", {
+        jsonString,
+        error,
+      });
+      // Revert partial chunk to buffer so it can be retried with next data
+      buffer = dataPrefix + jsonString;
+      // Stop parsing, wait for more data
+      break;
+    }
   }
 
-  return result;
+  return { buffer, accumulatedMessage, lastResponse };
 }
 
 async function reformulate(client, instruction) {
@@ -328,8 +386,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 responseTextHistory.shift(); // Remove the oldest entry
               }
 
-              responseText.textContent = ""; // Clear previous response
-              responseText.contentEditable = "false"; // Disable editing
             }
 
             if (clicked) {
