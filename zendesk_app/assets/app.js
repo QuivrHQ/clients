@@ -31,7 +31,7 @@ function getHistoric(client) {
 
 async function getNewChat() {
   const quivrApiKey = await quivrApiKeyPromise;
-  const response = await fetch("https://api-gobocom.quivr.app/chat", {
+  const response = await fetch("https://api-preview.quivr.app/chat", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -54,7 +54,7 @@ async function getNewChat() {
 async function getQuivrResponse(prompt, chat_id) {
   const quivrApiKey = await quivrApiKeyPromise;
   const response = await fetch(
-    `https://api-gobocom.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
+    `https://api-preview.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
     {
       method: "POST",
       headers: {
@@ -71,6 +71,7 @@ async function getQuivrResponse(prompt, chat_id) {
   );
 
   if (!response.ok || !response.body) {
+    console.log(response);
     throw new Error("Network response not ok or streaming not supported.");
   }
 
