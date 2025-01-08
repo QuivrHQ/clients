@@ -216,10 +216,10 @@ Your goal is to reformulate this answer while adhering to the following guidelin
    - Do not personalize the response with the name of the user or the agent.
 7. Concluding phrases:
   - If a concluding phrase is required, keep it simple and inspire yourself from these exemples :
-   * Nous espérons que vous trouverez rapidement le logement que vous souhaitez.
-   * Nous continuons à transmettre votre candidature aux propriétaires de biens correspondant à vos critères et espérons que vous recevrez rapidement des propositions qui vous conviendront.
-   * Nous restons à votre disposition et nous espérons que vous recevrez rapidement des offres qui vous satisferont.
+   * Nous espérons que cette information vous sera utile.
+   * N'hésitez pas à nous contacter si vous avez besoin de plus amples renseignements..
    * Nous vous remercions de votre compréhension et restons à votre disposition.
+   * Nous vous souhaitons une excellente continuation dans vos démarches.
 
   Here is the agent's draft answer that you need to reformulate:
 
