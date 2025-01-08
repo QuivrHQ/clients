@@ -1,3 +1,2 @@
 zendesk_app/zcli.apps.config.json
-*/.DS_Store
-.DS_Store
+*.DS_Store

@@ -1,19 +1,15 @@
 const client = ZAFClient.init();
 client.invoke("resize", { width: "100%", height: "600px" });
 let responseTextHistory = [];
-let responseText = null; // Declare responseText in a higher scope
-let chat_id = null; // Declare chat_id in a higher scope
+let responseText = null; 
+let chat_id = null;
 
 const quivrApiKeyPromise = client.metadata().then(function (metadata) {
   return metadata.settings.quivr_api_key;
 });
 
 const defaultPromptPromise = client.metadata().then(function (metadata) {
-  default_prompt = metadata.settings.default_prompt;
-  if (default_prompt) {
-    return default_prompt;
-  }
-  return "You are an Agent for customer service, your goal is to satisfy the client. Keep a neutral and informative tone.";
+  return metadata.settings.default_prompt ?? "You are an Agent for customer service, your goal is to satisfy the client. Keep a neutral and informative tone.";
 });
 
 function getInput(client) {
@@ -31,7 +27,7 @@ function getHistoric(client) {
 
 async function getNewChat() {
   const quivrApiKey = await quivrApiKeyPromise;
-  const response = await fetch("https://api-preview.quivr.app/chat", {
+  const response = await fetch("https://api-gobocom.quivr.app/chat", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -54,7 +50,7 @@ async function getNewChat() {
 async function getQuivrResponse(prompt, chat_id) {
   const quivrApiKey = await quivrApiKeyPromise;
   const response = await fetch(
-    `https://api-preview.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
+    `https://api-gobocom.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
     {
       method: "POST",
       headers: {
@@ -71,7 +67,6 @@ async function getQuivrResponse(prompt, chat_id) {
   );
 
   if (!response.ok || !response.body) {
-    console.log(response);
     throw new Error("Network response not ok or streaming not supported.");
   }
 
@@ -87,10 +82,8 @@ async function getQuivrResponse(prompt, chat_id) {
     }
   });
 
-  if (responseText) {``
-
-    let htmlContent = marked.parse(quivrResponse);
-    responseText.innerHTML = DOMPurify.sanitize(htmlContent);
+  if (responseText) {
+    responseText.innerHTML = DOMPurify.sanitize(marked.parse(quivrResponse));
     responseTextHistory.push(responseText.innerHTML);
     if (responseTextHistory.length > 500) {
       responseTextHistory.shift();
@@ -101,7 +94,6 @@ async function getQuivrResponse(prompt, chat_id) {
   return assistant;
 }
 
-// Inspired by your snippet:
 async function processStream(
   body,
   onStreamMessage
@@ -142,32 +134,23 @@ function processBuffer(
 ) {
   const dataPrefix = "data: ";
 
-  // Keep parsing as long as we have another "data: " prefix in the buffer
   while (true) {
     const startIdx = buffer.indexOf(dataPrefix);
     if (startIdx === -1) {
-      // No more prefixes; we’re done for now
       break;
     }
 
-    // Look for the next "data: " after this one
     const nextIdx = buffer.indexOf(dataPrefix, startIdx + dataPrefix.length);
 
-    // If we don't find another prefix, we only have a *potentially partial* JSON
     let jsonString;
     if (nextIdx === -1) {
-      // Extract from after the prefix to the end of buffer; keep for parse attempt
       jsonString = buffer.slice(startIdx + dataPrefix.length);
-      // Clear everything up to that prefix from the buffer
       buffer = buffer.slice(0, startIdx);
     } else {
-      // We found another prefix, so the JSON chunk ends right before it
       jsonString = buffer.slice(startIdx + dataPrefix.length, nextIdx);
-      // Remove everything up to nextIdx from the buffer
       buffer = buffer.slice(nextIdx);
     }
 
-    // Attempt to parse
     try {
       const parsed = JSON.parse(jsonString.trim());
       const newContent = parsed.assistant || "";
@@ -183,9 +166,7 @@ function processBuffer(
         jsonString,
         error,
       });
-      // Revert partial chunk to buffer so it can be retried with next data
       buffer = dataPrefix + jsonString;
-      // Stop parsing, wait for more data
       break;
     }
   }
@@ -285,7 +266,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   try {
     chat_id = await getNewChat();
-    console.log("New chat ID:", chat_id);
   } catch (error) {
     console.error("Error getting new chat ID:", error);
   }
@@ -332,7 +312,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             const event = new Event("change");
             textarea.dispatchEvent(event);
           });
-            //"Vous êtes un assistant de LocService, et votre objectif est de satisfaire la demande du client. Ton neutre et informatif.";
           
         }, 1000);
       } else {
@@ -350,21 +329,18 @@ document.addEventListener("DOMContentLoaded", async function () {
       const responseWrapper = document.getElementById("response_block_wrapper");
       const loader = document.getElementById("button-loader");
       const button_icon = document.getElementById("button-icon");
-      responseText = document.getElementById("quivr_response"); // Assign to the higher scope variable
+      responseText = document.getElementById("quivr_response"); 
 
       if (responseText) {
-        // Add event listener to capture user edits
         let debounceTimer;
         responseText.addEventListener('input', function() {
           clearTimeout(debounceTimer);
           debounceTimer = setTimeout(() => {
-            // Push the current content onto the history stack
             responseTextHistory.push(responseText.innerHTML);
-            // Limit the history stack size
             if (responseTextHistory.length > 500) {
-              responseTextHistory.shift(); // Remove the oldest entry
+              responseTextHistory.shift(); 
             }
-          }, 500); // Adjust debounce delay as needed
+          }, 500); 
         });
       }
 
@@ -380,20 +356,16 @@ document.addEventListener("DOMContentLoaded", async function () {
             const instruction = instructionElement ? instructionElement.value : "";
 
             if (responseText) {
-              // Push the current content onto the history stack
               responseTextHistory.push(responseText.innerHTML);
-              // Limit the history stack size
-              if (responseTextHistory.length > 20) {
-                responseTextHistory.shift(); // Remove the oldest entry
+              if (responseTextHistory.length > 500) {
+                responseTextHistory.shift();
               }
 
             }
 
             if (clicked) {
-              // For subsequent clicks
               await reformulate_editor(responseText.innerHTML, instruction);
             } else {
-              // For the first click
               if (responseWrapper) {
                 responseWrapper.style.display = "block";
               }
@@ -412,7 +384,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                 "An error occurred while reformulating the text.";
             }
           } finally {
-            // Re-enable the button and hide loader after generation completes
             button.disabled = false;
             loader.style.display = "none";
             buttonTextWrapper.style.display = "inline";
@@ -436,7 +407,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         console.warn("Paste button with ID 'paste' not found.");
       }
 
-      // Add the keydown event listener for undo functionality
       document.addEventListener("keydown", function (event) {
         if ((event.ctrlKey || event.metaKey) && event.key === "z") {
           event.preventDefault();
