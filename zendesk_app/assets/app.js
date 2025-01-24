@@ -28,7 +28,7 @@ function getHistoric(client) {
 async function getNewChat() {
   apiKey = await quivrApiKeyPromise;
   const options = {
-    url: "https://api-gobocom.quivr.app/chat",
+    url: "https://api-preview.quivr.app/chat",
     type: "POST",
     contentType: "application/json",
     data: JSON.stringify({ name: "Zendesk Chat" }),
@@ -50,10 +50,9 @@ async function getNewChat() {
 
 async function getQuivrResponse(prompt, chat_id) {
     apiKey = await quivrApiKeyPromise;
-    console.log("Prompt:", prompt);
-    console.log("Chat ID:", chat_id);
+    // Remove debug logging
     const response = await fetch(
-    `https://api-gobocom.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
+    `https://api-preview.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
     {
       method: "POST",
       headers: {
