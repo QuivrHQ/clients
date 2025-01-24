@@ -445,8 +445,22 @@ document.addEventListener("DOMContentLoaded", async function () {
               
               // Update dropdown items and button text for second step
               dropdownMenu.innerHTML = `
-                <button class="dropdown_item" data-option="regenerer">Regénérer</button>
-                <button class="dropdown_item" data-option="corriger">Corriger</button>
+                <button class="dropdown_item" data-option="regenerer" role="menuitem">
+                  <span class="dropdown_item_icon">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M13.5 7H9.5L8 4L6.5 7H2.5L6 9L4.5 13L8 10L11.5 13L10 9L13.5 7Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </span>
+                  <span class="dropdown_item_text">Regénérer</span>
+                </button>
+                <button class="dropdown_item" data-option="corriger" role="menuitem">
+                  <span class="dropdown_item_icon">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M11.5 4.5L14.5 7.5M1.5 14.5H4.5L13.5 5.5C14.0304 4.96956 14.0304 4.03044 13.5 3.5L12.5 2.5C11.9696 1.96956 11.0304 1.96956 10.5 2.5L1.5 11.5V14.5Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </span>
+                  <span class="dropdown_item_text">Corriger</span>
+                </button>
               `;
               currentOption = "regenerer";
               buttonText.textContent = "Regénérer";
