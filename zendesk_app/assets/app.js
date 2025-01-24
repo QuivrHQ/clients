@@ -174,38 +174,72 @@ document.addEventListener("DOMContentLoaded", () => {
       const responseText = document.getElementById("quivr_response");
       const loader = document.getElementById("button-loader");
 
-      if (button) {
-        button.addEventListener("click", async () => {
+      const dropdown = document.getElementById("action-dropdown");
+      const buttonWrapper = document.getElementById("button-wrapper");
+      
+      if (dropdown) {
+        dropdown.addEventListener("change", async () => {
           try {
             loader.style.display = "block";
-            buttonTextWrapper.style.display = "none";
-            button.disabled = true;
+            buttonWrapper.style.pointerEvents = "none";
+            dropdown.disabled = true;
+            const selectedOption = dropdown.value;
             const instruction = document.getElementById("instruction").value;
 
-            const reformulatedText = await reformulate(client, instruction);
-            let formattedText = reformulatedText.replace(/^/gm, "<br>");
-            formattedText = formattedText.replace(/^<br>/, "");
-            responseText.innerHTML = formattedText;
-
+            let responseContent;
             if (!clicked) {
-              buttonText.textContent = "Regénérer";
+              // First step
+              if (selectedOption === "reformuler") {
+                responseContent = await reformulate(client, instruction);
+              } else if (selectedOption === "corriger") {
+                const input = await getInput(client);
+                chat_id = await getNewChat(client);
+                responseContent = await getQuivrResponse(
+                  "Corrige les fautes d'orthographes de ce draft:\n" + input,
+                  chat_id
+                );
+              }
+              
+              // Update dropdown options for second step
+              dropdown.innerHTML = `
+                <option value="regenerer">Regénérer</option>
+                <option value="corriger">Corriger</option>
+              `;
+              
               if (responseWrapper) {
                 responseWrapper.style.display = "block";
               }
               clicked = true;
+            } else {
+              // Second step
+              if (selectedOption === "regenerer") {
+                responseContent = await reformulate(client, instruction);
+              } else if (selectedOption === "corriger") {
+                const currentResponse = responseText.innerText;
+                chat_id = await getNewChat(client);
+                responseContent = await getQuivrResponse(
+                  "Corrige les fautes d'orthographes de ce draft:\n" + currentResponse,
+                  chat_id
+                );
+              }
             }
+
+            let formattedText = responseContent.replace(/^/gm, "<br>");
+            formattedText = formattedText.replace(/^<br>/, "");
+            responseText.innerHTML = formattedText;
+
           } catch (error) {
-            console.error("Error reformulating text:", error);
+            console.error("Error processing text:", error);
             responseWrapper.textContent =
-              "An error occurred while reformulating the text.";
+              "An error occurred while processing the text.";
           } finally {
             loader.style.display = "none";
-            buttonTextWrapper.style.display = "inline";
-            button.disabled = false;
+            buttonWrapper.style.pointerEvents = "auto";
+            dropdown.disabled = false;
           }
         });
       } else {
-        console.warn("Button with ID 'submit' not found.");
+        console.warn("Dropdown with ID 'action-dropdown' not found.");
       }
 
       if (pasteButton) {
