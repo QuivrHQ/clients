@@ -8,13 +8,19 @@
 <body>
   <div class="button_container">
     <div class="button_wrapper" id="button-wrapper">
-      <img class="button_icon" src="./ressources/brain.svg" alt="icon" id="button-icon">
-      <span class="loader" id="button-loader"></span>
-      <div class="dropdown_container" id="dropdown-container">
-        <select class="dropdown_select" id="action-dropdown">
-          <option value="reformuler">Reformuler</option>
-          <option value="corriger">Corriger</option>
-        </select>
+      <div class="button_content" id="main-action-button">
+        <img class="button_icon" src="./ressources/brain.svg" alt="icon" id="button-icon">
+        <span class="loader" id="button-loader"></span>
+        <span class="text" id="button-text">Reformuler</span>
+      </div>
+      <button class="dropdown_trigger" id="dropdown-trigger" aria-label="Toggle dropdown">
+        <svg class="dropdown_arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 1.5L6 6.5L11 1.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="dropdown_menu" id="dropdown-menu">
+        <button class="dropdown_item" data-option="reformuler">Reformuler</button>
+        <button class="dropdown_item" data-option="corriger">Corriger</button>
       </div>
     </div>
   </div>
