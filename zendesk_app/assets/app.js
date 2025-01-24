@@ -28,7 +28,7 @@ function getHistoric(client) {
 async function getNewChat() {
   apiKey = await quivrApiKeyPromise;
   const options = {
-    url: "https://api-gobocom.quivr.app/chat",
+    url: "https://api-preview.quivr.app/chat",
     type: "POST",
     contentType: "application/json",
     data: JSON.stringify({ name: "Zendesk Chat" }),
@@ -51,7 +51,7 @@ async function getNewChat() {
 async function getQuivrResponse(prompt, chat_id) {
     apiKey = await quivrApiKeyPromise;
     const response = await fetch(
-    `https://api-gobocom.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
+    `https://api-preview.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
     {
       method: "POST",
       headers: {
@@ -388,16 +388,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       const dropdownContainer = document.getElementById("dropdown-container");
       
       if (dropdown && buttonWrapper) {
-        // Handle click on the button wrapper
-        buttonWrapper.addEventListener("click", (event) => {
-          // Only handle clicks outside the select element
-          if (event.target !== dropdown) {
-            dropdown.click(); // Trigger dropdown open
-          }
-        });
-
-        // Handle both change and click on the same option
-        let lastSelectedOption = dropdown.value;
         const handleAction = async () => {
           try {
             loader.style.display = "block";
@@ -462,21 +452,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                 "An error occurred while processing the text.";
             }
           } finally {
-            button.disabled = false;
             loader.style.display = "none";
             buttonWrapper.style.pointerEvents = "auto";
             dropdown.disabled = false;
-            lastSelectedOption = selectedOption;
           }
         };
 
+        // Only use the change event handler
         dropdown.addEventListener("change", handleAction);
-        dropdown.addEventListener("click", (event) => {
-          // If clicking the same option, trigger the action
-          if (dropdown.value === lastSelectedOption) {
-            handleAction();
-          }
-        });
       } else {
         console.warn("Dropdown or button wrapper not found.");
       }
