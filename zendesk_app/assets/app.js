@@ -385,41 +385,71 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
 
 
-      const dropdown = document.getElementById("action-dropdown");
+      const mainActionButton = document.getElementById("main-action-button");
+      const dropdownTrigger = document.getElementById("dropdown-trigger");
+      const dropdownMenu = document.getElementById("dropdown-menu");
       const buttonWrapper = document.getElementById("button-wrapper");
-      const dropdownContainer = document.getElementById("dropdown-container");
+      let currentOption = "reformuler"; // Default option
       
-      if (dropdown && buttonWrapper) {
+      if (mainActionButton && dropdownTrigger && dropdownMenu) {
+        // Toggle dropdown visibility
+        dropdownTrigger.addEventListener("click", (event) => {
+          event.stopPropagation();
+          dropdownTrigger.classList.toggle("open");
+          dropdownMenu.classList.toggle("open");
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", (event) => {
+          if (!dropdownMenu.contains(event.target) && !dropdownTrigger.contains(event.target)) {
+            dropdownMenu.classList.remove("open");
+            dropdownTrigger.classList.remove("open");
+          }
+        });
+
+        // Handle dropdown item selection
+        dropdownMenu.addEventListener("click", (event) => {
+          const item = event.target.closest(".dropdown_item");
+          if (item) {
+            currentOption = item.dataset.option;
+            buttonText.textContent = item.textContent;
+            dropdownMenu.classList.remove("open");
+            dropdownTrigger.classList.remove("open");
+          }
+        });
+
         const handleAction = async () => {
           try {
-            const selectedOption = dropdown.value;
             const instruction = document.getElementById("instruction").value;
 
             // Show loading state
             loader.style.display = "block";
+            button_icon.style.display = "none";
             buttonWrapper.style.pointerEvents = "none";
-            dropdown.disabled = true;
+            dropdownMenu.style.pointerEvents = "none";
+            dropdownMenu.classList.remove("open");
+            dropdownTrigger.classList.remove("open");
 
             if (!clicked) {
               // First step
-              if (selectedOption === "reformuler") {
+              if (currentOption === "reformuler") {
                 await reformulate(client, instruction);
-              } else if (selectedOption === "corriger") {
+              } else if (currentOption === "corriger") {
                 const input = await getInput(client);
                 chat_id = await getNewChat();
                 await getQuivrResponse(
-
                   "Corrige les fautes d'orthographes de ce draft:\n" + input + "\n Reponds uniquement avec le texte entier corrigé. Si il n'y a pas de fautes, renvoie le texte original.",
-
                   chat_id.chat_id
                 );
               }
               
-              // Update dropdown options for second step
-              dropdown.innerHTML = `
-                <option value="regenerer">Regénérer</option>
-                <option value="corriger">Corriger</option>
+              // Update dropdown items and button text for second step
+              dropdownMenu.innerHTML = `
+                <button class="dropdown_item" data-option="regenerer">Regénérer</button>
+                <button class="dropdown_item" data-option="corriger">Corriger</button>
               `;
+              currentOption = "regenerer";
+              buttonText.textContent = "Regénérer";
               
               // Show response and paste button
               if (responseWrapper) {
@@ -432,9 +462,9 @@ document.addEventListener("DOMContentLoaded", async function () {
               clicked = true;
             } else {
               // Second step
-              if (selectedOption === "regenerer") {
+              if (currentOption === "regenerer") {
                 await reformulate(client, instruction);
-              } else if (selectedOption === "corriger") {
+              } else if (currentOption === "corriger") {
                 const currentResponse = responseText.innerText;
                 chat_id = await getNewChat();
                 await getQuivrResponse(
@@ -460,13 +490,14 @@ document.addEventListener("DOMContentLoaded", async function () {
           } finally {
             // Reset loading state
             loader.style.display = "none";
+            button_icon.style.display = "block";
             buttonWrapper.style.pointerEvents = "auto";
-            dropdown.disabled = false;
+            dropdownMenu.style.pointerEvents = "auto";
           }
         };
 
-        // Only use the change event handler
-        dropdown.addEventListener("change", handleAction);
+        // Main button click handler
+        mainActionButton.addEventListener("click", handleAction);
       } else {
         console.warn("Dropdown or button wrapper not found.");
       }
