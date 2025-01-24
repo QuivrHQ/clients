@@ -26,36 +26,37 @@ function getHistoric(client) {
 }
 
 async function getNewChat() {
-  const quivrApiKey = await quivrApiKeyPromise;
-  const response = await fetch("https://api-gobocom.quivr.app/chat", {
-    method: "POST",
+  apiKey = await quivrApiKeyPromise;
+  const options = {
+    url: "https://api-gobocom.quivr.app/chat",
+    type: "POST",
+    contentType: "application/json",
+    data: JSON.stringify({ name: "Zendesk Chat" }),
     headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${quivrApiKey}`,
-      accept: "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${apiKey}`
     },
-    body: JSON.stringify({
-      name: "Zendesk Chat",
-    }),
-  });
+    cors: false
+  };
 
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
+  try {
+    const response = await client.request(options);
+    return response;
+  } catch (error) {
+    console.error("Error creating chat:", error);
+    throw error;
   }
-
-  const data = await response.json();
-  return data.chat_id;
 }
 
 async function getQuivrResponse(prompt, chat_id) {
-  const quivrApiKey = await quivrApiKeyPromise;
-  const response = await fetch(
+    apiKey = await quivrApiKeyPromise;
+    const response = await fetch(
     `https://api-gobocom.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${quivrApiKey}`,
+        Authorization: `Bearer ${apiKey}`,
         Accept: "text/event-stream",
       },
       body: JSON.stringify({
@@ -235,12 +236,49 @@ Respond directly with the message to send to the customer, ready to be sent:
 
 async function reformulate_editor(draft, instruction) {
   const prompt = `
-Edit this draft answer: ${draft}
 
 According to these instructions: ${instruction}
 
-Present your reformulated answer without any additional commentary or explanations. The reformulated text should appear as if it's a direct response to the customer in Markdown format.
-Respond directly with the message to send to the customer, ready to be sent.
+Your goal is to reformulate the Agent draft answer while adhering to the following guidelines:
+
+1. Language: Maintain the same language as the draft answer unless specifically instructed otherwise.
+2. Format: 
+   - If the draft answer contains bullet points or tables, preserve this format in your reformulation.
+   - If the draft answer does not contain bullet points or tables, use natural, flowing well-formatted text without introducing them.
+   - If the draft answer contains links, keep them in your reformulation with the same format (embedded or not embedded).
+   - If the draft answer contains bold/italic text, maintain this formatting in your reformulation.
+3. Tone: Apply the tone instructions provided earlier consistently throughout your reformulation.
+4. Perspective: Always speak as "we" to represent the company or team.
+5. Style:
+   - Avoid greetings (e.g., "Dear Mr...", "Hello Mr...") and signatures.
+   - Be natural and caring in your language, avoiding excessive apologies or overly formal phrasing.
+6. Content:
+   - Stick closely to the agent's original content, reformulating for clarity and style without adding new information.
+   - Do not invent an answer or provide new information that was not present in the original agent draft.
+   - Personalize a bit the response to the specific context of the customer's query.
+   - Do not include any instructions or guidelines in your output.
+   - Do not personalize the response with the name of the user or the agent.
+   - Avoid using the terms "We understand your frustration" or "We understand how you feel" and prefer "We un.
+7. Concluding phrases:
+  - If a concluding phrase is required, keep it simple and inspire yourself from these exemples :
+   * Nous espérons que cette information vous sera utile.
+   * N'hésitez pas à nous contacter si vous avez besoin de plus amples renseignements..
+   * Nous vous remercions de votre compréhension et restons à votre disposition.
+   * Nous vous souhaitons une excellente continuation dans vos démarches.
+  
+  Here is the agent's draft answer that you need to reformulate:
+
+  <draft answer>
+  ${draft}
+  </draft answer>
+
+  Here are the instructions you need to follow:
+  <instruction>
+${instruction}
+</instruction>
+  Stay close to the original draft, don't make it too long or too short.
+  Respond directly with the message to send to the customer, ready to be sent:
+
   `;
   return getQuivrResponse(prompt, chat_id);
 }
@@ -265,7 +303,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   let clicked = false;
 
   try {
-    chat_id = await getNewChat();
+    chat_id = await getNewChat().then((response) => response.chat_id);
   } catch (error) {
     console.error("Error getting new chat ID:", error);
   }
