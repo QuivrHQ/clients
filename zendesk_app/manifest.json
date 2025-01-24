@@ -6,21 +6,33 @@
     "url": "https://www.quivr.app"
   },
   "defaultLocale": "en",
-  "private": true,
+  "private": false,
   "location": {
     "support": {
       "ticket_sidebar": {
         "url": "assets/app.html",
         "flexible": true
+      },
+      "new_ticket_sidebar": {
+        "url": "assets/app.html",
+        "flexible": true
       }
     }
   },
+  "domainWhitelist": [
+    "api-gobocom.quivr.app"
+  ],
   "parameters": [
     {
       "name": "quivr_api_key",
       "type": "text",
       "required": true,
       "secure": true
+    },
+    {
+      "name": "default_prompt",
+      "type": "text",
+      "required": false
     }
   ],
   "version": "1.0.0",

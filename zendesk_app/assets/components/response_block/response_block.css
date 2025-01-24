@@ -11,7 +11,11 @@
 }
 
 .quivr_response {
-    padding: 16px;
+    padding: 0px 16px;
+    text-align: left;
+}
+.quivr_response:focus {
+    outline: none;
 }
 
 .paste_button_wrapper {

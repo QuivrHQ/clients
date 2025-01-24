@@ -1,8 +1,15 @@
 const client = ZAFClient.init();
 client.invoke("resize", { width: "100%", height: "600px" });
+let responseTextHistory = [];
+let responseText = null; 
+let chat_id = null;
 
 const quivrApiKeyPromise = client.metadata().then(function (metadata) {
   return metadata.settings.quivr_api_key;
+});
+
+const defaultPromptPromise = client.metadata().then(function (metadata) {
+  return metadata.settings.default_prompt ?? "You are an Agent for customer service, your goal is to satisfy the client. Keep a neutral and informative tone.";
 });
 
 function getInput(client) {
@@ -19,85 +26,265 @@ function getHistoric(client) {
 }
 
 async function getNewChat() {
-  const response = await fetch("https://api.quivr.app/chat", {
-    method: "POST",
+  apiKey = await quivrApiKeyPromise;
+  const options = {
+    url: "https://api-gobocom.quivr.app/chat",
+    type: "POST",
+    contentType: "application/json",
+    data: JSON.stringify({ name: "Zendesk Chat" }),
     headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer 2a0c1a4534922227914a562ab30a166f",
-      accept: "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${apiKey}`
     },
-    body: JSON.stringify({
-      name: "Zendesk Chat",
-    }),
-  });
+    cors: false
+  };
 
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
+  try {
+    const response = await client.request(options);
+    return response;
+  } catch (error) {
+    console.error("Error creating chat:", error);
+    throw error;
   }
-
-  const data = await response.json();
-  return data.chat_id;
 }
 
 async function getQuivrResponse(prompt, chat_id) {
-  const quivrApiKey = await quivrApiKeyPromise;
-  const response = await fetch(
-    `https://api.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
+    apiKey = await quivrApiKeyPromise;
+    const response = await fetch(
+    `https://api-gobocom.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${quivrApiKey}`,
-        accept: "application/json",
+        Authorization: `Bearer ${apiKey}`,
+        Accept: "text/event-stream",
       },
       body: JSON.stringify({
         question: prompt,
         brain_id: "7890ba8a-d45c-fd1e-3d36-347c61264e15",
+        streaming: true,
       }),
     }
   );
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
+
+  if (!response.ok || !response.body) {
+    throw new Error("Network response not ok or streaming not supported.");
   }
 
-  const reader = response.body.getReader();
+  if (responseText) {
+    responseText.contentEditable = "false";
+    responseText.textContent = "";
+  }
+  let quivrResponse = "";
+  const { assistant } = await processStream(response.body, (chunk) => {
+    if (responseText) {
+      responseText.textContent += chunk;
+      quivrResponse += chunk;
+    }
+  });
+
+  if (responseText) {
+    responseText.innerHTML = DOMPurify.sanitize(marked.parse(quivrResponse));
+    responseTextHistory.push(responseText.innerHTML);
+    if (responseTextHistory.length > 500) {
+      responseTextHistory.shift();
+    }
+    responseText.contentEditable = "true";
+  }
+
+  return assistant;
+}
+
+async function processStream(
+  body,
+  onStreamMessage
+) {
+  const reader = body.getReader();
   const decoder = new TextDecoder("utf-8");
-  let result = "";
-  let done = false;
+  let buffer = "";
+  let accumulatedMessage = "";
+  let lastResponse = null;
 
-  while (!done) {
-    const { value, done: doneReading } = await reader.read();
-    done = doneReading;
-    result += decoder.decode(value, { stream: true });
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+
+    ({ buffer, accumulatedMessage, lastResponse } = processBuffer(
+      buffer,
+      accumulatedMessage,
+      lastResponse,
+      onStreamMessage
+    ));
   }
 
-  const matches = result.match(/data: (.+?)(?=data:|$)/g);
-  const finalAnswer = matches
-    .map((match) => JSON.parse(match.replace("data: ", "")).assistant)
-    .join("");
+  reader.releaseLock();
+  return (
+    lastResponse ?? {
+      assistant: accumulatedMessage,
+    }
+  );
+}
 
-  return finalAnswer;
+function processBuffer(
+  buffer,
+  accumulatedMessage,
+  lastResponse,
+  onStreamMessage
+) {
+  const dataPrefix = "data: ";
+
+  while (true) {
+    const startIdx = buffer.indexOf(dataPrefix);
+    if (startIdx === -1) {
+      break;
+    }
+
+    const nextIdx = buffer.indexOf(dataPrefix, startIdx + dataPrefix.length);
+
+    let jsonString;
+    if (nextIdx === -1) {
+      jsonString = buffer.slice(startIdx + dataPrefix.length);
+      buffer = buffer.slice(0, startIdx);
+    } else {
+      jsonString = buffer.slice(startIdx + dataPrefix.length, nextIdx);
+      buffer = buffer.slice(nextIdx);
+    }
+
+    try {
+      const parsed = JSON.parse(jsonString.trim());
+      const newContent = parsed.assistant || "";
+
+      accumulatedMessage = newContent;
+      onStreamMessage(newContent);
+
+      lastResponse = {
+        assistant: accumulatedMessage,
+      };
+    } catch (error) {
+      console.warn("[Streaming] Failed to parse message, possibly partial chunk:", {
+        jsonString,
+        error,
+      });
+      buffer = dataPrefix + jsonString;
+      break;
+    }
+  }
+
+  return { buffer, accumulatedMessage, lastResponse };
 }
 
 async function reformulate(client, instruction) {
   const historic = await getHistoric(client);
   const input = await getInput(client);
 
-  chat_id = await getNewChat(client);
-  const clientName = await getRequesterName(client);
-  const agentName = await getUserName(client);
-
   const prompt = `
-    You are reformulation bot, you only reformulate what the agent wrote.
-    Here is the tone instruction:\n${instruction}\n
-    Stick to the agent content. Client name : ${clientName} \nAgent Name : ${agentName} Here is the chat history: \n\n
-    ${historic}\n\nReformulate this agent draft answer \n: ${input} \n\n Respond only with the reformulation in the same language as the draft answer : `;
+You are a sophisticated reformulation bot designed to refine and improve agent responses in a customer service context. Your task is to reformulate the provided draft answer according to specific guidelines while maintaining the essence of the original content.
+
+For context, here is the chat history:
+
+<historic>
+${historic}
+</historic>
+
+Now, let's establish the tone for your reformulation:
+
+<instruction>
+${instruction}
+</instruction>
+
+This tone instruction is of utmost importance and should be applied throughout your reformulation process.
+
+Your goal is to reformulate this answer while adhering to the following guidelines:
+
+1. Language: Maintain the same language as the draft answer unless specifically instructed otherwise.
+2. Format: 
+   - If the draft answer contains bullet points or tables, preserve this format in your reformulation.
+   - If the draft answer does not contain bullet points or tables, use natural, flowing well-formatted text without introducing them.
+   - If the draft answer contains links, keep them in your reformulation with the same format (embedded or not embedded).
+   - If the draft answer contains bold/italic text, maintain this formatting in your reformulation.
+3. Tone: Apply the tone instructions provided earlier consistently throughout your reformulation.
+4. Perspective: Always speak as "we" to represent the company or team.
+5. Style:
+   - Avoid greetings (e.g., "Dear Mr...", "Hello Mr...") and signatures.
+   - Be natural and caring in your language, avoiding excessive apologies or overly formal phrasing.
+6. Content:
+   - Stick closely to the agent's original content, reformulating for clarity and style without adding new information.
+   - Do not invent an answer or provide new information that was not present in the original agent draft.
+   - Personalize a bit the response to the specific context of the customer's query.
+   - Do not include any instructions or guidelines in your output.
+   - Do not personalize the response with the name of the user or the agent.
+7. Concluding phrases:
+  - If a concluding phrase is required, keep it simple and inspire yourself from these exemples :
+   * Nous espérons que cette information vous sera utile.
+   * N'hésitez pas à nous contacter si vous avez besoin de plus amples renseignements..
+   * Nous vous remercions de votre compréhension et restons à votre disposition.
+   * Nous vous souhaitons une excellente continuation dans vos démarches.
+
+  Here is the agent's draft answer that you need to reformulate:
+
+<draft answer>
+${input}
+</draft answer>
+Stay close to the original draft, don't make it too long or too short.
+Respond directly with the message to send to the customer, ready to be sent:
+  `;
 
   return getQuivrResponse(prompt, chat_id);
 }
 
+async function reformulate_editor(draft, instruction) {
+  const prompt = `
+
+According to these instructions: ${instruction}
+
+Your goal is to reformulate the Agent draft answer while adhering to the following guidelines:
+
+1. Language: Maintain the same language as the draft answer unless specifically instructed otherwise.
+2. Format: 
+   - If the draft answer contains bullet points or tables, preserve this format in your reformulation.
+   - If the draft answer does not contain bullet points or tables, use natural, flowing well-formatted text without introducing them.
+   - If the draft answer contains links, keep them in your reformulation with the same format (embedded or not embedded).
+   - If the draft answer contains bold/italic text, maintain this formatting in your reformulation.
+3. Tone: Apply the tone instructions provided earlier consistently throughout your reformulation.
+4. Perspective: Always speak as "we" to represent the company or team.
+5. Style:
+   - Avoid greetings (e.g., "Dear Mr...", "Hello Mr...") and signatures.
+   - Be natural and caring in your language, avoiding excessive apologies or overly formal phrasing.
+6. Content:
+   - Stick closely to the agent's original content, reformulating for clarity and style without adding new information.
+   - Do not invent an answer or provide new information that was not present in the original agent draft.
+   - Personalize a bit the response to the specific context of the customer's query.
+   - Do not include any instructions or guidelines in your output.
+   - Do not personalize the response with the name of the user or the agent.
+   - Avoid using the terms "We understand your frustration" or "We understand how you feel" and prefer "We un.
+7. Concluding phrases:
+  - If a concluding phrase is required, keep it simple and inspire yourself from these exemples :
+   * Nous espérons que cette information vous sera utile.
+   * N'hésitez pas à nous contacter si vous avez besoin de plus amples renseignements..
+   * Nous vous remercions de votre compréhension et restons à votre disposition.
+   * Nous vous souhaitons une excellente continuation dans vos démarches.
+  
+  Here is the agent's draft answer that you need to reformulate:
+
+  <draft answer>
+  ${draft}
+  </draft answer>
+
+  Here are the instructions you need to follow:
+  <instruction>
+${instruction}
+</instruction>
+  Stay close to the original draft, don't make it too long or too short.
+  Respond directly with the message to send to the customer, ready to be sent:
+
+  `;
+  return getQuivrResponse(prompt, chat_id);
+}
+
 function pasteInEditor(client, reformulatedText) {
-  return client.set("ticket.comment.text", reformulatedText);
+  return client.set({ "ticket.comment.text": reformulatedText });
 }
 
 function getUserName(client) {
@@ -112,8 +299,14 @@ function getRequesterName(client) {
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async function () {
   let clicked = false;
+
+  try {
+    chat_id = await getNewChat().then((response) => response.chat_id);
+  } catch (error) {
+    console.error("Error getting new chat ID:", error);
+  }
 
   function adjustTextareaHeight(textarea) {
     textarea.style.height = "26px";
@@ -152,11 +345,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         setTimeout(() => {
-          const textarea = document.getElementById("instruction");
-          textarea.value =
-            "Vous êtes un assistant attentionné de LocService, et votre objectif est de satisfaire la demande du client.";
-          const event = new Event("change");
-          textarea.dispatchEvent(event);
+          defaultPromptPromise.then((default_prompt) => {
+            textarea.value = default_prompt;
+            const event = new Event("change");
+            textarea.dispatchEvent(event);
+          });
+          
         }, 1000);
       } else {
         console.warn("Textarea with ID 'instruction' not found.");
@@ -171,8 +365,23 @@ document.addEventListener("DOMContentLoaded", () => {
       const buttonTextWrapper = document.getElementById("button-icon");
       const buttonText = document.getElementById("button-text");
       const responseWrapper = document.getElementById("response_block_wrapper");
-      const responseText = document.getElementById("quivr_response");
       const loader = document.getElementById("button-loader");
+      const button_icon = document.getElementById("button-icon");
+      responseText = document.getElementById("quivr_response"); 
+
+      if (responseText) {
+        let debounceTimer;
+        responseText.addEventListener('input', function() {
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            responseTextHistory.push(responseText.innerHTML);
+            if (responseTextHistory.length > 500) {
+              responseTextHistory.shift(); 
+            }
+          }, 500); 
+        });
+      }
+
 
       const dropdown = document.getElementById("action-dropdown");
       const buttonWrapper = document.getElementById("button-wrapper");
@@ -197,15 +406,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const selectedOption = dropdown.value;
             const instruction = document.getElementById("instruction").value;
 
-            let responseContent;
             if (!clicked) {
               // First step
               if (selectedOption === "reformuler") {
-                responseContent = await reformulate(client, instruction);
+                await reformulate(client, instruction);
               } else if (selectedOption === "corriger") {
                 const input = await getInput(client);
-                chat_id = await getNewChat(client);
-                responseContent = await getQuivrResponse(
+                chat_id = await getNewChat();
+                await getQuivrResponse(
                   "Corrige les fautes d'orthographes de ce draft:\n" + input,
                   chat_id
                 );
@@ -225,26 +433,36 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
               // Second step
               if (selectedOption === "regenerer") {
-                responseContent = await reformulate(client, instruction);
+                await reformulate(client, instruction);
               } else if (selectedOption === "corriger") {
                 const currentResponse = responseText.innerText;
-                chat_id = await getNewChat(client);
-                responseContent = await getQuivrResponse(
+                chat_id = await getNewChat();
+                await getQuivrResponse(
                   "Corrige les fautes d'orthographes de ce draft:\n" + currentResponse,
                   chat_id
                 );
               }
             }
 
-            let formattedText = responseContent.replace(/^/gm, "<br>");
-            formattedText = formattedText.replace(/^<br>/, "");
-            responseText.innerHTML = formattedText;
+            if (responseText) {
+              responseTextHistory.push(responseText.innerHTML);
+              if (responseTextHistory.length > 500) {
+                responseTextHistory.shift();
+              }
+            }
 
+            if (!clicked) {
+              buttonText.textContent = "Réécrire";
+              button_icon.src = "./ressources/reecrire.svg";
+            }
           } catch (error) {
             console.error("Error processing text:", error);
-            responseWrapper.textContent =
-              "An error occurred while processing the text.";
+            if (responseWrapper) {
+              responseWrapper.textContent =
+                "An error occurred while processing the text.";
+            }
           } finally {
+            button.disabled = false;
             loader.style.display = "none";
             buttonWrapper.style.pointerEvents = "auto";
             dropdown.disabled = false;
@@ -266,7 +484,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (pasteButton) {
         pasteButton.addEventListener("click", async () => {
           try {
-            const reformulatedText = responseText.innerHTML;
+            let reformulatedText = responseText ? responseText.innerHTML : "";
+            reformulatedText = reformulatedText.replace(/<\/p>\s*<p>/g, "</p><br><p>");
             await pasteInEditor(client, reformulatedText);
           } catch (error) {
             console.error("Error pasting text in editor:", error);
@@ -275,6 +494,19 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         console.warn("Paste button with ID 'paste' not found.");
       }
+
+      document.addEventListener("keydown", function (event) {
+        if ((event.ctrlKey || event.metaKey) && event.key === "z") {
+          event.preventDefault();
+
+          if (responseTextHistory.length > 1 && responseText) {
+            const previousResponse = responseTextHistory.pop();
+            responseText.innerHTML = previousResponse;
+          } else {
+            console.warn("No more history to undo or responseText is not available.");
+          }
+        }
+      });
     });
   }, 1000);
 });
