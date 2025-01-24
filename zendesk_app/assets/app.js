@@ -393,6 +393,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       if (mainActionButton && dropdownTrigger && dropdownMenu) {
         // Toggle dropdown visibility
         dropdownTrigger.addEventListener("click", (event) => {
+          event.preventDefault();
           event.stopPropagation();
           dropdownTrigger.classList.toggle("open");
           dropdownMenu.classList.toggle("open");
@@ -510,7 +511,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         };
 
         // Main button click handler
-        mainActionButton.addEventListener("click", handleAction);
+        mainActionButton.addEventListener("click", (event) => {
+          // Only trigger action if clicking the main button area
+          if (event.target.closest('.button_content') && !dropdownTrigger.contains(event.target)) {
+            handleAction();
+          }
+        });
       } else {
         console.warn("Dropdown or button wrapper not found.");
       }
