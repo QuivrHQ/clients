@@ -28,7 +28,7 @@ function getHistoric(client) {
 async function getNewChat() {
   apiKey = await quivrApiKeyPromise;
   const options = {
-    url: "https://api-preview.quivr.app/chat",
+    url: "https://api-gobocom.quivr.app/chat",
     type: "POST",
     contentType: "application/json",
     data: JSON.stringify({ name: "Zendesk Chat" }),
@@ -50,8 +50,10 @@ async function getNewChat() {
 
 async function getQuivrResponse(prompt, chat_id) {
     apiKey = await quivrApiKeyPromise;
+    console.log("Prompt:", prompt);
+    console.log("Chat ID:", chat_id);
     const response = await fetch(
-    `https://api-preview.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
+    `https://api-gobocom.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
     {
       method: "POST",
       headers: {
@@ -303,7 +305,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   let clicked = false;
 
   try {
-    chat_id = await getNewChat().then((response) => response.chat_id);
+    chat_id = await getNewChat().then((response) => response.chat_id.chat_id);
   } catch (error) {
     console.error("Error getting new chat ID:", error);
   }
@@ -406,8 +408,10 @@ document.addEventListener("DOMContentLoaded", async function () {
                 const input = await getInput(client);
                 chat_id = await getNewChat();
                 await getQuivrResponse(
-                  "Corrige les fautes d'orthographes de ce draft:\n" + input,
-                  chat_id
+
+                  "Corrige les fautes d'orthographes de ce draft:\n" + input + "\n Reponds uniquement avec le texte entier corrigé. Si il n'y a pas de fautes, renvoie le texte original.",
+
+                  chat_id.chat_id
                 );
               }
               
@@ -434,8 +438,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                 const currentResponse = responseText.innerText;
                 chat_id = await getNewChat();
                 await getQuivrResponse(
-                  "Corrige les fautes d'orthographes de ce draft:\n" + currentResponse,
-                  chat_id
+                  "Corrige les fautes d'orthographes de ce draft:\n" + currentResponse + "\n Reponds uniquement avec le texte entier corrigé. Si il n'y a pas de fautes, renvoie le texte original.",
+                  chat_id.chat_id
                 );
               }
             }
