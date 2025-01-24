@@ -14,6 +14,10 @@
     padding: 16px;
 }
 
+.paste_button_wrapper {
+    display: none;
+}
+
 .paste_button_wrapper button {
     background-color: #CBCBCB;
     border: none;

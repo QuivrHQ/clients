@@ -176,9 +176,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const dropdown = document.getElementById("action-dropdown");
       const buttonWrapper = document.getElementById("button-wrapper");
+      const dropdownContainer = document.getElementById("dropdown-container");
       
-      if (dropdown) {
-        dropdown.addEventListener("change", async () => {
+      if (dropdown && buttonWrapper) {
+        // Handle click on the button wrapper
+        buttonWrapper.addEventListener("click", (event) => {
+          // Only handle clicks outside the select element
+          if (event.target !== dropdown) {
+            dropdown.click(); // Trigger dropdown open
+          }
+        });
+
+        // Handle both change and click on the same option
+        let lastSelectedOption = dropdown.value;
+        const handleAction = async () => {
           try {
             loader.style.display = "block";
             buttonWrapper.style.pointerEvents = "none";
@@ -208,6 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
               
               if (responseWrapper) {
                 responseWrapper.style.display = "block";
+                document.getElementById("paste_button_wrapper").style.display = "block";
               }
               clicked = true;
             } else {
@@ -236,10 +248,19 @@ document.addEventListener("DOMContentLoaded", () => {
             loader.style.display = "none";
             buttonWrapper.style.pointerEvents = "auto";
             dropdown.disabled = false;
+            lastSelectedOption = selectedOption;
+          }
+        };
+
+        dropdown.addEventListener("change", handleAction);
+        dropdown.addEventListener("click", (event) => {
+          // If clicking the same option, trigger the action
+          if (dropdown.value === lastSelectedOption) {
+            handleAction();
           }
         });
       } else {
-        console.warn("Dropdown with ID 'action-dropdown' not found.");
+        console.warn("Dropdown or button wrapper not found.");
       }
 
       if (pasteButton) {
