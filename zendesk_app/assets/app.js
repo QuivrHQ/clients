@@ -390,11 +390,13 @@ document.addEventListener("DOMContentLoaded", async function () {
       if (dropdown && buttonWrapper) {
         const handleAction = async () => {
           try {
+            const selectedOption = dropdown.value;
+            const instruction = document.getElementById("instruction").value;
+
+            // Show loading state
             loader.style.display = "block";
             buttonWrapper.style.pointerEvents = "none";
             dropdown.disabled = true;
-            const selectedOption = dropdown.value;
-            const instruction = document.getElementById("instruction").value;
 
             if (!clicked) {
               // First step
@@ -415,9 +417,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                 <option value="corriger">Corriger</option>
               `;
               
+              // Show response and paste button
               if (responseWrapper) {
                 responseWrapper.style.display = "block";
-                document.getElementById("paste_button_wrapper").style.display = "block";
+                const pasteButtonWrapper = document.getElementById("paste_button_wrapper");
+                if (pasteButtonWrapper) {
+                  pasteButtonWrapper.style.display = "block";
+                }
               }
               clicked = true;
             } else {
@@ -434,16 +440,12 @@ document.addEventListener("DOMContentLoaded", async function () {
               }
             }
 
+            // Update response history
             if (responseText) {
               responseTextHistory.push(responseText.innerHTML);
               if (responseTextHistory.length > 500) {
                 responseTextHistory.shift();
               }
-            }
-
-            if (!clicked) {
-              buttonText.textContent = "Réécrire";
-              button_icon.src = "./ressources/reecrire.svg";
             }
           } catch (error) {
             console.error("Error processing text:", error);
@@ -452,6 +454,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 "An error occurred while processing the text.";
             }
           } finally {
+            // Reset loading state
             loader.style.display = "none";
             buttonWrapper.style.pointerEvents = "auto";
             dropdown.disabled = false;

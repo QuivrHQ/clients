@@ -6,15 +6,17 @@
 
 .button_wrapper {
     display: flex;
-    border-radius: 12px;
+    height: 48px;
+    border-radius: 16px;
     background-color: #6142d4;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
     border: none;
-    padding: 12px 20px;
+    padding: 12px 24px;
     cursor: pointer;
     min-width: 200px;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s ease;
+    position: relative;
 }
 
 .button_wrapper:hover {
@@ -40,16 +42,25 @@
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    padding: 4px 28px 4px 0;
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    padding: 4px 32px 4px 0;
+    /* Custom dropdown arrow - smaller, cleaner version */
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 0 center;
-    background-size: 14px;
+    background-position: right 8px center;
+    background-size: 12px;
 }
 
 .dropdown_select option {
     background-color: #6142d4;
     color: white;
+    padding: 8px 16px;
+}
+
+/* Ensure brain icon is white and properly positioned */
+.button_icon {
+    width: 20px;
+    height: 20px;
+    filter: brightness(0) invert(1);
 }
 
 .button_wrapper:disabled {
@@ -57,13 +68,10 @@
     opacity: 0.5;
 }
 
-.button_icon {
-    width: 16px;
-    height: 16px;
-}
-
 .text {
     color: white;
+    font-size: 16px;
+    font-weight: 500;
 }
 
 .loader {
