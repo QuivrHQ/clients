@@ -48,6 +48,7 @@ async function getNewChat() {
   }
 }
 
+
 async function getQuivrResponse(prompt, chat_id) {
     apiKey = await quivrApiKeyPromise;
     const response = await fetch(
@@ -162,6 +163,7 @@ function processBuffer(
       lastResponse = {
         assistant: accumulatedMessage,
       };
+
     } catch (error) {
       console.warn("[Streaming] Failed to parse message, possibly partial chunk:", {
         jsonString,
@@ -175,9 +177,14 @@ function processBuffer(
   return { buffer, accumulatedMessage, lastResponse };
 }
 
-async function reformulate(client, instruction) {
-  const historic = await getHistoric(client);
-  const input = await getInput(client);
+async function correct(draft) {
+  await getQuivrResponse(
+    "Corrige les fautes d'orthographes de ce draft:\n" + draft + "\n Reponds uniquement avec le texte entier corrigé. Si il n'y a pas de fautes, renvoie le texte original.",
+    chat_id
+  );
+}
+
+async function reformulate(historic, input, instruction) {
 
   const prompt = `
 You are a sophisticated reformulation bot designed to refine and improve agent responses in a customer service context. Your task is to reformulate the provided draft answer according to specific guidelines while maintaining the essence of the original content.
@@ -236,8 +243,6 @@ Respond directly with the message to send to the customer, ready to be sent:
 
 async function reformulate_editor(draft, instruction) {
   const prompt = `
-
-According to these instructions: ${instruction}
 
 Your goal is to reformulate the Agent draft answer while adhering to the following guidelines:
 
@@ -304,6 +309,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   try {
     chat_id = await getNewChat().then((response) => response.chat_id);
+
   } catch (error) {
     console.error("Error getting new chat ID:", error);
   }
@@ -383,52 +389,135 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
 
 
-      if (button) {
-        button.addEventListener("click", async () => {
+      const mainActionButton = document.getElementById("main-action-button");
+      const dropdownTrigger = document.getElementById("dropdown-trigger");
+      const dropdownMenu = document.getElementById("dropdown-menu");
+      const buttonWrapper = document.getElementById("button-wrapper");
+      let currentOption = "reformuler"; // Default option
+      
+      if (mainActionButton && dropdownTrigger && dropdownMenu) {
+        // Toggle dropdown visibility
+        dropdownTrigger.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          dropdownTrigger.classList.toggle("open");
+          dropdownMenu.classList.toggle("open");
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", (event) => {
+          if (!dropdownMenu.contains(event.target) && !dropdownTrigger.contains(event.target)) {
+            dropdownMenu.classList.remove("open");
+            dropdownTrigger.classList.remove("open");
+          }
+        });
+
+        // Handle dropdown item selection
+        dropdownMenu.addEventListener("click", (event) => {
+          const item = event.target.closest(".dropdown_item");
+          if (item) {
+            currentOption = item.dataset.option;
+            buttonText.textContent = item.textContent;
+            dropdownMenu.classList.remove("open");
+            dropdownTrigger.classList.remove("open");
+          }
+        });
+
+        const handleAction = async () => {
           try {
+            const instruction = document.getElementById("instruction").value;
+
+            // Show loading state
             loader.style.display = "block";
-            buttonTextWrapper.style.display = "none";
-            button.disabled = true;
+            button_icon.style.display = "none";
+            buttonWrapper.style.pointerEvents = "none";
+            dropdownMenu.style.pointerEvents = "none";
+            dropdownMenu.classList.remove("open");
+            dropdownTrigger.classList.remove("open");
 
-            const instructionElement = document.getElementById("instruction");
-            const instruction = instructionElement ? instructionElement.value : "";
+            if (!clicked) {
+              // First step
+              if (currentOption === "reformuler") {
+                const historic = await getHistoric(client);
+                const input = await getInput(client);
+                await reformulate(historic, input, instruction);
+              } else if (currentOption === "corriger") {
+                const input = await getInput(client);
+                correct(input);
+              }
+              
+              // Update dropdown items and button text for second step
+              dropdownMenu.innerHTML = `
+                <button class="dropdown_item" data-option="regenerer" role="menuitem">
+                  <span class="dropdown_item_icon">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M13.5 7H9.5L8 4L6.5 7H2.5L6 9L4.5 13L8 10L11.5 13L10 9L13.5 7Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </span>
+                  <span class="dropdown_item_text">Regénérer</span>
+                </button>
+                <button class="dropdown_item" data-option="corriger" role="menuitem">
+                  <span class="dropdown_item_icon">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M11.5 4.5L14.5 7.5M1.5 14.5H4.5L13.5 5.5C14.0304 4.96956 14.0304 4.03044 13.5 3.5L12.5 2.5C11.9696 1.96956 11.0304 1.96956 10.5 2.5L1.5 11.5V14.5Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </span>
+                  <span class="dropdown_item_text">Corriger</span>
+                </button>
+              `;
+              currentOption = "regenerer";
+              buttonText.textContent = "Regénérer";
+              
+              // Show response and paste button
+              if (responseWrapper) {
+                responseWrapper.style.display = "block";
+                const pasteButtonWrapper = document.getElementById("paste_button_wrapper");
+                if (pasteButtonWrapper) {
+                  pasteButtonWrapper.style.display = "block";
+                }
+              }
+              clicked = true;
+            } else {
+              // Second step
+              if (currentOption === "regenerer") {
+                await reformulate_editor(responseText.innerHTML, instruction);
+              } else if (currentOption === "corriger") {
+                const currentResponse = responseText.innerText;
+                correct(currentResponse);
+              }
+            }
 
+            // Update response history
             if (responseText) {
               responseTextHistory.push(responseText.innerHTML);
               if (responseTextHistory.length > 500) {
                 responseTextHistory.shift();
               }
-
-            }
-
-            if (clicked) {
-              await reformulate_editor(responseText.innerHTML, instruction);
-            } else {
-              if (responseWrapper) {
-                responseWrapper.style.display = "block";
-              }
-              await reformulate(client, instruction);
-            }
-
-            if (!clicked) {
-              buttonText.textContent = "Réécrire";
-              button_icon.src = "./ressources/reecrire.svg";
-              clicked = true;
             }
           } catch (error) {
-            console.error("Error reformulating text:", error);
+            console.error("Error processing text:", error);
             if (responseWrapper) {
               responseWrapper.textContent =
-                "An error occurred while reformulating the text.";
+                "An error occurred while processing the text.";
             }
           } finally {
-            button.disabled = false;
+            // Reset loading state
             loader.style.display = "none";
-            buttonTextWrapper.style.display = "inline";
+            button_icon.style.display = "block";
+            buttonWrapper.style.pointerEvents = "auto";
+            dropdownMenu.style.pointerEvents = "auto";
+          }
+        };
+
+        // Main button click handler
+        mainActionButton.addEventListener("click", (event) => {
+          // Only trigger action if clicking the main button area
+          if (event.target.closest('.button_content') && !dropdownTrigger.contains(event.target)) {
+            handleAction();
           }
         });
       } else {
-        console.warn("Button with ID 'submit' not found.");
+        console.warn("Dropdown or button wrapper not found.");
       }
 
       if (pasteButton) {

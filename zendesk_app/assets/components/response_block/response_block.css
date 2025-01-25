@@ -7,6 +7,7 @@
     max-height: 300px;
     font-size: 13px;
     padding-block: 16px;
+    margin-bottom: 16px;
 }
 
 .quivr_response {
@@ -15,6 +16,10 @@
 }
 .quivr_response:focus {
     outline: none;
+}
+
+.paste_button_wrapper {
+    display: none;
 }
 
 .paste_button_wrapper button {

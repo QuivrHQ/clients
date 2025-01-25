@@ -6,14 +6,120 @@
 
 .button_wrapper {
     display: flex;
-    border-radius: 8px;
+    height: 48px;
+    border-radius: 16px;
     background-color: #6142d4;
     align-items: center;
-    gap: 8px;
     border: none;
-    padding-block: 8px;
-    padding-inline: 16px;
+    min-width: 200px;
+    transition: background-color 0.2s ease;
+    position: relative;
+}
+
+.button_wrapper:hover {
+    background-color: #5438c4;
+}
+
+.button_content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    flex: 1;
     cursor: pointer;
+}
+
+.dropdown_trigger {
+    background: none;
+    border: none;
+    padding: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    margin-right: 0;
+}
+
+.dropdown_trigger:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown_arrow {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.2s ease;
+}
+
+.dropdown_trigger.open .dropdown_arrow {
+    transform: rotate(180deg);
+}
+
+.dropdown_menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    background-color: #6142d4;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 10000;
+    min-width: 200px;
+    overflow: hidden;
+}
+
+.dropdown_menu.open {
+    display: block;
+}
+
+.dropdown_menu {
+    min-width: 200px;
+    padding: 8px;
+}
+
+.dropdown_item {
+    width: 100%;
+    padding: 12px 16px;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dropdown_item:hover {
+    background-color: #5438c4;
+}
+
+.dropdown_item_icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.dropdown_item_text {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Ensure brain icon is white and properly positioned */
+.button_icon {
+    width: 20px;
+    height: 20px;
+    filter: brightness(0) invert(1);
+    flex-shrink: 0;
 }
 
 .button_wrapper:disabled {
@@ -21,13 +127,10 @@
     opacity: 0.5;
 }
 
-.button_icon {
-    width: 16px;
-    height: 16px;
-}
-
 .text {
     color: white;
+    font-size: 16px;
+    font-weight: 500;
 }
 
 .loader {
