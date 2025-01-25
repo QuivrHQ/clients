@@ -440,6 +440,8 @@ document.addEventListener("DOMContentLoaded", async function () {
               if (currentOption === "reformuler") {
                 const historic = await getHistoric(client);
                 const input = await getInput(client);
+                responseWrapper.style.display = "block";
+
                 await reformulate(historic, input, instruction);
               } else if (currentOption === "corriger") {
                 const input = await getInput(client);
