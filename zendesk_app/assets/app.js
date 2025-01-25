@@ -177,10 +177,14 @@ function processBuffer(
   return { buffer, accumulatedMessage, lastResponse };
 }
 
+async function correct(draft) {
+  await getQuivrResponse(
+    "Corrige les fautes d'orthographes de ce draft:\n" + draft + "\n Reponds uniquement avec le texte entier corrigé. Si il n'y a pas de fautes, renvoie le texte original.",
+    chat_id
+  );
+}
 
-async function reformulate(client, instruction) {
-  const historic = await getHistoric(client);
-  const input = await getInput(client);
+async function reformulate(historic, input, instruction) {
 
   const prompt = `
 You are a sophisticated reformulation bot designed to refine and improve agent responses in a customer service context. Your task is to reformulate the provided draft answer according to specific guidelines while maintaining the essence of the original content.
@@ -239,8 +243,6 @@ Respond directly with the message to send to the customer, ready to be sent:
 
 async function reformulate_editor(draft, instruction) {
   const prompt = `
-
-According to these instructions: ${instruction}
 
 Your goal is to reformulate the Agent draft answer while adhering to the following guidelines:
 
@@ -436,14 +438,12 @@ document.addEventListener("DOMContentLoaded", async function () {
             if (!clicked) {
               // First step
               if (currentOption === "reformuler") {
-                await reformulate(client, instruction);
+                const historic = await getHistoric(client);
+                const input = await getInput(client);
+                await reformulate(historic, input, instruction);
               } else if (currentOption === "corriger") {
                 const input = await getInput(client);
-
-                await getQuivrResponse(
-                  "Corrige les fautes d'orthographes de ce draft:\n" + input + "\n Reponds uniquement avec le texte entier corrigé. Si il n'y a pas de fautes, renvoie le texte original.",
-                  chat_id
-                );
+                correct(input);
               }
               
               // Update dropdown items and button text for second step
@@ -480,13 +480,10 @@ document.addEventListener("DOMContentLoaded", async function () {
             } else {
               // Second step
               if (currentOption === "regenerer") {
-                await reformulate(client, instruction);
+                await reformulate_editor(responseText.innerHTML, instruction);
               } else if (currentOption === "corriger") {
                 const currentResponse = responseText.innerText;
-                await getQuivrResponse(
-                  "Corrige les fautes d'orthographes de ce draft:\n" + currentResponse + "\n Reponds uniquement avec le texte entier corrigé. Si il n'y a pas de fautes, renvoie le texte original.",
-                  chat_id
-                );
+                correct(currentResponse);
               }
             }
 
