@@ -27,7 +27,7 @@
       "name": "quivr_api_key",
       "type": "text",
       "required": true,
-      "secure": true
+      "secure": false
     },
     {
       "name": "default_prompt",

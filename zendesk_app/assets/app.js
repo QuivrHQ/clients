@@ -165,10 +165,10 @@ function processBuffer(
       };
 
     } catch (error) {
-      console.warn("[Streaming] Failed to parse message, possibly partial chunk:", {
-        jsonString,
-        error,
-      });
+      // console.warn("[Streaming] Failed to parse message, possibly partial chunk:", {
+      //   jsonString,
+      //   error,
+      // });
       buffer = dataPrefix + jsonString;
       break;
     }
