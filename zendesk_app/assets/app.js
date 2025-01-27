@@ -222,10 +222,11 @@ Your goal is to reformulate this answer while adhering to the following guidelin
    - Personalize a bit the response to the specific context of the customer's query.
    - Do not include any instructions or guidelines in your output.
    - Do not personalize the response with the name of the user or the agent.
-7. Concluding phrases:
+   - Prefer "We noticed that ..." instead of "We noted that ...". 
+   7. Concluding phrases:
   - If a concluding phrase is required, keep it simple and inspire yourself from these exemples :
    * Nous espérons que cette information vous sera utile.
-   * N'hésitez pas à nous contacter si vous avez besoin de plus amples renseignements..
+   * Nous restons à votre disposition pour toute question supplémentaire.
    * Nous vous remercions de votre compréhension et restons à votre disposition.
    * Nous vous souhaitons une excellente continuation dans vos démarches.
 
