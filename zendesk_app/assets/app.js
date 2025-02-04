@@ -21,14 +21,14 @@ function getInput(client) {
 function getHistoric(client) {
   return client.get("ticket.comments").then(function (data) {
     const comments = data["ticket.comments"].map((comment) => comment.value);
-    return comments.join("\n\n");
+    return comments;
   });
 }
 
 async function getNewChat() {
   apiKey = await quivrApiKeyPromise;
   const options = {
-    url: "https://api-gobocom.quivr.app/chat",
+    url: "https://api-preview.quivr.app/chat",
     type: "POST",
     contentType: "application/json",
     data: JSON.stringify({ name: "Zendesk Chat" }),
@@ -49,10 +49,10 @@ async function getNewChat() {
 }
 
 
-async function getQuivrResponse(prompt, chat_id) {
-    apiKey = await quivrApiKeyPromise;
+async function getQuivrResponse(prompt, chat_id, brain_id = "2c0a679c-4bb2-64c9-bb52-480fce08e134") {
+  apiKey = await quivrApiKeyPromise;
     const response = await fetch(
-    `https://api-gobocom.quivr.app/chat/${chat_id}/question/stream?brain_id=7890ba8a-d45c-fd1e-3d36-347c61264e15`,
+    `https://api-preview.quivr.app/chat/${chat_id}/question/stream?brain_id=${brain_id}`,
     {
       method: "POST",
       headers: {
@@ -62,7 +62,7 @@ async function getQuivrResponse(prompt, chat_id) {
       },
       body: JSON.stringify({
         question: prompt,
-        brain_id: "7890ba8a-d45c-fd1e-3d36-347c61264e15",
+        brain_id: brain_id,
         streaming: true,
       }),
     }
@@ -183,7 +183,11 @@ async function correct(draft) {
     chat_id
   );
 }
-
+async function generate_response(historic, input) {
+  const prompt = historic[historic.length - 1]
+  const brain_id = "a56c031d-0dc1-4b31-9ac9-0712ecb42983"
+  return getQuivrResponse(prompt, chat_id, brain_id);
+}
 async function reformulate(historic, input, instruction) {
 
   const prompt = `
@@ -394,7 +398,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       const dropdownTrigger = document.getElementById("dropdown-trigger");
       const dropdownMenu = document.getElementById("dropdown-menu");
       const buttonWrapper = document.getElementById("button-wrapper");
-      let currentOption = "reformuler"; // Default option
+      
+      let currentOption = "generer"; // Default option
       
       if (mainActionButton && dropdownTrigger && dropdownMenu) {
         // Toggle dropdown visibility
@@ -443,10 +448,16 @@ document.addEventListener("DOMContentLoaded", async function () {
                 const input = await getInput(client);
                 responseWrapper.style.display = "block";
 
-                await reformulate(historic, input, instruction);
+                await reformulate(historic.join("\n\n"), input, instruction);
               } else if (currentOption === "corriger") {
                 const input = await getInput(client);
                 correct(input);
+              } else if (currentOption === "generer") {
+                responseWrapper.style.display = "block";
+                const historic = await getHistoric(client);
+                console.log(historic)
+                const input = await getInput(client);
+                await generate_response(historic, input);
               }
               
               // Update dropdown items and button text for second step
@@ -487,6 +498,10 @@ document.addEventListener("DOMContentLoaded", async function () {
               } else if (currentOption === "corriger") {
                 const currentResponse = responseText.innerText;
                 correct(currentResponse);
+              } else if (currentOption === "generer") {
+                const historic = await getHistoric(client);
+                const input = await getInput(client);
+                await generate_response(historic, input);
               }
             }
 

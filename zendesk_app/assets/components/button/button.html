@@ -11,7 +11,7 @@
       <div class="button_content" id="main-action-button">
         <img class="button_icon" src="./ressources/brain.svg" alt="icon" id="button-icon">
         <span class="loader" id="button-loader"></span>
-        <span class="text" id="button-text">Reformuler</span>
+        <span class="text" id="button-text">Générer</span>
       </div>
       <button class="dropdown_trigger" id="dropdown-trigger" aria-label="Toggle dropdown">
         <svg class="dropdown_arrow" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -19,6 +19,14 @@
         </svg>
       </button>
       <div class="dropdown_menu" id="dropdown-menu" role="menu">
+        <button class="dropdown_item" data-option="generer" role="menuitem">
+          <span class="dropdown_item_icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M11.5 4.5L14.5 7.5M1.5 14.5H4.5L13.5 5.5C14.0304 4.96956 14.0304 4.03044 13.5 3.5L12.5 2.5C11.9696 1.96956 11.0304 1.96956 10.5 2.5L1.5 11.5V14.5Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="dropdown_item_text">Générer</span>
+        </button>
         <button class="dropdown_item" data-option="reformuler" role="menuitem">
           <span class="dropdown_item_icon">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -29,9 +37,10 @@
         </button>
         <button class="dropdown_item" data-option="corriger" role="menuitem">
           <span class="dropdown_item_icon">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M11.5 4.5L14.5 7.5M1.5 14.5H4.5L13.5 5.5C14.0304 4.96956 14.0304 4.03044 13.5 3.5L12.5 2.5C11.9696 1.96956 11.0304 1.96956 10.5 2.5L1.5 11.5V14.5Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 12.5L3.84375 9.5M3.84375 9.5L5 5.38889C5 5.38889 5.25 4.5 6 4.5C6.75 4.5 7 5.38889 7 5.38889L8.15625 9.5M3.84375 9.5H8.15625M9 12.5L8.15625 9.5M13 16.8333L15.4615 19.5L21 13.5M12 8.5H15C16.1046 8.5 17 7.60457 17 6.5C17 5.39543 16.1046 4.5 15 4.5H12V8.5ZM12 8.5H16C17.1046 8.5 18 9.39543 18 10.5C18 11.6046 17.1046 12.5 16 12.5H12V8.5Z" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
+            
           </span>
           <span class="dropdown_item_text">Corriger</span>
         </button>
