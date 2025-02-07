@@ -36,7 +36,7 @@ function App() {
         reformulate()
       },
       iconName: 'chevronRight',
-      disabled: loading || !response
+      disabled: loading
     },
     {
       label: 'Correct',
@@ -44,7 +44,7 @@ function App() {
         correct()
       },
       iconName: 'chevronRight',
-      disabled: loading || !response
+      disabled: loading
     }
   ]
 
