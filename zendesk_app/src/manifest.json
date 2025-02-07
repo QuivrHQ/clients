@@ -1,0 +1,27 @@
+{
+  "name": "Quivr",
+  "author": {
+    "name": "quivr",
+    "email": "antoine@quivr.app"
+  },
+  "defaultLocale": "en",
+  "private": true,
+  "location": {
+    "support": {
+      "ticket_sidebar": {
+        "url": "http://localhost:3000/",
+        "flexible": true
+      }
+    }
+  },
+  "parameters": [
+    {
+      "name": "quivr_api_key",
+      "type": "text",
+      "required": true,
+      "secure": true
+    }
+  ],
+  "version": "1.0",
+  "frameworkVersion": "2.0"
+}
