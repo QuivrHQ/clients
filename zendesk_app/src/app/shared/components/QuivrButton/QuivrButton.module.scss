@@ -1,0 +1,89 @@
+@use '../../styles/Radius.module.scss';
+@use '../../styles/Spacings.module.scss';
+@use '../../styles/Typography.module.scss';
+
+.button_wrapper {
+  font-size: Typography.$small;
+  white-space: nowrap;
+  padding-inline: Spacings.$spacing04;
+  padding-block: Spacings.$spacing02;
+  border-radius: Radius.$big;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: flex;
+  width: fit-content;
+  background-color: var(--background-0);
+  height: fit-content;
+  font-weight: 450;
+  user-select: none;
+
+  &.important {
+    text-transform: uppercase;
+  }
+
+  &.hidden {
+    display: none;
+  }
+
+  &.tiny {
+    font-size: Typography.$very_tiny;
+    border: 0.5px solid transparent;
+  }
+
+  &.small {
+    padding-inline: Spacings.$spacing03;
+    padding-block: Spacings.$spacing01;
+    font-size: Typography.$tiny;
+  }
+
+  &.disabled {
+    border-color: var(--border-2);
+    cursor: default;
+    color: var(--text-1);
+    background-color: var(--background-0);
+
+    &.dark {
+      opacity: 0.2;
+    }
+  }
+
+  &.primary:not(.disabled) {
+    border-color: var(--primary-0);
+    color: var(--primary-0);
+
+    &:hover,
+    &.important {
+      background-color: var(--primary-0);
+      color: var(--text-0);
+    }
+  }
+
+  &.dangerous:not(.disabled) {
+    border-color: var(--dangerous);
+    color: var(--dangerous);
+
+    &:hover,
+    &.important {
+      background-color: var(--dangerous);
+      color: var(--text-0);
+    }
+  }
+
+  &.gold:not(.disabled) {
+    border-color: var(--gold);
+    color: var(--gold);
+
+    &:hover,
+    &.important {
+      background-color: var(--gold);
+      color: var(--text-0);
+    }
+  }
+
+  .icon_label {
+    display: flex;
+    flex-direction: row;
+    gap: Spacings.$spacing02;
+    align-items: center;
+  }
+}
