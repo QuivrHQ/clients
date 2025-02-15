@@ -58,7 +58,7 @@ function App() {
     client.invoke('resize', { width: '100%', height: '450px' })
 
     const initializeQuivrService = async () => {
-      const service = new QuivrService('https://api.quivr.app', client)
+      const service = new QuivrService('http://localhost:5050', client)
       setQuivrService(service)
     }
 
@@ -123,47 +123,50 @@ function App() {
   return (
     <ThemeProvider theme={{ ...DEFAULT_THEME }}>
       <div className={styles.content_container}>
-        {editAgentPromptMode ? (
-          <TextAreaInput
-            label="Prompt"
-            inputValue={agentPrompt}
-            setInputValue={setAgentPrompt}
-            onSubmit={() => {
-              setEditAgentPromptMode(false)
-              setPromptSnippetHovered(false)
-            }}
-            autoFocus={true}
-          />
-        ) : (
-          <div
-            className={styles.prompt_snippet}
-            onClick={() => setEditAgentPromptMode(true)}
-            onMouseOver={() => setPromptSnippetHovered(true)}
-            onMouseOut={() => setPromptSnippetHovered(false)}
-          >
-            <span className={styles.prompt}>{agentPrompt}</span>
-            <Icon name="edit" size="normal" color={promptSnippetHovered ? 'primary' : 'black'} />
-          </div>
-        )}
-        {response && (
-          <>
-            <div className={styles.response_separator}></div>
-            <div className={styles.response_container}>
-              <ResponseContainer responseContent={response}></ResponseContainer>
+        <div className={styles.top_container}>
+          {editAgentPromptMode ? (
+            <TextAreaInput
+              label="Prompt"
+              inputValue={agentPrompt}
+              setInputValue={setAgentPrompt}
+              onSubmit={() => {
+                setEditAgentPromptMode(false)
+                setPromptSnippetHovered(false)
+              }}
+              autoFocus={true}
+            />
+          ) : (
+            <div
+              className={styles.prompt_snippet}
+              onClick={() => setEditAgentPromptMode(true)}
+              onMouseOver={() => setPromptSnippetHovered(true)}
+              onMouseOut={() => setPromptSnippetHovered(false)}
+            >
+              <span className={styles.prompt}>{agentPrompt}</span>
+              <Icon name="edit" size="normal" color={promptSnippetHovered ? 'primary' : 'black'} />
             </div>
-            <div className={styles.response_separator}></div>
-          </>
-        )}
-        <div className={styles.buttons_wrapper}>
-          <QuivrButton
-            label="Copy / Paste"
-            color="black"
-            onClick={() => pasteInEditor(client, response)}
-            size="tiny"
-            disabled={!response}
-          />
-          <SplitButton color="black" splitButtons={buttons} />
+          )}
+          {response && (
+            <>
+              <div className={styles.response_separator}></div>
+              <div className={styles.response_container}>
+                <ResponseContainer responseContent={response}></ResponseContainer>
+              </div>
+              <div className={styles.response_separator}></div>
+            </>
+          )}
+          <div className={styles.buttons_wrapper}>
+            <QuivrButton
+              label="Copy / Paste"
+              color="black"
+              onClick={() => pasteInEditor(client, response)}
+              size="tiny"
+              disabled={!response}
+            />
+            <SplitButton color="black" splitButtons={buttons} />
+          </div>
         </div>
+        {!response && <div>Hello</div>}
       </div>
     </ThemeProvider>
   )

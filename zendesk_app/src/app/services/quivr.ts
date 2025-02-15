@@ -36,7 +36,7 @@ export class QuivrService {
 
   async getQuivrResponse(prompt, chatId) {
     const response = await fetch(
-      `${this.apiUrl}/chat/${chatId}/question/stream?brain_id=0973ff75-c0ae-468e-99b4-7ae4130adcad`,
+      `${this.apiUrl}/chat/${chatId}/question/stream?brain_id=4673489f-f320-4c73-bc0f-615ca0c9b1cc`,
       {
         method: 'POST',
         headers: {
@@ -46,7 +46,7 @@ export class QuivrService {
         },
         body: JSON.stringify({
           question: prompt,
-          brain_id: '0973ff75-c0ae-468e-99b4-7ae4130adcad'
+          brain_id: '4673489f-f320-4c73-bc0f-615ca0c9b1cc'
         }),
         mode: 'cors'
       }

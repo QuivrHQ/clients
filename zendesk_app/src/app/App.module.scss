@@ -7,41 +7,50 @@
   gap: Spacings.$spacing05;
   overflow: hidden;
   max-height: 100dvh;
+  height: 100dvh;
   width: 100%;
+  justify-content: space-between;
 
-  .prompt_snippet {
+  .top_container {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: Spacings.$spacing03;
+    flex-direction: column;
+    gap: Spacings.$spacing05;
+    overflow: hidden;
 
-    .prompt {
-      @include Typography.EllipsisOverflow;
-    }
-
-    &:hover {
-      cursor: pointer;
+    .prompt_snippet {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: Spacings.$spacing03;
 
       .prompt {
-        color: var(--primary-0);
+        @include Typography.EllipsisOverflow;
+      }
+
+      &:hover {
+        cursor: pointer;
+
+        .prompt {
+          color: var(--primary-0);
+        }
       }
     }
-  }
 
-  .response_separator {
-    width: 100%;
-    height: 1px;
-    background-color: var(--border-0);
-  }
+    .response_separator {
+      width: 100%;
+      height: 1px;
+      background-color: var(--border-0);
+    }
 
-  .response_container {
-    position: relative;
-    overflow: auto;
-  }
+    .response_container {
+      position: relative;
+      overflow: auto;
+    }
 
-  .buttons_wrapper {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
+    .buttons_wrapper {
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+    }
   }
 }
