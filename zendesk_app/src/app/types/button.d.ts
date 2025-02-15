@@ -17,4 +17,5 @@ export interface ButtonType {
   important?: boolean
   size?: 'tiny' | 'small' | 'normal'
   tooltip?: string
+  disabled?: boolean
 }

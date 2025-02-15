@@ -15,7 +15,7 @@
       white-space: nowrap;
       padding-inline: Spacings.$spacing04;
       padding-block: Spacings.$spacing02;
-      border-radius: Radius.$big 0 0 Radius.$big;
+      border-radius: Radius.$small 0 0 Radius.$small;
       border: 1px solid transparent;
       cursor: pointer;
       display: flex;
@@ -31,7 +31,7 @@
       }
 
       &.menu_open {
-        border-radius: Radius.$big 0 0 0;
+        border-radius: Radius.$small 0 0 0;
       }
 
       &.hidden {
@@ -103,6 +103,7 @@
       align-items: center;
       justify-content: center;
       padding-inline: Spacings.$spacing02;
+      border-radius: 0 Radius.$small Radius.$small 0;
 
       &:hover {
         cursor: pointer;
@@ -114,6 +115,8 @@
   .menu {
     width: 100%;
     z-index: ZIndexes.$overlay;
+    border-radius: 0 0 Radius.$small Radius.$small;
+    overflow: hidden;
 
     .menu_item {
       padding-block: Spacings.$spacing02;
