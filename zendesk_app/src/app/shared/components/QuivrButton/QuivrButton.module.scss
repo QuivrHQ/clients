@@ -47,6 +47,18 @@
     }
   }
 
+  &.black {
+    border-color: var(--black-0);
+    color: var(--black-0);
+
+    &:hover,
+    &.important {
+      background-color: var(--black-0);
+      color: var(--white-0);
+      font-weight: 600;
+    }
+  }
+
   &.primary:not(.disabled) {
     border-color: var(--primary-0);
     color: var(--primary-0);

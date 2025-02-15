@@ -51,7 +51,7 @@
 
       &.disabled {
         border-color: var(--border-2);
-        border-right-color: var(--primary-0);
+        border-right-color: var(--black-0);
         cursor: default;
         color: var(--text-1);
         background-color: var(--background-0);
@@ -62,13 +62,24 @@
         }
       }
 
-      &.primary:not(.disabled) {
-        border-color: var(--primary-0);
-        color: var(--primary-0);
+      &.black {
+        border-color: var(--black-0);
+        color: var(--black-0);
 
         &:hover,
         &.important {
-          background-color: var(--primary-0);
+          background-color: var(--black-0);
+          color: var(--white-0);
+        }
+      }
+
+      &.black:not(.disabled) {
+        border-color: var(--black-0);
+        color: var(--black-0);
+
+        &:hover,
+        &.important {
+          background-color: var(--black-0);
           color: var(--text-0);
         }
       }
@@ -97,7 +108,7 @@
     }
 
     .icon_button {
-      border: 1px solid var(--primary-0);
+      border: 1px solid var(--black-0);
       border-left: none;
       display: flex;
       align-items: center;
@@ -107,7 +118,7 @@
 
       &:hover {
         cursor: pointer;
-        background-color: var(--primary-0);
+        background-color: var(--black-0);
       }
     }
   }
@@ -143,9 +154,9 @@
       }
 
       &:hover {
-        background-color: var(--primary-0);
+        background-color: var(--black-0);
         cursor: pointer;
-        border-inline-color: var(--primary-0);
+        border-inline-color: var(--black-0);
 
         .label {
           color: var(--white-0);

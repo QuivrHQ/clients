@@ -6,6 +6,9 @@
   overflow-y: auto;
   outline: none;
   box-shadow: none;
+  font-style: italic;
+  background-color: var(--background-3);
+  padding: Spacings.$spacing03;
 
   &:focus {
     outline: none !important;

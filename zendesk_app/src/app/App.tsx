@@ -154,12 +154,12 @@ function App() {
         <div className={styles.buttons_wrapper}>
           <QuivrButton
             label="Copy / Paste"
-            color="primary"
+            color="black"
             onClick={() => pasteInEditor(client, response)}
             size="tiny"
             disabled={!response}
           />
-          <SplitButton color="primary" splitButtons={buttons} />
+          <SplitButton color="black" splitButtons={buttons} />
         </div>
       </div>
     </ThemeProvider>
