@@ -62,17 +62,6 @@
         }
       }
 
-      &.black {
-        border-color: var(--black-0);
-        color: var(--black-0);
-
-        &:hover,
-        &.important {
-          background-color: var(--black-0);
-          color: var(--white-0);
-        }
-      }
-
       &.black:not(.disabled) {
         border-color: var(--black-0);
         color: var(--black-0);

@@ -128,7 +128,10 @@ function App() {
             label="Prompt"
             inputValue={agentPrompt}
             setInputValue={setAgentPrompt}
-            onSubmit={() => setEditAgentPromptMode(false)}
+            onSubmit={() => {
+              setEditAgentPromptMode(false)
+              setPromptSnippetHovered(false)
+            }}
             autoFocus={true}
           />
         ) : (
