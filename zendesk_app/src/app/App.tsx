@@ -157,6 +157,7 @@ function App() {
             color="primary"
             onClick={() => pasteInEditor(client, response)}
             size="tiny"
+            disabled={!response}
           />
           <SplitButton color="primary" splitButtons={buttons} />
         </div>

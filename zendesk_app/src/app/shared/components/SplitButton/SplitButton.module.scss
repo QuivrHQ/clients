@@ -13,7 +13,7 @@
     .default_button {
       font-size: Typography.$small;
       white-space: nowrap;
-      padding-inline: Spacings.$spacing04;
+      padding-inline: Spacings.$spacing05;
       padding-block: Spacings.$spacing02;
       border-radius: Radius.$small 0 0 Radius.$small;
       border: 1px solid transparent;
@@ -120,7 +120,7 @@
 
     .menu_item {
       padding-block: Spacings.$spacing02;
-      padding-left: Spacings.$spacing04;
+      padding-left: Spacings.$spacing05;
       padding-right: Spacings.$spacing02;
       width: 100%;
       border: 1px solid var(--border-0);
