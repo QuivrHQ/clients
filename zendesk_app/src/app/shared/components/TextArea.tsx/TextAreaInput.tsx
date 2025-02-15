@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react'
-
 import styles from './TextAreaInput.module.scss'
 
 type TextAreaInputProps = {
@@ -10,6 +9,7 @@ type TextAreaInputProps = {
   disabled?: boolean
   expandable?: boolean
   isArray?: boolean
+  autoFocus?: boolean
 }
 
 export const TextAreaInput = ({
@@ -19,9 +19,10 @@ export const TextAreaInput = ({
   onSubmit,
   disabled = false,
   expandable,
-  isArray = false
+  isArray = false,
+  autoFocus = false
 }: TextAreaInputProps) => {
-  const textAreaRef = useRef(null)
+  const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
   const adjustHeight = () => {
     const textarea = textAreaRef.current
@@ -38,7 +39,15 @@ export const TextAreaInput = ({
     }
   }, [inputValue, expandable])
 
-  const handleChange = (e: { target: { value: any } }) => {
+  useEffect(() => {
+    if (autoFocus && textAreaRef.current) {
+      const textarea = textAreaRef.current
+      textarea.focus()
+      textarea.setSelectionRange(textarea.value.length, textarea.value.length)
+    }
+  }, [autoFocus])
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value
     if (isArray) {
       const lines = value.split('\n').filter((line, index) => index !== 0 || line.trim() !== '')
@@ -51,9 +60,15 @@ export const TextAreaInput = ({
     }
   }
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey && onSubmit) {
       e.preventDefault()
+      onSubmit()
+    }
+  }
+
+  const handleBlur = () => {
+    if (onSubmit) {
       onSubmit()
     }
   }
@@ -67,6 +82,7 @@ export const TextAreaInput = ({
         onChange={handleChange}
         placeholder={label}
         onKeyDown={handleKeyDown}
+        onBlur={handleBlur}
         disabled={disabled}
         rows={3}
         style={{ resize: 'none' }}

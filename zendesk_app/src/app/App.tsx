@@ -7,6 +7,7 @@ import styles from './App.module.scss'
 import ResponseContainer from './components/ResponseContainer/ResponseContainer'
 import { useZendesk } from './hooks/useZendesk'
 import { QuivrService } from './services/quivr'
+import { Icon } from './shared/components/Icon/Icon'
 import QuivrButton from './shared/components/QuivrButton/QuivrButton'
 import SplitButton from './shared/components/SplitButton/SplitButton'
 import { correctPrompt, reformulationPrompt } from './shared/helpers/submitPrompts'
@@ -20,6 +21,8 @@ function App() {
   const [quivrService, setQuivrService] = useState<QuivrService | null>(null)
   const [loading, setLoading] = useState(false)
   const [alreadyReformulated, setAlreadyReformulated] = useState(false)
+  const [editAgentPromptMode, setEditAgentPromptMode] = useState(false)
+  const [promptSnippetHovered, setPromptSnippetHovered] = useState(false)
 
   const buttons: SplitButtonType[] = [
     {
@@ -120,7 +123,25 @@ function App() {
   return (
     <ThemeProvider theme={{ ...DEFAULT_THEME }}>
       <div className={styles.content_container}>
-        <TextAreaInput label="Prompt" inputValue={agentPrompt} setInputValue={setAgentPrompt} />
+        {editAgentPromptMode ? (
+          <TextAreaInput
+            label="Prompt"
+            inputValue={agentPrompt}
+            setInputValue={setAgentPrompt}
+            onSubmit={() => setEditAgentPromptMode(false)}
+            autoFocus={true}
+          />
+        ) : (
+          <div
+            className={styles.prompt_snippet}
+            onClick={() => setEditAgentPromptMode(true)}
+            onMouseOver={() => setPromptSnippetHovered(true)}
+            onMouseOut={() => setPromptSnippetHovered(false)}
+          >
+            <span className={styles.prompt}>{agentPrompt}</span>
+            <Icon name="edit" size="normal" color={promptSnippetHovered ? 'primary' : 'black'} />
+          </div>
+        )}
         {response && (
           <>
             <div className={styles.response_separator}></div>
