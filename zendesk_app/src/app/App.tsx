@@ -4,6 +4,7 @@ import { useClient } from './hooks/useClient'
 import TextAreaInput from './shared/components/TextArea.tsx/TextAreaInput'
 
 import styles from './App.module.scss'
+import IterationTextbox from './components/IterationTextbox/IterationTextbox'
 import ResponseContainer from './components/ResponseContainer/ResponseContainer'
 import { useZendesk } from './hooks/useZendesk'
 import { QuivrService } from './services/quivr'
@@ -20,9 +21,9 @@ function App() {
   const [response, setResponse] = useState('')
   const [quivrService, setQuivrService] = useState<QuivrService | null>(null)
   const [loading, setLoading] = useState(false)
-  const [alreadyReformulated, setAlreadyReformulated] = useState(false)
   const [editAgentPromptMode, setEditAgentPromptMode] = useState(false)
   const [promptSnippetHovered, setPromptSnippetHovered] = useState(false)
+  const [iterationRequest, setIterationRequest] = useState('')
 
   const buttons: SplitButtonType[] = [
     {
@@ -36,7 +37,7 @@ function App() {
     {
       label: 'Rewrite',
       onClick: () => {
-        reformulate()
+        reformulate(false)
       },
       iconName: 'chevronRight',
       disabled: loading
@@ -78,20 +79,17 @@ function App() {
     return submit(historic[historic.length - 1])
   }
 
-  const reformulate = async () => {
+  const reformulate = async (isIteration: boolean) => {
     try {
       const historic = await getHistoric(client)
       const userInput = await getUserInput(client)
 
-      const prompt = reformulationPrompt(alreadyReformulated, userInput, agentPrompt, historic)
+      const prompt = reformulationPrompt(isIteration, userInput, agentPrompt, historic)
 
       await submit(prompt)
-      setAlreadyReformulated(true)
     } catch (error) {
       console.error('Error rewriting response:', error)
       setResponse('Error occurred while rewriting response.')
-    } finally {
-      setAlreadyReformulated(true)
     }
   }
 
@@ -146,6 +144,16 @@ function App() {
               <Icon name="edit" size="normal" color={promptSnippetHovered ? 'primary' : 'black'} />
             </div>
           )}
+          <div className={styles.buttons_wrapper}>
+            <QuivrButton
+              label="Copy Draft"
+              color="black"
+              onClick={() => pasteInEditor(client, response)}
+              size="tiny"
+              disabled={!response}
+            />
+            <SplitButton color="black" splitButtons={buttons} />
+          </div>
           {response && (
             <>
               <div className={styles.response_separator}></div>
@@ -155,18 +163,16 @@ function App() {
               <div className={styles.response_separator}></div>
             </>
           )}
-          <div className={styles.buttons_wrapper}>
-            <QuivrButton
-              label="Copy / Paste"
-              color="black"
-              onClick={() => pasteInEditor(client, response)}
-              size="tiny"
-              disabled={!response}
-            />
-            <SplitButton color="black" splitButtons={buttons} />
-          </div>
         </div>
-        {!response && <div>Hello</div>}
+        {!!response && (
+          <div className={styles.test}>
+            <IterationTextbox
+              value={iterationRequest}
+              setValue={setIterationRequest}
+              onSubmit={() => void reformulate(true)}
+            ></IterationTextbox>
+          </div>
+        )}
       </div>
     </ThemeProvider>
   )

@@ -35,8 +35,8 @@ const baseReformulationPrompt: string = `Your goal is to reformulate the Agent d
    
   Here is the agent's draft answer that you need to reformulate:`
 
-export const reformulationPrompt = (alreadyReformulated: boolean, userInput, inputValue, historic) => {
-  return alreadyReformulated
+export const reformulationPrompt = (isIteration: boolean, userInput, inputValue, historic) => {
+  return isIteration
     ? `${baseReformulationPrompt}
 
         <draft answer>
