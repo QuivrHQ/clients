@@ -100,7 +100,13 @@ function App() {
       const ticketId = await getTicketId(client)
       const userInput = await getUserInput(client)
 
-      const result = await quivrService.executeZendeskTask(task, chatId, agentPrompt, ticketId, userInput)
+      const result = await quivrService.executeZendeskTask(
+        task,
+        chatId,
+        task === 'iterate' ? iterationRequest : agentPrompt,
+        ticketId,
+        userInput
+      )
 
       setResponse(result.replace(/\\n/g, '\n').replace(/\n/g, '<br>'))
     } catch (error) {

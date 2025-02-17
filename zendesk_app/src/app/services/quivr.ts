@@ -55,15 +55,6 @@ export class QuivrService {
       mode: 'cors'
     })
 
-    console.info(
-      JSON.stringify({
-        subdomain: `${subdomain}.zendesk.com`,
-        email: userEmail,
-        api_key: this.zendeskApiKey,
-        time_range: 180
-      })
-    )
-
     if (!response.ok) {
       throw new Error('Failed to create zendesk link')
     }

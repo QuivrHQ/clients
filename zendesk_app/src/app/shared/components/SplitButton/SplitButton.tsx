@@ -66,7 +66,7 @@ export const SplitButton = ({ color, size = 'normal', splitButtons, important }:
           <span className={styles.label}>{splitButtons[0].label}</span>
         </div>
         <div
-          className={`${styles.icon_button} ${styles[color]} ${styles[size]}`}
+          className={`${styles.icon_button} ${styles[color]} ${styles[size]} ${menuOpen ? styles.open : ''}`}
           onClick={handleToggleMenu}
           onMouseEnter={() => setIconButtonHovered(true)}
           onMouseLeave={() => setIconButtonHovered(false)}
@@ -88,11 +88,6 @@ export const SplitButton = ({ color, size = 'normal', splitButtons, important }:
               onMouseLeave={handleMouseLeave}
             >
               <span className={styles.label}>{button.label}</span>
-              <Icon
-                name={button.iconName}
-                size="small"
-                color={button.disabled ? 'grey' : hoveredIndex === index ? 'white' : 'black'}
-              />
             </div>
           ))}
         </div>

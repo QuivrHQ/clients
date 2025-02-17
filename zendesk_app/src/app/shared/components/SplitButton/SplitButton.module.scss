@@ -14,7 +14,7 @@
       font-size: Typography.$small;
       white-space: nowrap;
       padding-inline: Spacings.$spacing05;
-      padding-block: Spacings.$spacing02;
+      padding-block: Spacings.$spacing03;
       border-radius: Radius.$small 0 0 Radius.$small;
       border: 1px solid transparent;
       cursor: pointer;
@@ -102,12 +102,19 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding-inline: Spacings.$spacing02;
+      padding-inline: Spacings.$spacing03;
       border-radius: 0 Radius.$small Radius.$small 0;
+      transition: transform 0.3s ease;
 
       &:hover {
         cursor: pointer;
         background-color: var(--black-0);
+      }
+
+      &.open {
+        transform: rotate(180deg);
+        border-right: none;
+        border-left: 1px solid var(--black-0);
       }
     }
   }
@@ -117,13 +124,16 @@
     z-index: ZIndexes.$overlay;
     border-radius: 0 0 Radius.$small Radius.$small;
     overflow: hidden;
+    position: absolute;
+    z-index: 1000000;
+    background-color: var(--white-0);
 
     .menu_item {
-      padding-block: Spacings.$spacing02;
+      padding-block: Spacings.$spacing03;
       padding-left: Spacings.$spacing05;
       padding-right: Spacings.$spacing02;
       width: 100%;
-      border: 1px solid var(--border-0);
+      border: 1px solid var(--black-0);
       border-top: none;
       display: flex;
       justify-content: space-between;
