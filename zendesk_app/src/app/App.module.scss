@@ -17,6 +17,10 @@
     gap: Spacings.$spacing05;
     overflow: hidden;
 
+    &.without_response {
+      overflow: visible;
+    }
+
     .prompt_snippet {
       display: flex;
       justify-content: space-between;

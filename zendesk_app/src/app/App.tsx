@@ -125,7 +125,7 @@ function App() {
   return (
     <ThemeProvider theme={{ ...DEFAULT_THEME }}>
       <div className={styles.content_container}>
-        <div className={styles.top_container}>
+        <div className={`${styles.top_container} ${!response ? styles.without_response : ''}`}>
           {editAgentPromptMode ? (
             <TextAreaInput
               label="Prompt"
@@ -162,7 +162,7 @@ function App() {
             <>
               <div className={styles.response_separator}></div>
               <div className={styles.response_container}>
-                <ResponseContainer responseContent={response}></ResponseContainer>
+                <ResponseContainer responseContent={response} setResponseContent={setResponse}></ResponseContainer>
               </div>
               <div className={styles.response_separator}></div>
             </>
