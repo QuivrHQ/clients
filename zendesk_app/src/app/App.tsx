@@ -84,6 +84,10 @@ function App() {
     connectZendeskAccount()
   }, [quivrService, accountConnected, client, getSubdomain, getUserEmail])
 
+  const isLoadingText = (): boolean => {
+    return ['.', '..', '...'].includes(response)
+  }
+
   const submit = async (task: ZendeskTask) => {
     if (!quivrService) return
 
@@ -150,7 +154,7 @@ function App() {
               color="black"
               onClick={() => pasteInEditor(client, response)}
               size="tiny"
-              disabled={!response}
+              disabled={isLoadingText() || !response}
             />
             <SplitButton color="black" splitButtons={buttons} />
           </div>
@@ -164,7 +168,7 @@ function App() {
             </>
           )}
         </div>
-        {!!response && (
+        {!!response && !isLoadingText() && (
           <div className={styles.test}>
             <IterationTextbox
               value={iterationRequest}
