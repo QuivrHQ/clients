@@ -54,7 +54,7 @@ export class QuivrService {
         subdomain: `${subdomain}.zendesk.com`,
         email: userEmail,
         api_key: this.zendeskApiKey,
-        time_range: 180
+        time_range: 30
       }),
       mode: 'cors'
     })
