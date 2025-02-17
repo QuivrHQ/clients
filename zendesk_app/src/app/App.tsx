@@ -84,7 +84,12 @@ function App() {
       const historic = await getHistoric(client)
       const userInput = await getUserInput(client)
 
-      const prompt = reformulationPrompt(isIteration, userInput, agentPrompt, historic)
+      const prompt = reformulationPrompt(
+        isIteration,
+        isIteration ? response : userInput,
+        isIteration ? iterationRequest : agentPrompt,
+        historic
+      )
 
       await submit(prompt)
     } catch (error) {

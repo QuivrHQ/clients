@@ -1,3 +1,5 @@
+import { ZendeskTask } from '../types/zendesk'
+
 export class QuivrService {
   private apiUrl: string
   private apiKey: string
@@ -51,6 +53,44 @@ export class QuivrService {
         mode: 'cors'
       }
     )
+
+    if (!response.ok || response.body === null) {
+      throw new Error('Network response was not ok')
+    }
+
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder('utf-8')
+    let result = ''
+    let done = false
+
+    while (!done) {
+      const { value, done: doneReading } = await reader.read()
+      done = doneReading
+      result += decoder.decode(value, { stream: true })
+    }
+
+    return result
+      .match(/data: (.+?)(?=data:|$)/g)
+      ?.map((match) => JSON.parse(match.replace('data: ', '')).assistant)
+      .join('')
+  }
+
+  async executeZendeskTask(task: ZendeskTask, chatId: string, prompt: string, ticketId: string, content: string) {
+    const response = await fetch(`${this.apiUrl}/zendesk/task/${task}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.apiKey}`,
+        accept: 'application/json'
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        ticket_id: ticketId,
+        system_prompt: prompt,
+        content: content
+      }),
+      mode: 'cors'
+    })
 
     if (!response.ok || response.body === null) {
       throw new Error('Network response was not ok')
