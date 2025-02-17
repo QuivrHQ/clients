@@ -53,7 +53,7 @@ function App() {
   ]
 
   const client = useClient()
-  const { getHistoric, getUserInput, pasteInEditor, getTicketId } = useZendesk()
+  const { getUserInput, pasteInEditor, getTicketId, getSubdomain, getUserEmail } = useZendesk()
 
   useEffect(() => {
     client.invoke('resize', { width: '100%', height: '450px' })
@@ -65,6 +65,20 @@ function App() {
 
     initializeQuivrService()
   }, [client])
+
+  useEffect(() => {
+    if (quivrService) {
+      setTimeout(async () => {
+        quivrService.getZendeskConnection().then((response) => {
+          console.log(response)
+        })
+      })
+    }
+  }, [quivrService])
+
+  const createZendeskConnection = async () => {
+    await quivrService.createZendeskConnection()
+  }
 
   const submit = async (task: ZendeskTask) => {
     if (!quivrService) return

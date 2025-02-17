@@ -15,6 +15,42 @@ export class QuivrService {
     })
   }
 
+  async getZendeskConnection(): Promise<string> {
+    const response = await fetch(`${this.apiUrl}/zendesk/`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.apiKey}`,
+        accept: 'application/json'
+      },
+      mode: 'cors'
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to get zendesk link')
+    }
+
+    return await response.json()
+  }
+
+  async createZendeskConnection(): Promise<string> {
+    const response = await fetch(`${this.apiUrl}/zendesk/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.apiKey}`,
+        accept: 'application/json'
+      },
+      mode: 'cors'
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to get zendesk link')
+    }
+
+    return await response.json()
+  }
+
   async getNewChatId(name: string): Promise<string> {
     const response = await fetch(`${this.apiUrl}/chat`, {
       method: 'POST',

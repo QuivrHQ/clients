@@ -1,32 +1,37 @@
 export const useZendesk = () => {
   function getHistoric(client) {
-    return client.get('ticket.comments').then(function (data) {
-      const comments = data['ticket.comments'].map((comment) => comment.value)
-      return comments
+    return client.get('ticket.comments').then((data) => {
+      return data['ticket.comments'].map((comment) => comment.value)
     })
   }
 
   function getUserInput(client) {
-    return client.get('ticket.comment').then(function (data) {
-      return data['ticket.comment'].text
-    })
+    return client.get('ticket.comment').then((data) => data['ticket.comment'].text)
   }
 
   function getUserName(client) {
-    return client.get('currentUser').then(function (data) {
-      return data.currentUser.name
-    })
+    return client.get('currentUser').then((data) => data.currentUser.name)
   }
 
   function getRequesterName(client) {
-    return client.get('ticket.requester').then(function (data) {
-      return data['ticket.requester'].name
-    })
+    return client.get('ticket.requester').then((data) => data['ticket.requester'].name)
   }
 
   function getTicketId(client) {
-    return client.get('ticket.id').then(function (data) {
-      return data['ticket.id']
+    return client.get('ticket.id').then((data) => data['ticket.id'])
+  }
+
+  function getUserEmail(client) {
+    return client.get('currentUser').then((data) => data.currentUser.email)
+  }
+
+  function getRequesterEmail(client) {
+    return client.get('ticket.requester').then((data) => data['ticket.requester'].email)
+  }
+
+  function getSubdomain(client) {
+    return client.context().then((context) => {
+      return context.account.subdomain
     })
   }
 
@@ -34,5 +39,15 @@ export const useZendesk = () => {
     return client.set('ticket.comment.text', reformulatedText)
   }
 
-  return { getHistoric, getUserInput, getUserName, getRequesterName, pasteInEditor, getTicketId }
+  return {
+    getHistoric,
+    getUserInput,
+    getUserName,
+    getRequesterName,
+    getTicketId,
+    getUserEmail,
+    getRequesterEmail,
+    getSubdomain,
+    pasteInEditor
+  }
 }
