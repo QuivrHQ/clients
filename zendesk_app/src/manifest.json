@@ -22,6 +22,12 @@
       "secure": true
     },
     {
+      "name": "quivr_workspace_id",
+      "type": "text",
+      "required": true,
+      "secure": true
+    },
+    {
       "name": "zendesk_api_key",
       "type": "text",
       "required": true,
