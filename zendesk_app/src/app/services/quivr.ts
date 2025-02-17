@@ -15,7 +15,7 @@ export class QuivrService {
     })
   }
 
-  async getNewChatId(name: string): Promise<Response> {
+  async getNewChatId(name: string): Promise<string> {
     const response = await fetch(`${this.apiUrl}/chat`, {
       method: 'POST',
       headers: {
@@ -33,10 +33,11 @@ export class QuivrService {
       throw new Error('Failed to get new chat id')
     }
 
-    return (await response.json()).chat_id
+    const data = await response.json()
+    return data.chat_id
   }
 
-  async getQuivrResponse(prompt, chatId) {
+  async getQuivrResponse(prompt: string, chatId: string): Promise<string> {
     const response = await fetch(
       `${this.apiUrl}/chat/${chatId}/question/stream?brain_id=4673489f-f320-4c73-bc0f-615ca0c9b1cc`,
       {
@@ -76,24 +77,28 @@ export class QuivrService {
   }
 
   async executeZendeskTask(task: ZendeskTask, chatId: string, prompt: string, ticketId: string, content: string) {
-    const response = await fetch(`${this.apiUrl}/zendesk/task/${task}`, {
+    const url = new URL(`${this.apiUrl}/zendesk/task/${task}`)
+    url.searchParams.append('chat_id', chatId)
+    url.searchParams.append('ticket_id', ticketId)
+    url.searchParams.append('system_prompt', prompt)
+    url.searchParams.append('content', content)
+    url.searchParams.append('stream', 'true')
+
+    console.info(`Request URL: ${url.toString()}`)
+
+    const response = await fetch(url.toString(), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.apiKey}`,
         accept: 'application/json'
       },
-      body: JSON.stringify({
-        chat_id: chatId,
-        ticket_id: ticketId,
-        system_prompt: prompt,
-        content: content
-      }),
       mode: 'cors'
     })
 
     if (!response.ok || response.body === null) {
-      throw new Error('Network response was not ok')
+      const errorText = await response.text()
+      throw new Error(`Network response was not ok: ${errorText}`)
     }
 
     const reader = response.body.getReader()

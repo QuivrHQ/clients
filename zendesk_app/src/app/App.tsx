@@ -53,7 +53,7 @@ function App() {
   ]
 
   const client = useClient()
-  const { getHistoric, getUserInput, getRequesterName, getUserName, pasteInEditor } = useZendesk()
+  const { getHistoric, getUserInput, pasteInEditor, getTicketId } = useZendesk()
 
   useEffect(() => {
     client.invoke('resize', { width: '100%', height: '450px' })
@@ -111,7 +111,10 @@ function App() {
 
     try {
       const chatId = await quivrService.getNewChatId('Zendesk Chat')
-      const result = await quivrService.getQuivrResponse(prompt, chatId)
+      const ticketId = await getTicketId(client)
+      const userInput = await getUserInput(client)
+
+      const result = await quivrService.executeZendeskTask('correct', chatId, prompt, ticketId, userInput)
 
       setResponse(result.replace(/\\n/g, '\n').replace(/\n/g, '<br>'))
     } catch (error) {

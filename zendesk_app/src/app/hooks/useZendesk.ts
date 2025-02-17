@@ -24,9 +24,15 @@ export const useZendesk = () => {
     })
   }
 
+  function getTicketId(client) {
+    return client.get('ticket.id').then(function (data) {
+      return data['ticket.id']
+    })
+  }
+
   function pasteInEditor(client, reformulatedText) {
     return client.set('ticket.comment.text', reformulatedText)
   }
 
-  return { getHistoric, getUserInput, getUserName, getRequesterName, pasteInEditor }
+  return { getHistoric, getUserInput, getUserName, getRequesterName, pasteInEditor, getTicketId }
 }
