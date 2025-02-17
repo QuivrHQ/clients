@@ -3,6 +3,7 @@ import { ZendeskTask } from '../types/zendesk'
 export class QuivrService {
   private apiUrl: string
   private apiKey: string
+  private zendeskApiKey: string
 
   constructor(apiUrl: string, client: any) {
     this.apiUrl = apiUrl
@@ -12,6 +13,10 @@ export class QuivrService {
   private async initialize(client: any) {
     this.apiKey = await client.metadata().then(function (metadata) {
       return metadata.settings.quivr_api_key
+    })
+
+    this.zendeskApiKey = await client.metadata().then(function (metadata) {
+      return metadata.settings.zendesk_api_key
     })
   }
 
@@ -33,7 +38,7 @@ export class QuivrService {
     return await response.json()
   }
 
-  async createZendeskConnection(): Promise<string> {
+  async createZendeskConnection(subdomain: string, userEmail: string): Promise<string> {
     const response = await fetch(`${this.apiUrl}/zendesk/`, {
       method: 'POST',
       headers: {
@@ -41,11 +46,26 @@ export class QuivrService {
         Authorization: `Bearer ${this.apiKey}`,
         accept: 'application/json'
       },
+      body: JSON.stringify({
+        subdomain: `${subdomain}.zendesk.com`,
+        email: userEmail,
+        api_key: this.zendeskApiKey,
+        time_range: 180
+      }),
       mode: 'cors'
     })
 
+    console.info(
+      JSON.stringify({
+        subdomain: `${subdomain}.zendesk.com`,
+        email: userEmail,
+        api_key: this.zendeskApiKey,
+        time_range: 180
+      })
+    )
+
     if (!response.ok) {
-      throw new Error('Failed to get zendesk link')
+      throw new Error('Failed to create zendesk link')
     }
 
     return await response.json()

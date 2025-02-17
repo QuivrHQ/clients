@@ -20,6 +20,12 @@
       "type": "text",
       "required": true,
       "secure": true
+    },
+    {
+      "name": "zendesk_api_key",
+      "type": "text",
+      "required": true,
+      "secure": true
     }
   ],
   "version": "1.0",

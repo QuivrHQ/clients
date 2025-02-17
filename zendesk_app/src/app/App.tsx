@@ -24,6 +24,7 @@ function App() {
   const [editAgentPromptMode, setEditAgentPromptMode] = useState(false)
   const [promptSnippetHovered, setPromptSnippetHovered] = useState(false)
   const [iterationRequest, setIterationRequest] = useState('')
+  const [accountConnected, setAccountConnected] = useState(false)
 
   const buttons: SplitButtonType[] = [
     {
@@ -67,18 +68,21 @@ function App() {
   }, [client])
 
   useEffect(() => {
-    if (quivrService) {
-      setTimeout(async () => {
-        quivrService.getZendeskConnection().then((response) => {
-          console.log(response)
+    const connectZendeskAccount = async () => {
+      if (quivrService && !accountConnected) {
+        setAccountConnected(true)
+        const subdomain = await getSubdomain(client)
+        const userEmail = await getUserEmail(client)
+        setTimeout(async () => {
+          quivrService.createZendeskConnection(subdomain, userEmail).then((response) => {
+            console.log(response)
+          })
         })
-      })
+      }
     }
-  }, [quivrService])
 
-  const createZendeskConnection = async () => {
-    await quivrService.createZendeskConnection()
-  }
+    connectZendeskAccount()
+  }, [quivrService, accountConnected, client, getSubdomain, getUserEmail])
 
   const submit = async (task: ZendeskTask) => {
     if (!quivrService) return
