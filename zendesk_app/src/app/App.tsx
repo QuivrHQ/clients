@@ -74,15 +74,17 @@ function App() {
         const subdomain = await getSubdomain(client)
         const userEmail = await getUserEmail(client)
         setTimeout(async () => {
-          quivrService.createZendeskConnection(subdomain, userEmail).then((response) => {
-            console.log(response)
+          quivrService.getZendeskConnection().then((response) => {
+            if (response === null) {
+              quivrService.createZendeskConnection(subdomain, userEmail)
+            }
           })
         })
       }
     }
 
     connectZendeskAccount()
-  }, [quivrService, accountConnected, client, getSubdomain, getUserEmail])
+  }, [quivrService])
 
   const isLoadingText = (): boolean => {
     return ['.', '..', '...'].includes(response)

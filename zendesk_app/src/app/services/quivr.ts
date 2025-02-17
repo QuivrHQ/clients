@@ -20,7 +20,7 @@ export class QuivrService {
     })
   }
 
-  async getZendeskConnection(): Promise<string> {
+  async getZendeskConnection(): Promise<string | null> {
     const response = await fetch(`${this.apiUrl}/zendesk/`, {
       method: 'GET',
       headers: {
@@ -30,6 +30,10 @@ export class QuivrService {
       },
       mode: 'cors'
     })
+
+    if (response.status === 204) {
+      return null
+    }
 
     if (!response.ok) {
       throw new Error('Failed to get zendesk link')
