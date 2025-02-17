@@ -11,8 +11,8 @@ import { QuivrService } from './services/quivr'
 import { Icon } from './shared/components/Icon/Icon'
 import QuivrButton from './shared/components/QuivrButton/QuivrButton'
 import SplitButton from './shared/components/SplitButton/SplitButton'
-import { correctPrompt, reformulationPrompt } from './shared/helpers/submitPrompts'
 import { SplitButtonType } from './types/button'
+import { ZendeskTask } from './types/zendesk'
 
 function App() {
   const [agentPrompt, setAgentPrompt] = useState(
@@ -29,7 +29,7 @@ function App() {
     {
       label: 'Generate',
       onClick: () => {
-        generate()
+        submit('generate')
       },
       iconName: 'chevronRight',
       disabled: loading
@@ -37,7 +37,7 @@ function App() {
     {
       label: 'Rewrite',
       onClick: () => {
-        reformulate(false)
+        submit('reformulate')
       },
       iconName: 'chevronRight',
       disabled: loading
@@ -45,7 +45,7 @@ function App() {
     {
       label: 'Correct',
       onClick: () => {
-        correct()
+        submit('correct')
       },
       iconName: 'chevronRight',
       disabled: loading
@@ -66,39 +66,7 @@ function App() {
     initializeQuivrService()
   }, [client])
 
-  const correct = async () => {
-    const userInput = await getUserInput(client)
-    const prompt = correctPrompt(userInput)
-
-    await submit(prompt)
-  }
-
-  async function generate() {
-    const historic = await getHistoric(client)
-
-    return submit(historic[historic.length - 1])
-  }
-
-  const reformulate = async (isIteration: boolean) => {
-    try {
-      const historic = await getHistoric(client)
-      const userInput = await getUserInput(client)
-
-      const prompt = reformulationPrompt(
-        isIteration,
-        isIteration ? response : userInput,
-        isIteration ? iterationRequest : agentPrompt,
-        historic
-      )
-
-      await submit(prompt)
-    } catch (error) {
-      console.error('Error rewriting response:', error)
-      setResponse('Error occurred while rewriting response.')
-    }
-  }
-
-  const submit = async (prompt: string) => {
+  const submit = async (task: ZendeskTask) => {
     if (!quivrService) return
 
     setLoading(true)
@@ -114,7 +82,7 @@ function App() {
       const ticketId = await getTicketId(client)
       const userInput = await getUserInput(client)
 
-      const result = await quivrService.executeZendeskTask('correct', chatId, prompt, ticketId, userInput)
+      const result = await quivrService.executeZendeskTask(task, chatId, agentPrompt, ticketId, userInput)
 
       setResponse(result.replace(/\\n/g, '\n').replace(/\n/g, '<br>'))
     } catch (error) {
@@ -177,7 +145,7 @@ function App() {
             <IterationTextbox
               value={iterationRequest}
               setValue={setIterationRequest}
-              onSubmit={() => void reformulate(true)}
+              onSubmit={() => void submit('iterate')}
             ></IterationTextbox>
           </div>
         )}
