@@ -7,7 +7,7 @@ interface ProgressBarProps {
 }
 
 const ProgressBar = ({ total, processed }: ProgressBarProps): JSX.Element => {
-  const progress = (processed / total) * 100
+  const progress = Math.floor((processed / total) * 100)
 
   return (
     <div className={styles.progress_bar_container}>
