@@ -9,10 +9,11 @@ import ResponseContainer from './components/ResponseContainer/ResponseContainer'
 import { useZendesk } from './hooks/useZendesk'
 import { QuivrService } from './services/quivr'
 import { Icon } from './shared/components/Icon/Icon'
-import QuivrButton from './shared/components/QuivrButton/QuivrButton'
-import SplitButton from './shared/components/SplitButton/SplitButton'
+import ProgressBar from './shared/components/ProgressBar/ProgressBar'
+import { QuivrButton } from './shared/components/QuivrButton/QuivrButton'
+import { SplitButton } from './shared/components/SplitButton/SplitButton'
 import { SplitButtonType } from './types/button'
-import { ZendeskTask } from './types/zendesk'
+import { TicketIngestionProgress, ZendeskTask } from './types/zendesk'
 
 function App() {
   const [agentPrompt, setAgentPrompt] = useState(
@@ -25,6 +26,7 @@ function App() {
   const [promptSnippetHovered, setPromptSnippetHovered] = useState(false)
   const [iterationRequest, setIterationRequest] = useState('')
   const [accountConnected, setAccountConnected] = useState(false)
+  const [ingestionStatus, setIngestionStatus] = useState<TicketIngestionProgress | null>(null)
 
   const buttons: SplitButtonType[] = [
     {
@@ -76,7 +78,17 @@ function App() {
         setTimeout(async () => {
           quivrService.getZendeskConnection().then((response) => {
             if (response === null) {
-              quivrService.createZendeskConnection(subdomain, userEmail)
+              quivrService.createZendeskConnection(subdomain, userEmail).then(async (response: string) => {
+                const intervalId = setInterval(async () => {
+                  const res: TicketIngestionProgress = await quivrService.getWorkflowStatus(response)
+                  setIngestionStatus(res)
+                  if (res.status === 'COMPLETED') {
+                    clearInterval(intervalId)
+                  }
+                }, 1500)
+
+                return () => clearInterval(intervalId)
+              })
             }
           })
         })
@@ -128,6 +140,9 @@ function App() {
     <ThemeProvider theme={{ ...DEFAULT_THEME }}>
       <div className={styles.content_container}>
         <div className={`${styles.top_container} ${!response ? styles.without_response : ''}`}>
+          {ingestionStatus && (
+            <ProgressBar total={ingestionStatus.total_tickets} processed={ingestionStatus.processed_tickets} />
+          )}
           {editAgentPromptMode ? (
             <TextAreaInput
               label="Prompt"

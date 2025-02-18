@@ -1,4 +1,4 @@
-import { ZendeskTask } from '../types/zendesk'
+import { TicketIngestionProgress, ZendeskTask } from '../types/zendesk'
 
 export class QuivrService {
   private apiUrl: string
@@ -61,6 +61,24 @@ export class QuivrService {
 
     if (!response.ok) {
       throw new Error('Failed to create zendesk link')
+    }
+
+    return await response.json()
+  }
+
+  async getWorkflowStatus(workflowId: string): Promise<TicketIngestionProgress> {
+    const response = await fetch(`${this.apiUrl}/zendesk/fill_brain/${workflowId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.apiKey}`,
+        accept: 'application/json'
+      },
+      mode: 'cors'
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to get workflow status')
     }
 
     return await response.json()
