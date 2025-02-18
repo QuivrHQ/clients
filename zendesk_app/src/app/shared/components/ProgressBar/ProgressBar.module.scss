@@ -1,26 +1,29 @@
+@use '../../styles/Radius.module.scss';
+@use '../../styles/Spacings.module.scss';
+@use '../../styles/Typography.module.scss';
+
 .progress_bar_container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 10px 0;
-}
+  gap: Spacings.$spacing04;
 
-.progress_bar {
-  width: 100%;
-  height: 20px;
-  background-color: #e0e0e0;
-  border-radius: 10px;
-  overflow: hidden;
-}
+  .title {
+    @include Typography.H3;
+    width: 100%;
+    color: var(--primary-0);
+  }
 
-.progress {
-  height: 100%;
-  background-color: #76c7c0;
-  transition: width 0.3s ease;
-}
+  .progress_bar {
+    width: 100%;
+    height: 15px;
+    background-color: #e0e0e0;
+    border-radius: Radius.$big;
+    overflow: hidden;
 
-.progress_text {
-  margin-top: 5px;
-  font-size: 14px;
-  color: #333;
+    .progress {
+      background-color: var(--primary-0);
+      height: 100%;
+    }
+  }
 }

@@ -11,11 +11,9 @@ const ProgressBar = ({ total, processed }: ProgressBarProps): JSX.Element => {
 
   return (
     <div className={styles.progress_bar_container}>
+      <span className={styles.title}>{progress}% to complete</span>
       <div className={styles.progress_bar}>
         <div className={styles.progress} style={{ width: `${progress}%` }}></div>
-      </div>
-      <div className={styles.progress_text}>
-        {processed} / {total} tickets processed
       </div>
     </div>
   )
