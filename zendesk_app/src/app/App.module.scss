@@ -21,6 +21,19 @@
       overflow: visible;
     }
 
+    .ingestion_progress {
+      display: flex;
+      flex-direction: column;
+      gap: Spacings.$spacing05;
+      padding-right: Spacings.$spacing06;
+
+      .close {
+        position: absolute;
+        top: Spacings.$spacing03;
+        right: Spacings.$spacing03;
+      }
+    }
+
     .prompt_snippet {
       display: flex;
       justify-content: space-between;

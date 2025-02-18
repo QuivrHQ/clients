@@ -9,6 +9,7 @@ import ResponseContainer from './components/ResponseContainer/ResponseContainer'
 import { useZendesk } from './hooks/useZendesk'
 import { QuivrService } from './services/quivr'
 import { Icon } from './shared/components/Icon/Icon'
+import { MessageInfoBox } from './shared/components/MessageInfoBox/MessageInfoBox'
 import ProgressBar from './shared/components/ProgressBar/ProgressBar'
 import { QuivrButton } from './shared/components/QuivrButton/QuivrButton'
 import { SplitButton } from './shared/components/SplitButton/SplitButton'
@@ -141,7 +142,21 @@ function App() {
       <div className={styles.content_container}>
         <div className={`${styles.top_container} ${!response ? styles.without_response : ''}`}>
           {ingestionStatus && (
-            <ProgressBar total={ingestionStatus.total_tickets} processed={ingestionStatus.processed_tickets} />
+            <MessageInfoBox type="info" children={undefined}>
+              <div className={styles.ingestion_progress}>
+                <div className={styles.close}>
+                  <Icon
+                    name="close"
+                    size="normal"
+                    color="black"
+                    handleHover={true}
+                    onClick={() => setIngestionStatus(null)}
+                  />
+                </div>
+                <span>We are currently ingesting your tickets to generate relevant responses.</span>
+                <ProgressBar total={ingestionStatus.total_tickets} processed={ingestionStatus.processed_tickets} />
+              </div>
+            </MessageInfoBox>
           )}
           {editAgentPromptMode ? (
             <TextAreaInput
