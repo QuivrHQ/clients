@@ -18,7 +18,7 @@ import { TicketIngestionProgress, ZendeskTask } from './types/zendesk'
 
 function App() {
   const [agentPrompt, setAgentPrompt] = useState(
-    'Vous êtes un assistant attentionné de LocService, et votre objectif est de satisfaire la demande du client.'
+    'Vous êtes un assistant attentionné, et votre objectif est de satisfaire la demande du client.'
   )
   const [response, setResponse] = useState('')
   const [quivrService, setQuivrService] = useState<QuivrService | null>(null)
