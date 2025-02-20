@@ -1,0 +1,42 @@
+{
+  "name": "Quivr",
+  "author": {
+    "name": "quivr",
+    "email": "antoine@quivr.app"
+  },
+  "defaultLocale": "en",
+  "domainWhitelist": [
+    "api.quivr.app"
+  ],
+  "private": true,
+  "location": {
+    "support": {
+      "ticket_sidebar": {
+        "url": "assets/index.html",
+        "flexible": true
+      }
+    }
+  },
+  "parameters": [
+    {
+      "name": "quivr_api_key",
+      "type": "text",
+      "required": true,
+      "secure": true
+    },
+    {
+      "name": "quivr_workspace_id",
+      "type": "text",
+      "required": true,
+      "secure": true
+    },
+    {
+      "name": "zendesk_api_key",
+      "type": "text",
+      "required": true,
+      "secure": true
+    }
+  ],
+  "version": "1.0.2",
+  "frameworkVersion": "2.0"
+}

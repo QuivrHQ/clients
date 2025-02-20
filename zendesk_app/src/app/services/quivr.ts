@@ -2,108 +2,120 @@ import { TicketIngestionProgress, ZendeskTask } from '../types/zendesk'
 
 export class QuivrService {
   private apiUrl: string
-  private apiKey: string
-  private zendeskApiKey: string
+  private client: any
 
   constructor(apiUrl: string, client: any) {
     this.apiUrl = apiUrl
-    this.initialize(client)
-  }
-
-  private async initialize(client: any) {
-    this.apiKey = await client.metadata().then(function (metadata) {
-      return metadata.settings.quivr_api_key
-    })
-
-    this.zendeskApiKey = await client.metadata().then(function (metadata) {
-      return metadata.settings.zendesk_api_key
-    })
+    this.client = client
   }
 
   async getZendeskConnection(): Promise<string | null> {
-    const response = await fetch(`${this.apiUrl}/zendesk/`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
-        accept: 'application/json'
-      },
-      mode: 'cors'
-    })
+    try {
+      const response = await this.client.request({
+        url: `${this.apiUrl}/zendesk/`,
+        type: 'GET',
+        headers: {
+          Authorization: 'Bearer {{setting.quivr_api_key}}'
+        },
+        secure: true,
+        accepts: 'application/json',
+        httpCompleteResponse: true
+      })
 
-    if (response.status === 204) {
-      return null
-    }
+      console.log('Response Status:', response.status)
+      console.log('Response:', response)
 
-    if (!response.ok) {
+      if (response.status === 204) {
+        return null
+      }
+
+      return response
+    } catch (error) {
       throw new Error('Failed to get zendesk link')
     }
-
-    return await response.json()
   }
 
   async createZendeskConnection(subdomain: string, userEmail: string): Promise<string> {
-    const response = await fetch(`${this.apiUrl}/zendesk/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
-        accept: 'application/json'
-      },
-      body: JSON.stringify({
-        subdomain: `${subdomain}.zendesk.com`,
-        email: userEmail,
-        api_key: this.zendeskApiKey,
-        time_range: 30
-      }),
-      mode: 'cors'
-    })
+    try {
 
-    if (!response.ok) {
+      const response = await this.client.request({
+        url: `${this.apiUrl}/zendesk/`,
+        type: 'POST',
+        headers: {
+          Authorization: 'Bearer {{setting.quivr_api_key}}',
+          'Content-Type': 'application/json'
+        },
+        secure: true,
+        accepts: 'application/json',
+        data: JSON.stringify({
+          subdomain: `${subdomain}.zendesk.com`,
+          email: userEmail,
+          api_key: '{{setting.zendesk_api_key}}',
+          time_range: 30
+        })
+      })
+
+      return response
+    } catch (error) {
       throw new Error('Failed to create zendesk link')
     }
-
-    return await response.json()
   }
 
   async getWorkflowStatus(workflowId: string): Promise<TicketIngestionProgress> {
-    const response = await fetch(`${this.apiUrl}/zendesk/fill_brain/${workflowId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
-        accept: 'application/json'
-      },
-      mode: 'cors'
-    })
+    try {
+      const response = await this.client.request({
+        url: `${this.apiUrl}/zendesk/fill_brain/${workflowId}`,
+        type: 'GET',
+        headers: {
+          Authorization: 'Bearer {{setting.quivr_api_key}}'
+        },
+        secure: true,
+        accepts: 'application/json'
+      })
 
-    if (!response.ok) {
+      return response
+    } catch (error) {
       throw new Error('Failed to get workflow status')
     }
-
-    return await response.json()
   }
 
   async getNewChatId(name: string): Promise<string> {
-    const response = await fetch(`${this.apiUrl}/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
-        accept: 'application/json'
-      },
-      body: JSON.stringify({
-        name: name
-      }),
-      mode: 'cors'
-    })
+    try {
+      const response = await this.client.request({
+        url: `${this.apiUrl}/chat`,
+        type: 'POST',
+        headers: {
+          Authorization: 'Bearer {{setting.quivr_api_key}}',
+          'Content-Type': 'application/json'
+        },
+        secure: true,
+        accepts: 'application/json',
+        data: JSON.stringify({
+          name: name
+        })
+      })
 
-    if (!response.ok) {
-      throw new Error('Failed to get new chat id')
+      console.log('Chat response:', response)
+
+      if (!response) {
+        throw new Error('No response received from chat creation')
+      }
+
+      if (!response.chat_id) {
+        console.log('Full response object:', response)
+        throw new Error('No chat_id in response')
+      }
+
+      return response.chat_id
+    } catch (error) {
+      console.error('Error in getNewChatId:', error)
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response,
+        stack: error.stack
+      })
+      throw new Error(`Failed to get new chat id: ${error.message}`)
     }
-
-    const data = await response.json()
-    return data.chat_id
   }
 
   async executeZendeskTask(task: ZendeskTask, chatId: string, prompt: string, ticketId: string, content: string) {
@@ -112,37 +124,26 @@ export class QuivrService {
     url.searchParams.append('ticket_id', ticketId)
     url.searchParams.append('system_prompt', prompt)
     url.searchParams.append('content', content)
-    url.searchParams.append('stream', 'true')
+    url.searchParams.append('stream', 'False')
 
-    const response = await fetch(url.toString(), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
-        accept: 'application/json'
-      },
-      mode: 'cors'
-    })
+    try {
+      const response = await this.client.request({
+        url: url.toString(),
+        type: 'POST',
+        headers: {
+          Authorization: 'Bearer {{setting.quivr_api_key}}',
+          'Content-Type': 'application/json'
+        },
+        secure: true,
+        accepts: 'application/json',
+        data: JSON.stringify({}) // Empty object for POST request
+      })
+  
+      console.log('Response:', response)
 
-    if (!response.ok || response.body === null) {
-      const errorText = await response.text()
-      throw new Error(`Network response was not ok: ${errorText}`)
+      return response.assistant
+    } catch (error) {
+      throw new Error('Failed to execute zendesk task')
     }
-
-    const reader = response.body.getReader()
-    const decoder = new TextDecoder('utf-8')
-    let result = ''
-    let done = false
-
-    while (!done) {
-      const { value, done: doneReading } = await reader.read()
-      done = doneReading
-      result += decoder.decode(value, { stream: true })
-    }
-
-    return result
-      .match(/data: (.+?)(?=data:|$)/g)
-      ?.map((match) => JSON.parse(match.replace('data: ', '')).assistant)
-      .join('')
   }
 }
