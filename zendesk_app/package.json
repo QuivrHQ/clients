@@ -8,7 +8,7 @@
     "dev": "vite --port 3000",
     "watch": "vite build --watch --mode development",
     "build:dev": "vite build --mode development",
-    "build": "vite build --mode production",
+    "build": "vite build --mode production && cp manifest.json dist && cp zcli.apps.config.json dist",
     "lint": "eslint . --ext js,jsx --max-warnings 0",
     "start": "zcli apps:server src",
     "start:prod": "zcli apps:server dist"

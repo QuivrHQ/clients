@@ -1,3 +1,8 @@
 {
-    "app_id": 1108924
+    "app_id": 1108940,
+    "parameters": {
+        "quivr_api_key": "ae2e8b481b4057076265f27a5fc0b7df",
+        "quivr_workspace_id": "hdhdhdhdhdhdhdhd",
+        "zendesk_api_key": "vuZWcM941KJS5ks6eqsF7w8dc2h6B6XiFqrTHCji"
+    }
 }

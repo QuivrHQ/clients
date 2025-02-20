@@ -18,7 +18,7 @@ import { TicketIngestionProgress, ZendeskTask } from './types/zendesk'
 
 function App() {
   const [agentPrompt, setAgentPrompt] = useState(
-    'Vous êtes un assistant attentionné, et votre objectif est de satisfaire la demande du client.'
+    'Vous êtes un assistant attentionné,  votre objectif est de satisfaire la demande du client.'
   )
   const [response, setResponse] = useState('')
   const [quivrService, setQuivrService] = useState<QuivrService | null>(null)
@@ -63,7 +63,7 @@ function App() {
     client.invoke('resize', { width: '100%', height: '450px' })
 
     const initializeQuivrService = async () => {
-      const service = new QuivrService('http://localhost:5050', client)
+      const service = new QuivrService('https://api.quivr.app', client)
       setQuivrService(service)
     }
 

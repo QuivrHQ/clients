@@ -5,11 +5,14 @@
     "email": "antoine@quivr.app"
   },
   "defaultLocale": "en",
+  "domainWhitelist": [
+    "api.quivr.app"
+  ],
   "private": true,
   "location": {
     "support": {
       "ticket_sidebar": {
-        "url": "http://localhost:3000/",
+        "url": "assets/index.html",
         "flexible": true
       }
     }
@@ -34,6 +37,6 @@
       "secure": true
     }
   ],
-  "version": "1.0",
+  "version": "1.0.2",
   "frameworkVersion": "2.0"
 }
