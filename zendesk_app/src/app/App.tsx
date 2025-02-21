@@ -124,7 +124,7 @@ function App() {
         chatId,
         task === 'iterate' ? iterationRequest : agentPrompt,
         ticketId,
-        userInput
+        task === 'iterate' ? response : userInput
       )
 
       setResponse(result.replace(/\\n/g, '\n').replace(/\n/g, '<br>'))
