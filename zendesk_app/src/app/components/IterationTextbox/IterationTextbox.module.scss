@@ -1,0 +1,42 @@
+@use '../../shared/styles/Radius.module';
+@use '../../shared/styles/Spacings.module';
+@use '../../shared/styles/Typography.module';
+
+.chatbar_wrapper {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+
+  .chatbar {
+    padding: Spacings.$spacing03;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: Spacings.$spacing02;
+    border: 1px solid var(--border-0);
+    border-radius: Radius.$big;
+    align-items: center;
+
+    .input {
+      border: none;
+      width: 100%;
+      outline: none;
+      background-color: transparent;
+      font-size: Typography.$small;
+      max-height: 96px;
+      resize: none;
+      padding-block: Spacings.$spacing04;
+
+      &:focus {
+        outline: none;
+        box-shadow: none;
+      }
+    }
+
+    .icon {
+      cursor: pointer;
+      display: flex;
+    }
+  }
+}
