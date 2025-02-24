@@ -23,13 +23,13 @@
       "name": "quivr_api_key",
       "type": "text",
       "required": true,
-      "secure": true
+      "secure": false
     },
     {
       "name": "quivr_workspace_id",
       "type": "text",
       "required": true,
-      "secure": true
+      "secure": false
     },
     {
       "name": "zendesk_api_key",
@@ -38,6 +38,6 @@
       "secure": true
     }
   ],
-  "version": "1.0.2",
+  "version": "1.0.3",
   "frameworkVersion": "2.0"
 }
