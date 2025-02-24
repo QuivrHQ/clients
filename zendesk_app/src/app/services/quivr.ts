@@ -23,7 +23,7 @@ export class QuivrService {
         url: `${this.apiUrl}/zendesk/`,
         type: 'GET',
         headers: {
-          Authorization: 'Bearer {{setting.quivr_api_key}}'
+          Authorization: `Bearer ${this.quivrApiKey}`
         },
         secure: true,
         accepts: 'application/json',
@@ -46,10 +46,9 @@ export class QuivrService {
         url: `${this.apiUrl}/zendesk/`,
         type: 'POST',
         headers: {
-          Authorization: 'Bearer {{setting.quivr_api_key}}',
+          Authorization: `Bearer ${this.quivrApiKey}`,
           'Content-Type': 'application/json'
         },
-        secure: true,
         accepts: 'application/json',
         data: JSON.stringify({
           subdomain: `${subdomain}.zendesk.com`,
@@ -71,7 +70,7 @@ export class QuivrService {
         url: `${this.apiUrl}/zendesk/fill_brain/${workflowId}`,
         type: 'GET',
         headers: {
-          Authorization: 'Bearer {{setting.quivr_api_key}}'
+          Authorization: `Bearer ${this.quivrApiKey}`
         },
         secure: true,
         accepts: 'application/json'
@@ -89,7 +88,7 @@ export class QuivrService {
         url: `${this.apiUrl}/chat`,
         type: 'POST',
         headers: {
-          Authorization: 'Bearer {{setting.quivr_api_key}}',
+          Authorization: `Bearer ${this.quivrApiKey}`,
           'Content-Type': 'application/json'
         },
         secure: true,
