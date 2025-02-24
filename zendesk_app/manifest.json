@@ -6,7 +6,9 @@
     "url": "https://www.quivr.com"
   },
   "defaultLocale": "en",
-  "domainWhitelist": ["api.quivr.app"],
+  "domainWhitelist": [
+    "api.quivr.app"
+  ],
   "private": false,
   "location": {
     "support": {
@@ -36,6 +38,6 @@
       "secure": true
     }
   ],
-  "version": "1.0.2",
+  "version": "1.0.3",
   "frameworkVersion": "2.0"
 }
