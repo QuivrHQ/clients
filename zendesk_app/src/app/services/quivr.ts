@@ -3,7 +3,7 @@ import { TicketIngestionProgress, ZendeskTask } from '../types/zendesk'
 export class QuivrService {
   private apiUrl: string
   private client: any
-  private apiKey: string
+  private quivrApiKey: string
 
   constructor(apiUrl: string, client: any) {
     this.apiUrl = apiUrl
@@ -12,7 +12,7 @@ export class QuivrService {
   }
 
   private async initialize(client: any) {
-    this.apiKey = await client.metadata().then(function (metadata) {
+    this.quivrApiKey = await client.metadata().then(function (metadata) {
       return metadata.settings.quivr_api_key
     })
   }
@@ -137,7 +137,7 @@ export class QuivrService {
     const response = await fetch(url.toString(), {
       method: 'POST',
       headers: {
-        Authorization: 'Bearer {{setting.quivr_api_key}}',
+        Authorization: `Bearer ${this.quivrApiKey}`,
         'Content-Type': 'application/json',
         Accept: 'text/event-stream'
       },
