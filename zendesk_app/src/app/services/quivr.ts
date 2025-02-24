@@ -25,7 +25,6 @@ export class QuivrService {
         headers: {
           Authorization: `Bearer ${this.quivrApiKey}`
         },
-        secure: true,
         accepts: 'application/json',
         httpCompleteResponse: true
       })
@@ -49,6 +48,7 @@ export class QuivrService {
           Authorization: `Bearer ${this.quivrApiKey}`,
           'Content-Type': 'application/json'
         },
+        secure: true,
         accepts: 'application/json',
         data: JSON.stringify({
           subdomain: `${subdomain}.zendesk.com`,
@@ -72,7 +72,6 @@ export class QuivrService {
         headers: {
           Authorization: `Bearer ${this.quivrApiKey}`
         },
-        secure: true,
         accepts: 'application/json'
       })
 
@@ -91,7 +90,6 @@ export class QuivrService {
           Authorization: `Bearer ${this.quivrApiKey}`,
           'Content-Type': 'application/json'
         },
-        secure: true,
         accepts: 'application/json',
         data: JSON.stringify({
           name: name
