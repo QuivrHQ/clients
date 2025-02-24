@@ -3,10 +3,18 @@ import { TicketIngestionProgress, ZendeskTask } from '../types/zendesk'
 export class QuivrService {
   private apiUrl: string
   private client: any
+  private apiKey: string
 
   constructor(apiUrl: string, client: any) {
     this.apiUrl = apiUrl
     this.client = client
+    this.initialize(client)
+  }
+
+  private async initialize(client: any) {
+    this.apiKey = await client.metadata().then(function (metadata) {
+      return metadata.settings.quivr_api_key
+    })
   }
 
   async getZendeskConnection(): Promise<string | null> {
@@ -126,8 +134,6 @@ export class QuivrService {
     url.searchParams.append('content', content)
     url.searchParams.append('stream', 'true')
 
-    console.info(`Request URL: ${url.toString()}`)
-
     const response = await fetch(url.toString(), {
       method: 'POST',
       headers: {
@@ -135,7 +141,6 @@ export class QuivrService {
         'Content-Type': 'application/json',
         Accept: 'text/event-stream'
       },
-      secure: true,
       body: JSON.stringify({})
     })
 

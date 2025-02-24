@@ -128,25 +128,21 @@ function App() {
         task === 'iterate' ? response : userInput,
         (message: string) => {
           if (!!message.length) {
-            setLoading(false)
             clearInterval(loadingInterval)
-            if (isLoadingText()) {
-              setResponse(message)
-            } else {
-              setResponse((prevResponse) =>
-                prevResponse === '.' || prevResponse === '..' || prevResponse === '...'
-                  ? message.replace(/\\n/g, '\n').replace(/\n/g, '<br>') // On écrase le loadingText
-                  : prevResponse + message.replace(/\\n/g, '\n').replace(/\n/g, '<br>')
-              )
-            }
+            setResponse((prevResponse) =>
+              prevResponse === '.' || prevResponse === '..' || prevResponse === '...'
+                ? message.replace(/\\n/g, '\n').replace(/\n/g, '<br>')
+                : prevResponse + message.replace(/\\n/g, '\n').replace(/\n/g, '<br>')
+            )
           }
         }
       )
     } catch (error) {
-      console.info(error)
+      console.error(error)
       setResponse('Error occurred while rewriting response.')
     } finally {
       clearInterval(loadingInterval)
+      setLoading(false)
     }
   }
 
