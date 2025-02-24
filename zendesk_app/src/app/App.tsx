@@ -120,21 +120,33 @@ function App() {
       const ticketId = await getTicketId(client)
       const userInput = await getUserInput(client)
 
-      const result = await quivrService.executeZendeskTask(
+      await quivrService.executeZendeskTask(
         task,
         chatId,
         task === 'iterate' ? iterationRequest : agentPrompt,
         ticketId,
-        task === 'iterate' ? response : userInput
+        task === 'iterate' ? response : userInput,
+        (message: string) => {
+          if (!!message.length) {
+            setLoading(false)
+            clearInterval(loadingInterval)
+            if (isLoadingText()) {
+              setResponse(message)
+            } else {
+              setResponse((prevResponse) =>
+                prevResponse === '.' || prevResponse === '..' || prevResponse === '...'
+                  ? message.replace(/\\n/g, '\n').replace(/\n/g, '<br>') // On écrase le loadingText
+                  : prevResponse + message.replace(/\\n/g, '\n').replace(/\n/g, '<br>')
+              )
+            }
+          }
+        }
       )
-
-      setResponse(result.replace(/\\n/g, '\n').replace(/\n/g, '<br>'))
     } catch (error) {
-      console.error('Error rewriting response:', error)
+      console.info(error)
       setResponse('Error occurred while rewriting response.')
     } finally {
       clearInterval(loadingInterval)
-      setLoading(false)
     }
   }
 
