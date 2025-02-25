@@ -20,7 +20,7 @@
   },
   "parameters": [
     {
-      "name": "quivr_api_key",
+      "name": "quivr_api_token",
       "type": "text",
       "required": true,
       "secure": false

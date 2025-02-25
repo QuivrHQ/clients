@@ -13,7 +13,7 @@ export class QuivrService {
 
   private async initialize(client: any) {
     this.quivrApiKey = await client.metadata().then(function (metadata) {
-      return metadata.settings.quivr_api_key
+      return metadata.settings.quivr_api_token
     })
   }
 
