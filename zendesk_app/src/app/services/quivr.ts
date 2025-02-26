@@ -12,6 +12,12 @@ export class QuivrService {
   }
 
   private async initialize(client: any) {
+    this.apiUrl = await client.context().then(function (context) {
+      if (context.account.subdomain === 'locservice') {
+        return 'https://api-gobocom.quivr.app'
+      }
+      return 'https://api.quivr.app'
+    })
     this.quivrApiKey = await client.metadata().then(function (metadata) {
       return metadata.settings.quivr_api_token
     })

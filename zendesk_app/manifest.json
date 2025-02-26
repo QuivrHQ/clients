@@ -7,7 +7,8 @@
   },
   "defaultLocale": "en",
   "domainWhitelist": [
-    "api.quivr.app"
+    "api.quivr.app",
+    "api-gobocom.quivr.app"
   ],
   "private": false,
   "location": {
@@ -38,6 +39,6 @@
       "secure": true
     }
   ],
-  "version": "1.0.4",
+  "version": "1.0.5",
   "frameworkVersion": "2.0"
 }
