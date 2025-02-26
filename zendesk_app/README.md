@@ -19,7 +19,7 @@ npm run start
 ```
 
 Don't forget to change in manifest.json -> 'assets/index.html' -> 'http://localhost:3000'
-And in `quivr.ts` change the {{setting.quivr_api_key}} to your Quivr API key. and the {{setting.zendesk_api_key}} to your Zendesk API key.
+And in `quivr.ts` change the {{setting.quivr_api_token}} to your Quivr API Token. and the {{setting.zendesk_api_key}} to your Zendesk API key.
 
 ## Building the app
 

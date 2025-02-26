@@ -5,9 +5,9 @@
     "long_description": "## Quivr  \nQuivr is an open-source Retrieval-Augmented Generation (RAG) AI designed to enhance knowledge management and content generation. It enables users to efficiently retrieve, generate, and refine text using advanced AI capabilities, making it a powerful tool for automation and productivity.  \n\n\n## Quivr for Zendesk  \nQuivr for Zendesk integrates Quivr directly into your Zendesk workflow, empowering support agents with AI-driven assistance:  \n\n- ✨ **AI-Powered Suggestions**: Generate, refine, and improve responses effortlessly.  \n- 🔍 **Context-Aware AI**: Uses full ticket context, including customer details and conversation history.  \n- 🏆 **Efficiency Boost**: Speeds up ticket resolution and enhances agent productivity.  \n- 🔄 **Seamless Integration**: Work with Quivr AI directly inside Zendesk.  \n\n**Note:** Requires an active Quivr account.",
     "installation_instructions": "## Installation Instructions  \nClick **Install**, then provide:  \n- 🗝️ Your **Quivr API key**  \n- 🔑 Your **Zendesk API key**  \n- 🏢 Your **Quivr Workspace ID** (found in the user section of [quivr.app](https://quivr.app))  \n\nYou're all set to enhance your Zendesk experience!",
     "parameters": {
-      "quivr_api_key": {
-        "label": "Quivr API Key",
-        "description": "Your Quivr API key, found in the user section of [quivr.app](https://quivr.app)"
+      "quivr_api_token": {
+        "label": "Quivr API Token",
+        "description": "Your Quivr API Token, found in the user section of [quivr.app](https://quivr.app)"
       },
       "quivr_workspace_id": {
         "label": "Quivr Workspace ID",
