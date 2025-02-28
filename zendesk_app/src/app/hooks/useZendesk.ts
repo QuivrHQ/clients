@@ -36,7 +36,7 @@ export const useZendesk = () => {
   }
 
   function pasteInEditor(client, reformulatedText) {
-    return client.set('ticket.comment.text', reformulatedText)
+    return client.set('ticket.comment.text', reformulatedText, { html: true })
   }
 
   return {

@@ -1,4 +1,5 @@
 import { DEFAULT_THEME, ThemeProvider } from '@zendeskgarden/react-theming'
+import { marked } from 'marked'
 import React, { useEffect, useState } from 'react'
 import { useClient } from './hooks/useClient'
 import TextAreaInput from './shared/components/TextArea.tsx/TextAreaInput'
@@ -193,7 +194,7 @@ function App() {
             <QuivrButton
               label="Copy Draft"
               color="black"
-              onClick={() => pasteInEditor(client, response)}
+              onClick={() => pasteInEditor(client, marked(response))}
               size="tiny"
               disabled={isLoadingText() || !response}
             />
