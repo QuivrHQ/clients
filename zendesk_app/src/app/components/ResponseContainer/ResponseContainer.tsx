@@ -1,5 +1,5 @@
 import { marked } from 'marked'
-import React, { type JSX, useEffect } from 'react'
+import React, { useEffect, type JSX } from 'react'
 
 import styles from './ResponseContainer.module.scss'
 
