@@ -54,11 +54,12 @@ export class QuivrService {
           Authorization: `Bearer ${this.quivrApiKey}`,
           'Content-Type': 'application/json'
         },
+        secure: true,
         accepts: 'application/json',
         data: JSON.stringify({
           subdomain: `${subdomain}.zendesk.com`,
           email: userEmail,
-          api_key: 'oIHcMStZguH0hYgsurItZqOaxolmgmFtdBgvTTgU',
+          api_key: '{{settings.zendesk_api_key}}',
           time_range: 30
         })
       })
