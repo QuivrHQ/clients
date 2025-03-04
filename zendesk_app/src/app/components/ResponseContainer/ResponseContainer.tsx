@@ -1,5 +1,5 @@
 import { marked } from 'marked'
-import React, { type JSX } from 'react'
+import React, { type JSX, useEffect } from 'react'
 
 import styles from './ResponseContainer.module.scss'
 
@@ -9,14 +9,20 @@ interface ResponseContainerProps {
 }
 
 export const ResponseContainer = ({ responseContent, setResponseContent }: ResponseContainerProps): JSX.Element => {
-  const htmlContent = marked(responseContent)
+  useEffect(() => {
+    const parseContent = async () => {
+      const parsedContent = await marked(responseContent)
+      setResponseContent(parsedContent)
+    }
+    parseContent()
+  }, [responseContent])
 
   return (
     <div>
       <div
         className={styles.response_container}
         contentEditable={true}
-        dangerouslySetInnerHTML={{ __html: htmlContent }}
+        dangerouslySetInnerHTML={{ __html: responseContent }}
       ></div>
     </div>
   )
