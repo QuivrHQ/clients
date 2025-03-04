@@ -163,7 +163,6 @@ export class QuivrService {
 
     let buffer = ''
     let accumulatedMessage = ''
-    let lastResponse: { assistant: string } | null = null
     let isDone = false
 
     try {
@@ -172,71 +171,57 @@ export class QuivrService {
         isDone = done
 
         if (done) {
+          this.processIncompleteData(buffer, onStreamMessage)
+          reader.releaseLock()
           break
         }
 
-        buffer += decoder.decode(value, { stream: true })
-        ;({ buffer, accumulatedMessage, lastResponse } = this.processBuffer(
-          buffer,
-          accumulatedMessage,
-          lastResponse,
-          onStreamMessage
-        ))
+        buffer = this.processStreamData(value, buffer, decoder, onStreamMessage)
       }
-
-      return accumulatedMessage
     } catch (error) {
-      console.error('Stream processing error:', error)
-      throw error
+      console.error('Error processing stream:', error)
     } finally {
       reader.releaseLock()
     }
+
+    return accumulatedMessage
   }
 
-  private processBuffer(
+  private processStreamData(
+    value: Uint8Array,
     buffer: string,
-    accumulatedMessage: string,
-    lastResponse: { assistant: string } | null,
+    decoder: TextDecoder,
     onStreamMessage: (message: string) => void
-  ) {
-    const dataPrefix = 'data: '
+  ): string {
+    const rawData = buffer + decoder.decode(value)
+    const dataStrings = rawData.split('data: ').filter(Boolean)
 
-    while (buffer.includes(dataPrefix)) {
-      const messageStart = buffer.indexOf(dataPrefix)
-      const messageEnd = buffer.indexOf(dataPrefix, messageStart + dataPrefix.length)
-
-      let jsonString
-      if (messageEnd === -1) {
-        jsonString = buffer.slice(messageStart + dataPrefix.length)
-        buffer = ''
+    dataStrings.forEach((data, index) => {
+      if (!data.endsWith('\n') && index === dataStrings.length - 1) {
+        buffer = data
       } else {
-        jsonString = buffer.slice(messageStart + dataPrefix.length, messageEnd)
-        buffer = buffer.slice(messageEnd)
+        try {
+          const parsedData = JSON.parse(data.trim())
+          const newContent = parsedData.assistant ?? ''
+          onStreamMessage(newContent)
+        } catch (e) {
+          console.error('Error parsing data string', e)
+        }
       }
+    })
 
+    return buffer
+  }
+
+  private processIncompleteData(buffer: string, onStreamMessage: (message: string) => void) {
+    if (buffer !== '') {
       try {
-        const data: {
-          assistant?: string
-        } = JSON.parse(jsonString.trim()) as {
-          assistant?: string
-        }
-        const newContent = data.assistant ?? ''
-        if (typeof newContent === 'string') {
-          accumulatedMessage = newContent
-          onStreamMessage(accumulatedMessage)
-        }
-
-        lastResponse = {
-          assistant: accumulatedMessage
-        }
-      } catch (error) {
-        console.warn('Failed to parse message:', {
-          jsonString,
-          error
-        })
+        const parsedData = JSON.parse(buffer)
+        const newContent = parsedData.assistant ?? ''
+        onStreamMessage(newContent)
+      } catch (e) {
+        console.error('Error parsing incomplete data at stream end', e)
       }
     }
-
-    return { buffer, accumulatedMessage, lastResponse }
   }
 }
