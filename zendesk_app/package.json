@@ -5,13 +5,15 @@
   "type": "module",
   "scripts": {
     "test": "vitest",
-    "dev": "vite --port 3000",
+    "dev": "node scripts/toggle-env.js dev && vite --port 3000",
     "watch": "vite build --watch --mode development",
     "build:dev": "vite build --mode development",
-    "build": "vite build --mode production && cp manifest.json dist && cp zcli.apps.config.json dist",
+    "build": "node scripts/toggle-env.js prod && vite build --mode production && cp manifest.json dist && cp zcli.apps.config.json dist",
     "lint": "eslint . --ext js,jsx --max-warnings 0",
     "start": "zcli apps:server src",
-    "start:prod": "zcli apps:server dist"
+    "start:prod": "zcli apps:server dist",
+    "switch:dev": "node scripts/toggle-env.js dev",
+    "switch:prod": "node scripts/toggle-env.js prod"
   },
   "dependencies": {
     "@zendeskgarden/css-bedrock": "^9.1.1",
