@@ -1,5 +1,5 @@
 import { marked } from 'marked'
-import React, { type JSX } from 'react'
+import React, { useEffect, useState, type JSX } from 'react'
 
 import styles from './ResponseContainer.module.scss'
 
@@ -9,7 +9,11 @@ interface ResponseContainerProps {
 }
 
 export const ResponseContainer = ({ responseContent, setResponseContent }: ResponseContainerProps): JSX.Element => {
-  const htmlContent = marked(responseContent)
+  const [htmlContent, setHtmlContent] = useState('')
+
+  useEffect(() => {
+    setHtmlContent(marked(responseContent))
+  }, [responseContent])
 
   return (
     <div>
