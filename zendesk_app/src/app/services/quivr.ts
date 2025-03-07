@@ -54,12 +54,11 @@ export class QuivrService {
           Authorization: `Bearer ${this.quivrApiKey}`,
           'Content-Type': 'application/json'
         },
-        secure: true,
         accepts: 'application/json',
         data: JSON.stringify({
           subdomain: `${subdomain}.zendesk.com`,
           email: userEmail,
-          api_key: '{{setting.zendesk_api_key}}',
+          api_key: 'your-api-key-here',
           time_range: 30
         })
       })
@@ -146,6 +145,7 @@ export class QuivrService {
       },
       body: JSON.stringify({})
     })
+    console.info(response)
 
     if (!response.body) {
       throw new Error('ReadableStream not supported or no body in response.')

@@ -29,7 +29,7 @@ function App() {
 
   const buttons: SplitButtonType[] = [
     {
-      label: 'Generate',
+      label: 'Generate Draft',
       onClick: () => {
         submit('generate')
       },
@@ -37,7 +37,7 @@ function App() {
       disabled: loading
     },
     {
-      label: 'Rewrite',
+      label: 'Rewrite Reply',
       onClick: () => {
         submit('reformulate')
       },
@@ -45,7 +45,7 @@ function App() {
       disabled: loading
     },
     {
-      label: 'Correct',
+      label: 'Correct Reply',
       onClick: () => {
         submit('correct')
       },
