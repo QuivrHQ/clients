@@ -57,5 +57,9 @@
     --code-very-dark-grey: #75715e;
     --code-blue: #66d9ef;
     --code-orange: #fd971f;
+
+    /* Zendesk black */
+    --zendesk-black: #39434B;
+    --zendesk-black-hover: #5B6970;
   }
   

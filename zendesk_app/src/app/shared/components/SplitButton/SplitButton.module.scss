@@ -9,20 +9,21 @@
 
   .button_and_dropdown_button {
     display: flex;
+    gap: 1px;
 
     .default_button {
       font-size: Typography.$small;
       white-space: nowrap;
       padding-inline: Spacings.$spacing05;
       padding-block: Spacings.$spacing03;
-      border-radius: Radius.$small 0 0 Radius.$small;
-      border: 1px solid transparent;
+      border-radius: Radius.$normal 0 0 Radius.$normal;
       cursor: pointer;
       display: flex;
       width: fit-content;
-      background-color: var(--background-0);
+      background-color: var(--zendesk-black);
+      color: var(--white-0);
       height: fit-content;
-      font-weight: 450;
+      font-weight: 500;
       align-items: center;
       gap: Spacings.$spacing02;
 
@@ -31,7 +32,7 @@
       }
 
       &.menu_open {
-        border-radius: Radius.$small 0 0 0;
+        border-radius: Radius.$normal 0 0 0;
       }
 
       &.hidden {
@@ -63,12 +64,11 @@
       }
 
       &.black:not(.disabled) {
-        border-color: var(--black-0);
-        color: var(--black-0);
+        color: var(--white-0);
 
         &:hover,
         &.important {
-          background-color: var(--black-0);
+          background-color: var(--zendesk-black-hover);
           color: var(--text-0);
         }
       }
@@ -97,17 +97,16 @@
     }
 
     .icon_button_wrapper {
-      border: 1px solid var(--black-0);
-      border-left: none;
       display: flex;
       align-items: center;
       justify-content: center;
       padding-inline: Spacings.$spacing03;
-      border-radius: 0 Radius.$small Radius.$small 0;
+      border-radius: 0 Radius.$normal Radius.$normal 0;
+      background-color: var(--zendesk-black);
 
       &:hover {
         cursor: pointer;
-        background-color: var(--black-0);
+        background-color: var(--zendesk-black-hover);
       }
 
       .icon_button {
@@ -115,8 +114,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
+      }
 
-        &.open {
+      &.open {
+        border-radius: 0 Radius.$normal 0 0;
+        .icon_button {
           transform: rotate(180deg);
         }
       }
@@ -126,18 +128,18 @@
   .menu {
     width: 100%;
     z-index: ZIndexes.$overlay;
-    border-radius: 0 0 Radius.$small Radius.$small;
+    border-radius: 0 0 Radius.$normal Radius.$normal;
     overflow: hidden;
     position: absolute;
-    z-index: 1000000;
     background-color: var(--white-0);
+    border: 1px solid var(--zendesk-black);
+    z-index: ZIndexes.$overlay;
 
     .menu_item {
       padding-block: Spacings.$spacing03;
       padding-left: Spacings.$spacing05;
       padding-right: Spacings.$spacing02;
       width: 100%;
-      border: 1px solid var(--black-0);
       border-top: none;
       display: flex;
       justify-content: space-between;
@@ -157,9 +159,8 @@
       }
 
       &:hover {
-        background-color: var(--black-0);
+        background-color: var(--zendesk-black-hover);
         cursor: pointer;
-        border-inline-color: var(--black-0);
 
         .label {
           color: var(--white-0);

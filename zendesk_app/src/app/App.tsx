@@ -2,7 +2,6 @@ import { DEFAULT_THEME, ThemeProvider } from '@zendeskgarden/react-theming'
 import { marked } from 'marked'
 import React, { useEffect, useState } from 'react'
 import { useClient } from './hooks/useClient'
-import TextAreaInput from './shared/components/TextArea.tsx/TextAreaInput'
 
 import styles from './App.module.scss'
 import IterationTextbox from './components/IterationTextbox/IterationTextbox'
@@ -24,8 +23,6 @@ function App() {
   const [response, setResponse] = useState('')
   const [quivrService, setQuivrService] = useState<QuivrService | null>(null)
   const [loading, setLoading] = useState(false)
-  const [editAgentPromptMode, setEditAgentPromptMode] = useState(false)
-  const [promptSnippetHovered, setPromptSnippetHovered] = useState(false)
   const [iterationRequest, setIterationRequest] = useState('')
   const [accountConnected, setAccountConnected] = useState(false)
   const [ingestionStatus, setIngestionStatus] = useState<TicketIngestionProgress | null>(null)
@@ -168,28 +165,7 @@ function App() {
               </div>
             </MessageInfoBox>
           )}
-          {editAgentPromptMode ? (
-            <TextAreaInput
-              label="Prompt"
-              inputValue={agentPrompt}
-              setInputValue={setAgentPrompt}
-              onSubmit={() => {
-                setEditAgentPromptMode(false)
-                setPromptSnippetHovered(false)
-              }}
-              autoFocus={true}
-            />
-          ) : (
-            <div
-              className={styles.prompt_snippet}
-              onClick={() => setEditAgentPromptMode(true)}
-              onMouseOver={() => setPromptSnippetHovered(true)}
-              onMouseOut={() => setPromptSnippetHovered(false)}
-            >
-              <span className={styles.prompt}>{agentPrompt}</span>
-              <Icon name="edit" size="normal" color={promptSnippetHovered ? 'primary' : 'black'} />
-            </div>
-          )}
+
           <div className={styles.buttons_wrapper}>
             <QuivrButton
               label="Copy Draft"
