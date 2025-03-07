@@ -33,7 +33,11 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create and push tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
         run: |
+          git config user.email "stan@quivr.app"
+          git config user.name "StanGirard"
           git tag -a "v${{ steps.get_version.outputs.version }}" -m "Version ${{ steps.get_version.outputs.version }}"
           git push origin "v${{ steps.get_version.outputs.version }}"
 
@@ -92,7 +96,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./preview.zip
+          asset_path: ./zendesk_app/preview.zip
           asset_name: preview.zip
           asset_content_type: application/zip
 
@@ -103,6 +107,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./production.zip
+          asset_path: ./zendesk_app/production.zip
           asset_name: production.zip
           asset_content_type: application/zip 
