@@ -2,8 +2,10 @@ name: Build and Release
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [main]
+    paths:
+      - 'zendesk_app/manifest.json'
+      - 'zendesk_app/src/manifest.json'
 
 jobs:
   release:
@@ -14,6 +16,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PAT_GITHUB_TOKEN }}
       
       - name: Use Node.js
         uses: actions/setup-node@v3
@@ -22,17 +26,22 @@ jobs:
           cache: 'npm'
           cache-dependency-path: zendesk_app/package-lock.json
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Install ZCLI
-        run: npm i @zendesk/zcli -g
-
       - name: Get version
         id: get_version
         run: |
           VERSION=$(node -p "require('./src/manifest.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create and push tag
+        run: |
+          git tag -a "v${{ steps.get_version.outputs.version }}" -m "Version ${{ steps.get_version.outputs.version }}"
+          git push origin "v${{ steps.get_version.outputs.version }}"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install ZCLI
+        run: npm i @zendesk/zcli -g
 
       # Build Preview Version
       - name: Build Preview Version
@@ -59,7 +68,7 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
         with:
           tag_name: v${{ steps.get_version.outputs.version }}
           release_name: Release v${{ steps.get_version.outputs.version }}
@@ -70,7 +79,7 @@ jobs:
       - name: Upload Preview ZIP
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./quivr-preview-v${{ steps.get_version.outputs.version }}.zip
@@ -81,7 +90,7 @@ jobs:
       - name: Upload Production ZIP
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./quivr-v${{ steps.get_version.outputs.version }}.zip
