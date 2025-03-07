@@ -64,7 +64,7 @@ function App() {
     client.invoke('resize', { width: '100%', height: '450px' })
 
     const initializeQuivrService = async () => {
-      // TODO: change to api-preview.quivr.app when in preview 1
+      // TODO: change to api-preview.quivr.app when in preview 2
       const service = new QuivrService('https://api.quivr.app', client)
       setQuivrService(service)
     }

@@ -76,6 +76,7 @@ jobs:
           # Restore original API URLs
           sed -i 's|https://api-preview.quivr.app|https://api.quivr.app|g' src/app/services/quivr.ts
           sed -i 's|https://api-preview.quivr.app|https://api.quivr.app|g' src/app/App.tsx
+          rm -rf dist
           npm run build
           zcli apps:package dist
           ZIP_FILE=$(find . -name "app-*.zip" -type f)
