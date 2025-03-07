@@ -45,6 +45,10 @@ jobs:
 
       # Build Preview Version
       - name: Build Preview Version
+        env:
+          ZENDESK_SUBDOMAIN: ${{ secrets.ZENDESK_PREVIEW_SUBDOMAIN }}
+          ZENDESK_EMAIL: ${{ secrets.ZENDESK_PREVIEW_EMAIL }}
+          ZENDESK_API_TOKEN: ${{ secrets.ZENDESK_PREVIEW_API_TOKEN }}
         run: |
           # Replace API URLs with preview URL
           sed -i 's|https://api.quivr.app|https://api-preview.quivr.app|g' src/app/services/quivr.ts
@@ -52,16 +56,22 @@ jobs:
           npm run build
           mkdir -p dist_preview
           cp -r dist/* dist_preview/
-          zcli apps:package dist_preview --path "quivr-preview-v${{ steps.get_version.outputs.version }}.zip"
+          zcli apps:package dist_preview --path "preview.zip"
 
       # Build Production Version
       - name: Build Production Version
+        env:
+          ZENDESK_SUBDOMAIN: ${{ secrets.ZENDESK_PROD_SUBDOMAIN }}
+          ZENDESK_EMAIL: ${{ secrets.ZENDESK_PROD_EMAIL }}
+          ZENDESK_API_TOKEN: ${{ secrets.ZENDESK_PROD_API_TOKEN }}
         run: |
           # Restore original API URLs
           sed -i 's|https://api-preview.quivr.app|https://api.quivr.app|g' src/app/services/quivr.ts
           sed -i 's|https://api-preview.quivr.app|https://api.quivr.app|g' src/app/App.tsx
           npm run build
-          zcli apps:package dist --path "quivr-v${{ steps.get_version.outputs.version }}.zip"
+          mkdir -p dist_prod
+          cp -r dist/* dist_prod/
+          zcli apps:package dist_prod --path "production.zip"
 
       # Create GitHub Release
       - name: Create Release
@@ -82,8 +92,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./quivr-preview-v${{ steps.get_version.outputs.version }}.zip
-          asset_name: quivr-preview-v${{ steps.get_version.outputs.version }}.zip
+          asset_path: ./preview.zip
+          asset_name: preview.zip
           asset_content_type: application/zip
 
       # Upload Production ZIP
@@ -93,6 +103,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./quivr-v${{ steps.get_version.outputs.version }}.zip
-          asset_name: quivr-v${{ steps.get_version.outputs.version }}.zip
+          asset_path: ./production.zip
+          asset_name: production.zip
           asset_content_type: application/zip 
