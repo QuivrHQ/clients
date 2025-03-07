@@ -58,9 +58,13 @@ jobs:
           sed -i 's|https://api.quivr.app|https://api-preview.quivr.app|g' src/app/services/quivr.ts
           sed -i 's|https://api.quivr.app|https://api-preview.quivr.app|g' src/app/App.tsx
           npm run build
-          mkdir -p dist_preview
-          cp -r dist/* dist_preview/
-          zcli apps:package dist_preview --path "preview.zip"
+          zcli apps:package dist
+          ZIP_FILE=$(find . -name "app-*.zip" -type f)
+          if [ $(echo "$ZIP_FILE" | wc -l) -ne 1 ]; then
+            echo "Error: Found multiple or no zip files"
+            exit 1
+          fi
+          mv "$ZIP_FILE" preview.zip
 
       # Build Production Version
       - name: Build Production Version
@@ -73,9 +77,13 @@ jobs:
           sed -i 's|https://api-preview.quivr.app|https://api.quivr.app|g' src/app/services/quivr.ts
           sed -i 's|https://api-preview.quivr.app|https://api.quivr.app|g' src/app/App.tsx
           npm run build
-          mkdir -p dist_prod
-          cp -r dist/* dist_prod/
-          zcli apps:package dist_prod --path "production.zip"
+          zcli apps:package dist
+          ZIP_FILE=$(find . -name "app-*.zip" -type f)
+          if [ $(echo "$ZIP_FILE" | wc -l) -ne 1 ]; then
+            echo "Error: Found multiple or no zip files"
+            exit 1
+          fi
+          mv "$ZIP_FILE" production.zip
 
       # Create GitHub Release
       - name: Create Release
