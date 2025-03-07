@@ -1,0 +1,113 @@
+name: Build Zendesk App Packages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Get version from manifest
+        id: get_version
+        run: |
+          VERSION=$(node -p "require('./src/manifest.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install ZCLI
+        run: npm i @zendesk/zcli -g
+
+      # Setup ZCLI for preview environment
+      - name: Setup ZCLI
+        run: |
+          echo '{
+            "zat": {
+              "subdomain": "${{ secrets.ZENDESK_PREVIEW_SUBDOMAIN }}",
+              "username": "${{ secrets.ZENDESK_PREVIEW_EMAIL }}",
+              "password": "${{ secrets.ZENDESK_PREVIEW_API_TOKEN }}"
+            }
+          }' > ~/.zat
+
+      # Build Preview Version
+      - name: Build Preview Version
+        run: |
+          # Replace API URLs with preview URL
+          sed -i 's|https://api.quivr.app|https://api-preview.quivr.app|g' src/app/services/quivr.ts
+          sed -i 's|https://api.quivr.app|https://api-preview.quivr.app|g' src/app/App.tsx
+          npm run build
+          mkdir -p dist_preview
+          cp -r dist/* dist_preview/
+          zcli apps:package dist_preview --path "quivr-preview-v${{ steps.get_version.outputs.version }}.zip"
+
+      # Update Preview App in Zendesk
+      - name: Update Preview App in Zendesk
+        run: |
+          # Create config file for preview app
+          echo '{
+            "app_id": "${{ secrets.ZENDESK_PREVIEW_APP_ID }}"
+          }' > dist_preview/zcli.apps.config.json
+          
+          # Update the app
+          zcli apps:update dist_preview || echo "First time installation, proceeding with create"
+          if [ $? -ne 0 ]; then
+            zcli apps:create dist_preview
+          fi
+
+      # Build Production Version
+      - name: Build Production Version
+        run: |
+          # Restore original API URLs
+          sed -i 's|https://api-preview.quivr.app|https://api.quivr.app|g' src/app/services/quivr.ts
+          sed -i 's|https://api-preview.quivr.app|https://api.quivr.app|g' src/app/App.tsx
+          npm run build
+          zcli apps:package dist --path "quivr-v${{ steps.get_version.outputs.version }}.zip"
+
+      # Create GitHub Release
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          release_name: Release v${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+
+      # Upload Preview ZIP
+      - name: Upload Preview ZIP
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./quivr-preview-v${{ steps.get_version.outputs.version }}.zip
+          asset_name: quivr-preview-v${{ steps.get_version.outputs.version }}.zip
+          asset_content_type: application/zip
+
+      # Upload Production ZIP
+      - name: Upload Production ZIP
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./quivr-v${{ steps.get_version.outputs.version }}.zip
+          asset_name: quivr-v${{ steps.get_version.outputs.version }}.zip
+          asset_content_type: application/zip 
