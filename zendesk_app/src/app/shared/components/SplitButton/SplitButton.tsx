@@ -27,15 +27,6 @@ export const SplitButton = ({ color, size = 'normal', splitButtons, important }:
     setMenuOpen(!menuOpen)
   }
 
-  const useIconColor = () => {
-    if (hoveredIndex === -1 || important || iconButtonHovered) {
-      return 'white'
-    }
-    return hoveredIndex === -1 || important ? 'white' : color
-  }
-
-  const iconColor = useIconColor()
-
   const defaultButtonClasses = `${styles.default_button} ${menuOpen ? styles.menu_open : ''} ${styles[color]} ${
     important ? styles.important : ''
   } ${styles[size]} ${splitButtons[0].disabled ? styles.disabled : ''}`
@@ -66,13 +57,13 @@ export const SplitButton = ({ color, size = 'normal', splitButtons, important }:
           <span className={styles.label}>{splitButtons[0].label}</span>
         </div>
         <div
-          className={`${styles.icon_button_wrapper} ${styles[color]} ${styles[size]}`}
+          className={`${styles.icon_button_wrapper} ${styles[color]} ${styles[size]} ${menuOpen ? styles.open : ''}`}
           onClick={handleToggleMenu}
           onMouseEnter={() => setIconButtonHovered(true)}
           onMouseLeave={() => setIconButtonHovered(false)}
         >
-          <div className={`${styles.icon_button} ${menuOpen ? styles.open : ''}`}>
-            <Icon name="chevronDown" size="normal" color={iconColor} />
+          <div className={styles.icon_button}>
+            <Icon name="chevronDown" size="normal" color="white" />
           </div>
         </div>
       </div>
