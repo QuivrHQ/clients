@@ -37,4 +37,8 @@ jobs:
         run: npm run build
 
       - name: Validate
+        env:
+          ZENDESK_SUBDOMAIN: ${{ secrets.ZENDESK_PREVIEW_SUBDOMAIN }}
+          ZENDESK_EMAIL: ${{ secrets.ZENDESK_PREVIEW_EMAIL }}
+          ZENDESK_API_TOKEN: ${{ secrets.ZENDESK_PREVIEW_API_TOKEN }}
         run: zcli apps:validate dist 
