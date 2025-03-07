@@ -8,7 +8,8 @@
   "defaultLocale": "en",
   "domainWhitelist": [
     "api.quivr.app",
-    "api-gobocom.quivr.app"
+    "api-gobocom.quivr.app",
+    "api-preview.quivr.app"
   ],
   "private": false,
   "location": {
