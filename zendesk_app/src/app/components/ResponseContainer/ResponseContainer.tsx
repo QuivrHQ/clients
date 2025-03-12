@@ -10,10 +10,18 @@ interface ResponseContainerProps {
 
 export const ResponseContainer = ({ responseContent, setResponseContent }: ResponseContainerProps): JSX.Element => {
   const [htmlContent, setHtmlContent] = useState('')
+  const [manualEditing, setManualEditing] = useState(false)
 
   useEffect(() => {
-    setHtmlContent(marked(responseContent))
+    if (!manualEditing) {
+      setHtmlContent(marked(responseContent))
+    }
   }, [responseContent])
+
+  const handleInput = (event: React.FormEvent<HTMLDivElement>) => {
+    setManualEditing(true)
+    setResponseContent(event.currentTarget.innerHTML)
+  }
 
   return (
     <div>
@@ -21,6 +29,8 @@ export const ResponseContainer = ({ responseContent, setResponseContent }: Respo
         className={styles.response_container}
         contentEditable={true}
         dangerouslySetInnerHTML={{ __html: htmlContent }}
+        onInput={handleInput}
+        onBlur={() => setManualEditing(false)}
       ></div>
     </div>
   )
