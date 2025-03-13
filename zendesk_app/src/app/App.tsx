@@ -17,9 +17,9 @@ import { SplitButtonType } from './types/button'
 import { TicketIngestionProgress, ZendeskTask } from './types/zendesk'
 
 function App() {
-  const [agentPrompt, setAgentPrompt] = useState(
+  const agentPrompt: string =
     'Vous êtes un assistant attentionné,  votre objectif est de satisfaire la demande du client.'
-  )
+
   const [response, setResponse] = useState('')
   const [quivrService, setQuivrService] = useState<QuivrService | null>(null)
   const [loading, setLoading] = useState(false)
@@ -61,7 +61,7 @@ function App() {
     client.invoke('resize', { width: '100%', height: '450px' })
 
     const initializeQuivrService = async () => {
-      const service = new QuivrService('https://api.quivr.app', client)
+      const service = new QuivrService('https://api-preview.quivr.app', client)
       setQuivrService(service)
     }
 
@@ -95,7 +95,17 @@ function App() {
       }
     }
 
+    const getAutoDraft = async () => {
+      if (quivrService) {
+        const ticketId = await getTicketId(client)
+        const autoDraft = await quivrService.getAutoDraft(ticketId)
+
+        setResponse(autoDraft)
+      }
+    }
+
     connectZendeskAccount()
+    getAutoDraft()
   }, [quivrService])
 
   const isLoadingText = (): boolean => {

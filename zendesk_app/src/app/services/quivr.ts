@@ -16,7 +16,7 @@ export class QuivrService {
       if (context.account.subdomain === 'locservice') {
         return 'https://api-gobocom.quivr.app'
       }
-      return 'https://api.quivr.app'
+      return 'https://api-preview.quivr.app'
     })
     this.quivrApiKey = await client.metadata().then(function (metadata) {
       return metadata.settings.quivr_api_token
@@ -54,12 +54,11 @@ export class QuivrService {
           Authorization: `Bearer ${this.quivrApiKey}`,
           'Content-Type': 'application/json'
         },
-        secure: true,
         accepts: 'application/json',
         data: JSON.stringify({
           subdomain: `${subdomain}.zendesk.com`,
           email: userEmail,
-          api_key: '{{setting.zendesk_api_key}}',
+          api_key: 'your-api-key-here',
           time_range: 30
         })
       })
@@ -222,6 +221,23 @@ export class QuivrService {
       } catch (e) {
         console.error('Error parsing incomplete data at stream end', e)
       }
+    }
+  }
+
+  async getAutoDraft(ticketId: string): Promise<string> {
+    try {
+      const response = await this.client.request({
+        url: `${this.apiUrl}/zendesk/autodraft?ticket_id=${ticketId}`,
+        type: 'GET',
+        headers: {
+          Authorization: `Bearer ${this.quivrApiKey}`
+        },
+        accepts: 'application/json'
+      })
+
+      return response
+    } catch (error) {
+      throw new Error('Failed to get auto draft')
     }
   }
 }
