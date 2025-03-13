@@ -224,4 +224,21 @@ export class QuivrService {
       }
     }
   }
+
+  async getAutoDraft(ticketId: string): Promise<string> {
+    try {
+      const response = await this.client.request({
+        url: `${this.apiUrl}/zendesk/autodraft?ticket_id=${ticketId}`,
+        type: 'GET',
+        headers: {
+          Authorization: `Bearer ${this.quivrApiKey}`
+        },
+        accepts: 'application/json'
+      })
+
+      return response
+    } catch (error) {
+      throw new Error('Failed to get auto draft')
+    }
+  }
 }
