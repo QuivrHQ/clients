@@ -61,7 +61,7 @@ function App() {
     client.invoke('resize', { width: '100%', height: '450px' })
 
     const initializeQuivrService = async () => {
-      const service = new QuivrService('https://api-preview.quivr.app', client)
+      const service = new QuivrService('https://api.quivr.app', client)
       setQuivrService(service)
     }
 
@@ -99,7 +99,6 @@ function App() {
       if (quivrService) {
         const ticketId = await getTicketId(client)
         const autoDraft = await quivrService.getAutoDraft(ticketId)
-
         setResponse(autoDraft)
       }
     }
