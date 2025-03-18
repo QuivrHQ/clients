@@ -1,4 +1,4 @@
-export type ZendeskTask = 'iterate' | 'reformulate' | 'generate' | 'correct'
+export type ZendeskTask = 'iterate' | 'reformulate' | 'generate' | 'correct' | 'summarize'
 
 export interface TicketIngestionProgress {
   total_tickets: number

@@ -51,6 +51,14 @@ function App() {
       },
       iconName: 'chevronRight',
       disabled: loading
+    },
+    {
+      label: 'Summarize',
+      onClick: () => {
+        submit('summarize')
+      },
+      iconName: 'chevronRight',
+      disabled: loading
     }
   ]
 
