@@ -53,7 +53,7 @@ function App() {
       disabled: loading
     },
     {
-      label: 'Summarize',
+      label: 'Summarize Ticket',
       onClick: () => {
         submit('summarize')
       },
