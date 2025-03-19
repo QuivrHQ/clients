@@ -40,7 +40,8 @@ export default ({ mode }) => {
     build: {
       rollupOptions: {
         input: {
-          main: resolve(__dirname, 'src/index.html')
+          main: resolve(__dirname, 'src/index.html'),
+          editor: resolve(__dirname, 'src/editor.html')
         },
         output: {
           entryFileNames: `[name].js`,

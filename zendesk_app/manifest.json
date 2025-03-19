@@ -15,8 +15,11 @@
   "location": {
     "support": {
       "ticket_sidebar": {
-        "url": "assets/index.html",
+        "url": "http://localhost:3000",
         "flexible": true
+      },
+      "ticket_editor": {
+        "url": "http://localhost:3000/editor"
       }
     }
   },

@@ -16,7 +16,11 @@ import { SplitButton } from './shared/components/SplitButton/SplitButton'
 import { SplitButtonType } from './types/button'
 import { TicketIngestionProgress, ZendeskTask } from './types/zendesk'
 
-function App() {
+interface AppProps {
+  isEditorMode?: boolean;
+}
+
+function App({ isEditorMode = false }: AppProps) {
   const agentPrompt: string =
     'Vous êtes un assistant attentionné,  votre objectif est de satisfaire la demande du client.'
 
@@ -159,6 +163,18 @@ function App() {
       clearInterval(loadingInterval)
       setLoading(false)
     }
+  }
+
+  // Render editor mode UI or sidebar UI based on isEditorMode prop
+  if (isEditorMode) {
+    console.log('isEditorMode')
+    return (
+      <ThemeProvider theme={{ ...DEFAULT_THEME }}>
+        <div className={styles.editorContainer}>
+          <p>Hello</p>
+        </div>
+      </ThemeProvider>
+    )
   }
 
   return (
