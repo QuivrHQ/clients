@@ -5,6 +5,7 @@ import { QuivrService } from '../../services/quivr'
 import { SplitButtonType } from '../../types/button'
 import { ZendeskTask } from '../../types/zendesk'
 
+import ActionButton from './ActionButton/ActionButton'
 import styles from './ReplyBoxApp.module.scss'
 
 export const ReplyBoxApp = (): JSX.Element => {
@@ -115,9 +116,9 @@ export const ReplyBoxApp = (): JSX.Element => {
     <div className={styles.content_container}>
       <div className={styles.buttons_container}>
         {buttons.map((button, index) => (
-          <button key={index} className={styles.button} onClick={button.onClick}>
-            {button.label}
-          </button>
+          <div key={index}>
+            <ActionButton button={button} />
+          </div>
         ))}
       </div>
     </div>
