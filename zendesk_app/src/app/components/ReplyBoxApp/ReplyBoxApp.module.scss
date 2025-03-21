@@ -1,0 +1,11 @@
+@use '../../shared/styles/Spacings.module';
+@use '../../shared/styles/Radius.module';
+
+.content_container {
+  padding: Spacings.$spacing03;
+
+  .buttons_container {
+    border-radius: Radius.$normal;
+    overflow: hidden;
+  }
+}

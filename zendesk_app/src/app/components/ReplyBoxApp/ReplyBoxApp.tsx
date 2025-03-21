@@ -57,7 +57,7 @@ export const ReplyBoxApp = (): JSX.Element => {
   const { getTicketId, getUserInput } = useZendesk()
 
   useEffect(() => {
-    client.invoke('resize', { width: '150px', height: `${ACTION_BUTTON_HEIGHT * buttons.length}px` })
+    client.invoke('resize', { width: '175px', height: `${ACTION_BUTTON_HEIGHT * buttons.length + 16}px` })
 
     const initializeQuivrService = async () => {
       const service = new QuivrService('https://api.quivr.app', client)
@@ -76,6 +76,7 @@ export const ReplyBoxApp = (): JSX.Element => {
   const submit = async (task: ZendeskTask) => {
     if (!quivrService) return
 
+    client.invoke('close')
     setLoading(true)
     let loadingText = '.'
     setResponse(loadingText)
