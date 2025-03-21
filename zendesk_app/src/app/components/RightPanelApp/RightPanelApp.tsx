@@ -13,9 +13,9 @@ import { IterationTextbox } from './components/IterationTextbox/IterationTextbox
 import { ResponseContainer } from './components/ResponseContainer/ResponseContainer'
 
 import { marked } from 'marked'
-import styles from './RightPanel.module.scss'
+import styles from './RightPanelApp.module.scss'
 
-export const RightPanel = (): JSX.Element => {
+export const RightPanelApp = (): JSX.Element => {
   const agentPrompt: string =
     'Vous êtes un assistant attentionné,  votre objectif est de satisfaire la demande du client.'
   const [response, setResponse] = useState('')
@@ -213,4 +213,4 @@ export const RightPanel = (): JSX.Element => {
   )
 }
 
-export default RightPanel
+export default RightPanelApp
