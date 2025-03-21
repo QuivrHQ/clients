@@ -1,6 +1,7 @@
 import { DEFAULT_THEME, ThemeProvider } from '@zendeskgarden/react-theming'
 import React from 'react'
 
+import { ReplyBoxApp } from './components/ReplyBoxApp/ReplyBoxApp'
 import { RightPanelApp } from './components/RightPanelApp/RightPanelApp'
 
 interface AppProps {
@@ -9,7 +10,7 @@ interface AppProps {
 
 function App({ isEditorMode = false }: AppProps) {
   return (
-    <ThemeProvider theme={{ ...DEFAULT_THEME }}>{isEditorMode ? <div>Hello</div> : <RightPanelApp />}</ThemeProvider>
+    <ThemeProvider theme={{ ...DEFAULT_THEME }}>{isEditorMode ? <ReplyBoxApp /> : <RightPanelApp />}</ThemeProvider>
   )
 }
 
