@@ -17,7 +17,7 @@ import { SplitButtonType } from './types/button'
 import { TicketIngestionProgress, ZendeskTask } from './types/zendesk'
 
 interface AppProps {
-  isEditorMode?: boolean;
+  isEditorMode?: boolean
 }
 
 function App({ isEditorMode = false }: AppProps) {
@@ -167,7 +167,6 @@ function App({ isEditorMode = false }: AppProps) {
 
   // Render editor mode UI or sidebar UI based on isEditorMode prop
   if (isEditorMode) {
-    console.log('isEditorMode')
     return (
       <ThemeProvider theme={{ ...DEFAULT_THEME }}>
         <div className={styles.editorContainer}>

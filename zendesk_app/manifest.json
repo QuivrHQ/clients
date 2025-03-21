@@ -9,7 +9,8 @@
   "domainWhitelist": [
     "api.quivr.app",
     "api-gobocom.quivr.app",
-    "api-preview.quivr.app"
+    "api-preview.quivr.app",
+    "localhost:*"
   ],
   "private": false,
   "location": {
