@@ -1,3 +1,4 @@
+import { marked } from 'marked'
 import React, { useEffect, useState, type JSX } from 'react'
 import { useClient } from '../../hooks/useClient'
 import { useZendesk } from '../../hooks/useZendesk'
@@ -7,6 +8,8 @@ import { ZendeskTask } from '../../types/zendesk'
 
 import ActionButton from './ActionButton/ActionButton'
 import styles from './ReplyBoxApp.module.scss'
+
+const ACTION_BUTTON_HEIGHT = 34
 
 export const ReplyBoxApp = (): JSX.Element => {
   const client = useClient()
@@ -54,7 +57,7 @@ export const ReplyBoxApp = (): JSX.Element => {
   const { getTicketId, getUserInput } = useZendesk()
 
   useEffect(() => {
-    client.invoke('resize', { width: '300px', height: '100px' })
+    client.invoke('resize', { width: '150px', height: `${ACTION_BUTTON_HEIGHT * buttons.length}px` })
 
     const initializeQuivrService = async () => {
       const service = new QuivrService('https://api.quivr.app', client)
@@ -66,7 +69,7 @@ export const ReplyBoxApp = (): JSX.Element => {
 
   useEffect(() => {
     if (response && response !== '.' && response !== '..' && response !== '...') {
-      client.set('ticket.comment.text', response.replace(/<br>/g, '\n'))
+      client.set('ticket.comment.text', marked(response.replace(/<br>/g, '\n')))
     }
   }, [response, client])
 
