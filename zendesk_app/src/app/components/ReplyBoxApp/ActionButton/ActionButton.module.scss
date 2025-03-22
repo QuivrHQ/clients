@@ -9,6 +9,10 @@
   color: var(--white-0);
   height: 34px;
   font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: Spacings.$spacing05;
 
   &:hover {
     cursor: pointer;

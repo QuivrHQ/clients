@@ -6,6 +6,7 @@ import { QuivrService } from '../../services/quivr'
 import { SplitButtonType } from '../../types/button'
 import { ZendeskTask } from '../../types/zendesk'
 
+import { LoaderIcon } from '../../shared/components/LoaderIcon/LoaderIcon'
 import ActionButton from './ActionButton/ActionButton'
 import styles from './ReplyBoxApp.module.scss'
 
@@ -57,7 +58,7 @@ export const ReplyBoxApp = (): JSX.Element => {
   const { getTicketId, getUserInput } = useZendesk()
 
   useEffect(() => {
-    client.invoke('resize', { width: '175px', height: `${ACTION_BUTTON_HEIGHT * buttons.length + 16}px` })
+    client.invoke('resize', { width: '200px', height: `${ACTION_BUTTON_HEIGHT * buttons.length + 28}px` })
 
     const initializeQuivrService = async () => {
       const service = new QuivrService('https://api.quivr.app', client)
@@ -76,7 +77,6 @@ export const ReplyBoxApp = (): JSX.Element => {
   const submit = async (task: ZendeskTask) => {
     if (!quivrService) return
 
-    client.invoke('close')
     setLoading(true)
     let loadingText = '.'
     setResponse(loadingText)
@@ -99,6 +99,8 @@ export const ReplyBoxApp = (): JSX.Element => {
         (message: string) => {
           if (!!message.length) {
             clearInterval(loadingInterval)
+            setLoading(false)
+            client.invoke('close')
             setResponse((prevResponse) =>
               prevResponse === '.' || prevResponse === '..' || prevResponse === '...'
                 ? message.replace(/\\n/g, '\n').replace(/\n/g, '<br>')
@@ -112,19 +114,25 @@ export const ReplyBoxApp = (): JSX.Element => {
       setResponse('Error occurred while rewriting response.')
     } finally {
       clearInterval(loadingInterval)
-      setLoading(false)
     }
   }
 
   return (
-    <div className={styles.content_container}>
-      <div className={styles.buttons_container}>
-        {buttons.map((button, index) => (
-          <div key={index}>
-            <ActionButton button={button} />
-          </div>
-        ))}
-      </div>
+    <div className={`${styles.content_container} ${loading ? styles.loading : ''}`}>
+      {loading ? (
+        <div className={styles.loading_box}>
+          <span>Loading...</span>
+          <LoaderIcon size="big" color="black" />
+        </div>
+      ) : (
+        <div className={styles.buttons_container}>
+          {buttons.map((button, index) => (
+            <div key={index}>
+              <ActionButton button={button} />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
