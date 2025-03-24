@@ -16,7 +16,7 @@ export class QuivrService {
       if (context.account.subdomain === 'locservice') {
         return 'https://api-gobocom.quivr.app'
       }
-      return 'https://api-preview.quivr.app'
+      return 'https://api.quivr.app'
     })
     this.quivrApiKey = await client.metadata().then(function (metadata) {
       return metadata.settings.quivr_api_token
@@ -54,11 +54,12 @@ export class QuivrService {
           Authorization: `Bearer ${this.quivrApiKey}`,
           'Content-Type': 'application/json'
         },
+        secure: true,
         accepts: 'application/json',
         data: JSON.stringify({
           subdomain: `${subdomain}.zendesk.com`,
           email: userEmail,
-          api_key: 'your-api-key-here',
+          api_key: '{{settings.zendesk_api_key}}',
           time_range: 30
         })
       })
@@ -234,8 +235,6 @@ export class QuivrService {
         },
         accepts: 'application/json'
       })
-
-      console.info(response)
 
       return response
     } catch (error) {
