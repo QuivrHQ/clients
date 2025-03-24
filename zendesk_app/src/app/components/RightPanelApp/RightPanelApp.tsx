@@ -163,7 +163,7 @@ export const RightPanelApp = (): JSX.Element => {
     <div className={styles.content_container}>
       <div className={`${styles.top_container} ${!response ? styles.without_response : ''}`}>
         {ingestionStatus && (
-          <MessageInfoBox type="info" children={undefined}>
+          <MessageInfoBox type="info">
             <div className={styles.ingestion_progress}>
               <div className={styles.close}>
                 <Icon

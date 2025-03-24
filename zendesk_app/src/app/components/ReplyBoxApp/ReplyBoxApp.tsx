@@ -119,7 +119,7 @@ export const ReplyBoxApp = (): JSX.Element => {
 
   return (
     <div className={`${styles.content_container} ${loading ? styles.loading : ''}`}>
-      {loading ? (
+      {!loading ? (
         <div className={styles.loading_box}>
           <span>Loading...</span>
           <LoaderIcon size="big" color="black" />
