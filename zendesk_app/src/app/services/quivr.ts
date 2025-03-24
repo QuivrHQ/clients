@@ -3,7 +3,7 @@ import { TicketIngestionProgress, ZendeskTask } from '../types/zendesk'
 export class QuivrService {
   private apiUrl: string
   private client: any
-  private quivrApiKey: string
+  private quivrApiKey: string = ''
 
   constructor(apiUrl: string, client: any) {
     this.apiUrl = apiUrl
@@ -12,13 +12,13 @@ export class QuivrService {
   }
 
   private async initialize(client: any) {
-    this.apiUrl = await client.context().then(function (context) {
+    this.apiUrl = await client.context().then(function (context: { account: { subdomain: string } }) {
       if (context.account.subdomain === 'locservice') {
         return 'https://api-gobocom.quivr.app'
       }
-      return 'https://api.quivr.app'
+      return 'https://api-preview.quivr.app'
     })
-    this.quivrApiKey = await client.metadata().then(function (metadata) {
+    this.quivrApiKey = await client.metadata().then(function (metadata: { settings: { quivr_api_token: any } }) {
       return metadata.settings.quivr_api_token
     })
   }
@@ -113,12 +113,7 @@ export class QuivrService {
       return response.chat_id
     } catch (error) {
       console.error('Error in getNewChatId:', error)
-      console.error('Error details:', {
-        message: error.message,
-        response: error.response,
-        stack: error.stack
-      })
-      throw new Error(`Failed to get new chat id: ${error.message}`)
+      throw new Error(`Failed to get new chat id`)
     }
   }
 
