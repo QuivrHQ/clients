@@ -1,5 +1,5 @@
-@use '../../shared/styles/Spacings.module';
-@use '../../shared/styles/Typography.module';
+@use '@styles/Spacings.module';
+@use '@styles/Typography.module';
 
 .content_container {
   display: flex;

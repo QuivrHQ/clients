@@ -1,12 +1,12 @@
-import { fileURLToPath } from 'node:url'
-import { resolve, dirname } from 'node:path'
 import react from '@vitejs/plugin-react'
-import TranslationsLoader from './rollup/translations-loader-plugin'
-import { extractMarketplaceTranslation } from './rollup/modifiers/translations'
-import StaticCopy from './rollup/static-copy-plugin'
+import { dirname, resolve } from 'node:path'
+import process from 'node:process'
+import { fileURLToPath } from 'node:url'
 import { defineConfig, loadEnv } from 'vite'
 import { changeLocation } from './rollup/modifiers/manifest'
-import process from 'node:process'
+import { extractMarketplaceTranslation } from './rollup/modifiers/translations'
+import StaticCopy from './rollup/static-copy-plugin'
+import TranslationsLoader from './rollup/translations-loader-plugin'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -30,6 +30,11 @@ export default ({ mode }) => {
         ]
       })
     ],
+    resolve: {
+      alias: {
+        '@styles': resolve(__dirname, 'src/app/shared/styles')
+      }
+    },
     root: 'src',
     test: {
       include: ['../{test,spec}/**/*.{test,spec}.{js,ts,jsx}'],

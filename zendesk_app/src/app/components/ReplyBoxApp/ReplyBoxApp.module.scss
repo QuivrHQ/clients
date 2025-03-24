@@ -1,6 +1,6 @@
-@use '../../shared/styles/Spacings.module';
-@use '../../shared/styles/Radius.module';
-@use '../../shared/styles/Typography.module';
+@use '@styles/Spacings.module';
+@use '@styles/Radius.module';
+@use '@styles/Typography.module';
 
 .content_container {
   padding: Spacings.$spacing05;

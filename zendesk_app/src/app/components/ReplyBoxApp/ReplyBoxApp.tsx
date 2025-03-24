@@ -1,5 +1,5 @@
 import { marked } from 'marked'
-import React, { useEffect, useState, type JSX } from 'react'
+import { useEffect, useState, type JSX } from 'react'
 import { useClient } from '../../hooks/useClient'
 import { useZendesk } from '../../hooks/useZendesk'
 import { QuivrService } from '../../services/quivr'
@@ -113,6 +113,8 @@ export const ReplyBoxApp = (): JSX.Element => {
     } catch (error) {
       console.error(error)
       setResponse('Error occurred while rewriting response.')
+      setLoading(false)
+      client.invoke('close')
     } finally {
       clearInterval(loadingInterval)
     }
