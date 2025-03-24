@@ -6,21 +6,16 @@
     "url": "https://www.quivr.com"
   },
   "defaultLocale": "en",
-  "domainWhitelist": [
-    "api.quivr.app",
-    "api-gobocom.quivr.app",
-    "api-preview.quivr.app",
-    "localhost:*"
-  ],
+  "domainWhitelist": ["api.quivr.app", "api-gobocom.quivr.app", "api-preview.quivr.app", "localhost:*"],
   "private": false,
   "location": {
     "support": {
       "ticket_sidebar": {
-        "url": "http://localhost:3000",
+        "url": "assets/index.html",
         "flexible": true
       },
       "ticket_editor": {
-        "url": "http://localhost:3000/editor"
+        "url": "assets/index.html/editor"
       }
     }
   },
