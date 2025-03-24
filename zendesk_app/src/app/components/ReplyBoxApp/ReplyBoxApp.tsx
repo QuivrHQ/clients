@@ -6,6 +6,7 @@ import { QuivrService } from '../../services/quivr'
 import { SplitButtonType } from '../../types/button'
 import { ZendeskTask } from '../../types/zendesk'
 
+import { ZAFClient } from '../../contexts/ClientProvider'
 import { LoaderIcon } from '../../shared/components/LoaderIcon/LoaderIcon'
 import ActionButton from './ActionButton/ActionButton'
 import styles from './ReplyBoxApp.module.scss'
@@ -13,7 +14,7 @@ import styles from './ReplyBoxApp.module.scss'
 const ACTION_BUTTON_HEIGHT = 34
 
 export const ReplyBoxApp = (): JSX.Element => {
-  const client = useClient()
+  const client = useClient() as ZAFClient
   const agentPrompt: string =
     'Vous êtes un assistant attentionné,  votre objectif est de satisfaire la demande du client.'
   const [quivrService, setQuivrService] = useState<QuivrService | null>(null)
@@ -119,7 +120,7 @@ export const ReplyBoxApp = (): JSX.Element => {
 
   return (
     <div className={`${styles.content_container} ${loading ? styles.loading : ''}`}>
-      {!loading ? (
+      {loading ? (
         <div className={styles.loading_box}>
           <span>Loading...</span>
           <LoaderIcon size="big" color="black" />

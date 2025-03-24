@@ -13,6 +13,7 @@ import { IterationTextbox } from './components/IterationTextbox/IterationTextbox
 import { ResponseContainer } from './components/ResponseContainer/ResponseContainer'
 
 import { marked } from 'marked'
+import { ZAFClient } from '../../contexts/ClientProvider'
 import styles from './RightPanelApp.module.scss'
 
 export const RightPanelApp = (): JSX.Element => {
@@ -61,7 +62,7 @@ export const RightPanelApp = (): JSX.Element => {
   ]
 
   const { pasteInEditor, getTicketId, getUserInput, getSubdomain, getUserEmail } = useZendesk()
-  const client = useClient()
+  const client = useClient() as ZAFClient
 
   useEffect(() => {
     client.invoke('resize', { width: '100%', height: '450px' })
