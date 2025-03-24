@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useEffect, useMemo, useState } from 'react'
 
 declare global {
   interface Window {
@@ -18,7 +18,9 @@ export interface ZAFClient {
 
 export const ClientContext = createContext({})
 
-export function ClientProvider({ children }) {
+import { ReactNode } from 'react'
+
+export function ClientProvider({ children }: { children: ReactNode }) {
   const client: ZAFClient = useMemo(() => window.ZAFClient.init(), [])
   const [appRegistered, setAppRegistered] = useState(false)
 
