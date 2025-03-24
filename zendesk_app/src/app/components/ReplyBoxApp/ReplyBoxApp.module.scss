@@ -3,9 +3,9 @@
 @use '@styles/Typography.module';
 
 .content_container {
-  padding: Spacings.$spacing05;
-  background-color: var(--background-6);
-  height: 164px;
+  border: 4px solid var(--border-1);
+  height: 144px;
+  background-color: var(--border-1);
 
   &.loading {
     background-color: var(--white-0);

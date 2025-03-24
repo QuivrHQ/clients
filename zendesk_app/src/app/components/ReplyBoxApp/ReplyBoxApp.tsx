@@ -59,7 +59,7 @@ export const ReplyBoxApp = (): JSX.Element => {
   const { getTicketId, getUserInput } = useZendesk()
 
   useEffect(() => {
-    client.invoke('resize', { width: '200px', height: `${ACTION_BUTTON_HEIGHT * buttons.length + 28}px` })
+    client.invoke('resize', { width: '200px', height: `${ACTION_BUTTON_HEIGHT * buttons.length + 8}px` })
 
     const initializeQuivrService = async () => {
       const service = new QuivrService('https://api.quivr.app', client)
