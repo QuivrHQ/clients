@@ -1,4 +1,5 @@
-@use '../../shared/styles/Spacings.module';
+@use '@styles/Spacings.module';
+@use '@styles/Typography.module';
 
 .response_container {
   position: relative;
@@ -8,6 +9,8 @@
   box-shadow: none;
   background-color: var(--background-3);
   padding: Spacings.$spacing05;
+  font-size: Typography.$tiny;
+  line-height: 18px;
 
   &:focus {
     outline: none !important;
