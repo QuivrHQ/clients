@@ -1,0 +1,45 @@
+@use '@styles/Spacings.module';
+@use '@styles/Radius.module';
+@use '@styles/Typography.module';
+
+.content_container {
+  border: 4px solid var(--border-1);
+  height: 144px;
+  background-color: var(--border-1);
+
+  &.loading {
+    background-color: var(--white-0);
+  }
+
+  .buttons_container {
+    border-radius: Radius.$normal;
+    overflow: hidden;
+  }
+
+  .loading_box {
+    background-color: var(--white-0);
+    background: linear-gradient(90deg, var(--text-3) 50%, var(--text-3) 75%, var(--text-4) 90%);
+    background-size: 200% 100%;
+    animation: loading 2s infinite linear;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    width: 100%;
+    height: 100%;
+    background-color: blue;
+    display: flex;
+    font-weight: 600;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: Spacings.$spacing05;
+  }
+
+  @keyframes loading {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+}

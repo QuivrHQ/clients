@@ -1,6 +1,6 @@
 import React, { type JSX } from 'react'
 
-import { Icon } from '../../shared/components/Icon/Icon'
+import { Icon } from '../../../../shared/components/Icon/Icon'
 import styles from './IterationTextbox.module.scss'
 
 interface IterationTextboxProps {
