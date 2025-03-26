@@ -9,7 +9,8 @@
   align-items: center;
 
   .chatbar {
-    padding: Spacings.$spacing03;
+    padding-inline: Spacings.$spacing03;
+    padding-block: Spacings.$spacing01;
     width: 100%;
     display: flex;
     align-items: center;
@@ -17,13 +18,14 @@
     border: 1px solid var(--border-0);
     border-radius: Radius.$big;
     align-items: center;
+    font-size: Typography.$tiny;
 
     .input {
       border: none;
       width: 100%;
       outline: none;
       background-color: transparent;
-      font-size: Typography.$small;
+      font-size: Typography.$tiny;
       max-height: 96px;
       resize: none;
       padding-block: Spacings.$spacing04;
