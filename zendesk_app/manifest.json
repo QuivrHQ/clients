@@ -15,7 +15,7 @@
         "flexible": true
       },
       "ticket_editor": {
-        "url": "assets/index/editor.html"
+        "url": "assets/editor.html"
       }
     }
   },
