@@ -6,7 +6,7 @@ interface ProgressBarProps {
   processed: number
 }
 
-const ProgressBar = ({ total, processed }: ProgressBarProps): JSX.Element => {
+export const ProgressBar = ({ total, processed }: ProgressBarProps): JSX.Element => {
   const progress = Math.floor((processed / total) * 100)
 
   return (

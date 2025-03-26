@@ -1,0 +1,21 @@
+@use '@styles/Spacings.module';
+
+.content_container {
+  border-bottom: 1px solid var(--border-0);
+  width: 100%;
+  display: flex;
+  padding: Spacings.$spacing03;
+  background-color: var(--zendesk-black);
+  color: var(--white-0);
+  height: 34px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: Spacings.$spacing05;
+
+  &:hover {
+    cursor: pointer;
+    background-color: var(--zendesk-black-hover);
+  }
+}

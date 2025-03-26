@@ -1,14 +1,27 @@
-import React, { createContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useEffect, useMemo, useState } from 'react'
 
 declare global {
   interface Window {
-    ZAFClient: any
+    ZAFClient: {
+      init(): ZAFClient
+    }
   }
 }
+
+export interface ZAFClient {
+  invoke: (command: string, ...args: any[]) => Promise<any>
+  get: (path: string) => Promise<any>
+  set: (path: string, value: any) => Promise<any>
+  on: (event: string, callback: (data: any) => void) => void
+  trigger: (event: string, data?: any) => void
+}
+
 export const ClientContext = createContext({})
 
-export function ClientProvider({ children }) {
-  const client = useMemo(() => window.ZAFClient.init(), [])
+import { ReactNode } from 'react'
+
+export function ClientProvider({ children }: { children: ReactNode }) {
+  const client: ZAFClient = useMemo(() => window.ZAFClient.init(), [])
   const [appRegistered, setAppRegistered] = useState(false)
 
   useEffect(() => {

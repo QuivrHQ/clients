@@ -1,6 +1,6 @@
-@use '../../styles/Radius.module.scss';
-@use '../../styles/Spacings.module';
-@use '../../styles/Typography.module.scss';
+@use '@styles/Radius.module.scss';
+@use '@styles/Spacings.module';
+@use '@styles/Typography.module.scss';
 
 .text_area_input_container {
   display: flex;
