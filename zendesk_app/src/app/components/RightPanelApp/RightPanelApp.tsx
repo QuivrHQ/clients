@@ -52,6 +52,14 @@ export const RightPanelApp = (): JSX.Element => {
       disabled: loading
     },
     {
+      label: 'Translate Reply',
+      onClick: () => {
+        submit('translate')
+      },
+      iconName: 'chevronRight',
+      disabled: loading
+    },
+    {
       label: 'Summarize Ticket',
       onClick: () => {
         submit('summarize')
