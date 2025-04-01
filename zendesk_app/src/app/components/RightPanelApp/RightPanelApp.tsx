@@ -92,12 +92,13 @@ export const RightPanelApp = (): JSX.Element => {
           </>
         )}
       </div>
-      {!!response && !isLoadingText() && isChatEnabled && (
+      {isChatEnabled && (
         <div className={styles.test}>
           <IterationTextbox
             value={iterationRequest}
             setValue={setIterationRequest}
             onSubmit={() => void submitTask('iterate', { iterationRequest })}
+            hasDraftResponse={!!response}
           ></IterationTextbox>
         </div>
       )}

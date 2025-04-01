@@ -5,11 +5,12 @@ import styles from './IterationTextbox.module.scss'
 
 interface IterationTextboxProps {
   value: string
+  hasDraftResponse: boolean
   setValue: (value: string) => void
   onSubmit: () => void
 }
 
-export const IterationTextbox = ({ value, setValue, onSubmit }: IterationTextboxProps): JSX.Element => {
+export const IterationTextbox = ({ value, setValue, onSubmit, hasDraftResponse }: IterationTextboxProps): JSX.Element => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -22,10 +23,10 @@ export const IterationTextbox = ({ value, setValue, onSubmit }: IterationTextbox
     <div className={styles.chatbar_wrapper}>
       <div className={styles.chatbar}>
         <textarea
-          placeholder="Modify this draft..."
+          placeholder={hasDraftResponse ? 'Modify this draft...' : 'Ask Quivr...'}
           className={styles.input}
           value={value}
-          onChange={(e) => {
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
             setValue(e.target.value)
           }}
           onKeyDown={handleKeyDown}
