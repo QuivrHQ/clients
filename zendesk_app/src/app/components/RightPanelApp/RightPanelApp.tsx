@@ -201,15 +201,14 @@ export const RightPanelApp = (): JSX.Element => {
           </>
         )}
       </div>
-      {!!response && !isLoadingText() && (
         <div className={styles.test}>
           <IterationTextbox
             value={iterationRequest}
             setValue={setIterationRequest}
+            hasDraftResponse={!!response}
             onSubmit={() => void submit('iterate')}
           ></IterationTextbox>
         </div>
-      )}
     </div>
   )
 }
