@@ -1,4 +1,4 @@
-import { TicketIngestionProgress, ZendeskTask } from '../types/zendesk'
+import { TicketIngestionProgress, ZendeskConnection, ZendeskTask } from '../types/zendesk'
 
 export class QuivrService {
   private apiUrl: string
@@ -23,7 +23,7 @@ export class QuivrService {
     })
   }
 
-  async getZendeskConnection(): Promise<string | null> {
+  async getZendeskConnection(): Promise<ZendeskConnection | null> {
     try {
       const response = await this.client.request({
         url: `${this.apiUrl}/zendesk/`,
@@ -39,9 +39,9 @@ export class QuivrService {
         return null
       }
 
-      return response
+      return response.responseJSON
     } catch (error) {
-      throw new Error('Failed to get zendesk link')
+      throw new Error('Failed to get zendesk connection')
     }
   }
 

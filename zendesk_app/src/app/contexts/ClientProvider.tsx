@@ -1,4 +1,4 @@
-import { createContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useEffect, useMemo, useState, ReactNode } from 'react'
 
 declare global {
   interface Window {
@@ -8,17 +8,29 @@ declare global {
   }
 }
 
+interface Context {
+  location?: string
+  [key: string]: any
+}
+
+interface Metadata {
+  [key: string]: any
+}
+
 export interface ZAFClient {
-  invoke: (command: string, ...args: any[]) => Promise<any>
-  get: (path: string) => Promise<any>
-  set: (path: string, value: any) => Promise<any>
-  on: (event: string, callback: (data: any) => void) => void
-  trigger: (event: string, data?: any) => void
+  on(event: string, callback: (data: any) => void, context?: any): void
+  off(event: string, callback: (data: any) => void): void
+  has(event: string, callback: (data: any) => void): boolean
+  trigger(event: string, data?: any): void
+  get<T = any>(key: string | string[]): Promise<T>
+  set(key: string | { [key: string]: any }, value?: any, options?: { html?: boolean }): Promise<any>
+  invoke<T = any>(method: string, ...args: any[]): Promise<T>
+  metadata(): Promise<Metadata>
+  context(): Promise<Context>
+  instance(instanceGuid: string): ZAFClient
 }
 
 export const ClientContext = createContext({})
-
-import { ReactNode } from 'react'
 
 export function ClientProvider({ children }: { children: ReactNode }) {
   const client: ZAFClient = useMemo(() => window.ZAFClient.init(), [])
