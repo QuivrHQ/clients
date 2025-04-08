@@ -20,6 +20,7 @@ interface SplitButtonProps {
 export const SplitButton = ({ color, size = 'normal', splitButtons, important, onSubmit, disabled }: SplitButtonProps): JSX.Element => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false)
   const splitButtonRef = useRef<HTMLDivElement>(null)
+  const hasMultipleButtons = splitButtons.length > 1;
 
   const handleToggleMenu = () => {
     setMenuOpen(!menuOpen)
@@ -27,7 +28,7 @@ export const SplitButton = ({ color, size = 'normal', splitButtons, important, o
 
   const defaultButtonClasses = `${styles.default_button} ${menuOpen ? styles.menu_open : ''} ${styles[color]} ${
     important ? styles.important : ''
-  } ${styles[size]} ${disabled ? styles.disabled : ''}`
+  } ${styles[size]} ${disabled ? styles.disabled : ''} ${hasMultipleButtons ? styles.multiple_buttons : ''}`
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -54,16 +55,18 @@ export const SplitButton = ({ color, size = 'normal', splitButtons, important, o
         >
           <span className={styles.label}>{splitButtons[0].label}</span>
         </div>
-        <div
-          className={`${styles.icon_button_wrapper} ${styles[color]} ${styles[size]} ${menuOpen ? styles.open : ''}`}
-          onClick={handleToggleMenu}
+        {hasMultipleButtons && (
+          <div
+            className={`${styles.icon_button_wrapper} ${styles[color]} ${styles[size]} ${menuOpen ? styles.open : ''}`}
+            onClick={handleToggleMenu}
         >
           <div className={styles.icon_button}>
-            <Icon name="chevronDown" size="normal" color="white" />
+              <Icon name="chevronDown" size="normal" color="white" />
+            </div>
           </div>
-        </div>
+        )}
       </div>
-      {menuOpen && (
+      {menuOpen && hasMultipleButtons && (
         <div className={styles.menu}>
           {splitButtons.slice(1).map((button, index) => (
             <div
