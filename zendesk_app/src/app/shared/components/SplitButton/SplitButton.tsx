@@ -6,22 +6,20 @@ import styles from './SplitButton.module.scss'
 
 import { Color } from '../../../types/colors'
 import { Icon } from '../Icon/Icon'
+import { ZendeskTask } from '../../../types/zendesk'
 
 interface SplitButtonProps {
   color: Color
   size?: 'tiny' | 'small' | 'normal'
   important?: boolean
   splitButtons: SplitButtonType[]
+  onSubmit: (action: ZendeskTask) => void
+  disabled?: boolean
 }
 
-export const SplitButton = ({ color, size = 'normal', splitButtons, important }: SplitButtonProps): JSX.Element => {
+export const SplitButton = ({ color, size = 'normal', splitButtons, important, onSubmit, disabled }: SplitButtonProps): JSX.Element => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false)
   const splitButtonRef = useRef<HTMLDivElement>(null)
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
-  const [iconButtonHovered, setIconButtonHovered] = useState<boolean>(false)
-
-  const handleMouseEnter = (index: number) => setHoveredIndex(index)
-  const handleMouseLeave = () => setHoveredIndex(null)
 
   const handleToggleMenu = () => {
     setMenuOpen(!menuOpen)
@@ -29,7 +27,7 @@ export const SplitButton = ({ color, size = 'normal', splitButtons, important }:
 
   const defaultButtonClasses = `${styles.default_button} ${menuOpen ? styles.menu_open : ''} ${styles[color]} ${
     important ? styles.important : ''
-  } ${styles[size]} ${splitButtons[0].disabled ? styles.disabled : ''}`
+  } ${styles[size]} ${disabled ? styles.disabled : ''}`
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -51,7 +49,7 @@ export const SplitButton = ({ color, size = 'normal', splitButtons, important }:
         <div
           className={defaultButtonClasses}
           onClick={() => {
-            void splitButtons[0].onClick()
+            onSubmit(splitButtons[0].task);
           }}
         >
           <span className={styles.label}>{splitButtons[0].label}</span>
@@ -59,8 +57,6 @@ export const SplitButton = ({ color, size = 'normal', splitButtons, important }:
         <div
           className={`${styles.icon_button_wrapper} ${styles[color]} ${styles[size]} ${menuOpen ? styles.open : ''}`}
           onClick={handleToggleMenu}
-          onMouseEnter={() => setIconButtonHovered(true)}
-          onMouseLeave={() => setIconButtonHovered(false)}
         >
           <div className={styles.icon_button}>
             <Icon name="chevronDown" size="normal" color="white" />
@@ -72,13 +68,11 @@ export const SplitButton = ({ color, size = 'normal', splitButtons, important }:
           {splitButtons.slice(1).map((button, index) => (
             <div
               key={index}
-              className={`${styles.menu_item} ${styles[color]} ${styles[size]} ${button.disabled ? styles.disabled : ''}`}
+              className={`${styles.menu_item} ${styles[color]} ${styles[size]} ${disabled ? styles.disabled : ''}`}
               onClick={() => {
-                void button.onClick()
+                onSubmit(button.task);
                 setMenuOpen(false)
               }}
-              onMouseEnter={() => handleMouseEnter(index)}
-              onMouseLeave={handleMouseLeave}
             >
               <span className={styles.label}>{button.label}</span>
             </div>

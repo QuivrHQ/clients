@@ -1,11 +1,12 @@
 import { iconList } from '../shared/helpers/iconList'
 import { Color } from './colors'
+import { ZendeskTask } from './zendesk'
 
 export interface SplitButtonType {
   label: string
   iconName: keyof typeof iconList
-  onClick: (event?: MouseEvent) => void | Promise<void>
-  disabled?: boolean
+  task: ZendeskTask
+  displayKey: string
 }
 
 export interface ButtonType {
