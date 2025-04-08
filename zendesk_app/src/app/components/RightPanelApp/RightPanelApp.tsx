@@ -20,7 +20,7 @@ import { useExecuteZendeskTask } from '../../hooks/useExecuteZendeskTask'
 export const RightPanelApp = (): JSX.Element => {
   const { quivrService, ingestionStatus, setIngestionStatus } = useQuivrApiContext()
   const [iterationRequest, setIterationRequest] = useState('')
-  const { actionButtons } = useActionButtons()
+  const { actionButtons, isChatEnabled } = useActionButtons()
   const { loading, response, setResponse, submitTask } = useExecuteZendeskTask()
 
   const { pasteInEditor, getTicketId } = useZendesk()
@@ -92,7 +92,7 @@ export const RightPanelApp = (): JSX.Element => {
           </>
         )}
       </div>
-      {!!response && !isLoadingText() && (
+      {!!response && !isLoadingText() && isChatEnabled && (
         <div className={styles.test}>
           <IterationTextbox
             value={iterationRequest}

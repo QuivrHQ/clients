@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { ZendeskConnection, ZendeskTask } from '../types/zendesk'
 import { useQuivrApiContext } from './useQuivrApiContext'
 
@@ -12,7 +11,7 @@ const buttons = [
   {
     label: 'Rewrite Reply',
     task: 'reformulate' as ZendeskTask,
-    displayKey: 'display_iterate_button',
+    displayKey: 'display_reformulate_button',
     iconName: 'chevronRight'
   },
   {
@@ -42,6 +41,7 @@ export const useActionButtons = () => {
   )
 
   return {
-    actionButtons: enabledButtons
+    actionButtons: enabledButtons,
+    isChatEnabled: zendeskConnection?.display_iterate_button ?? false
   }
 }

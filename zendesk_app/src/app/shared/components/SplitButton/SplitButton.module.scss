@@ -16,7 +16,7 @@
       white-space: nowrap;
       padding-inline: Spacings.$spacing05;
       padding-block: Spacings.$spacing03;
-      border-radius: Radius.$normal 0 0 Radius.$normal;
+      border-radius: Radius.$normal;
       cursor: pointer;
       display: flex;
       width: fit-content;
@@ -26,6 +26,10 @@
       font-weight: 500;
       align-items: center;
       gap: Spacings.$spacing02;
+
+      &.multiple_buttons {
+        border-radius: Radius.$normal 0 0 Radius.$normal;
+      }
 
       &.important {
         text-transform: uppercase;
