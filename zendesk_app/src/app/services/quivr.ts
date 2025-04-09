@@ -1,4 +1,4 @@
-import { TicketIngestionProgress, ZendeskConnection, ZendeskTask } from '../types/zendesk'
+import { TicketIngestionProgress, ZendeskConnection, ZendeskTask, ZendeskUser } from '../types/zendesk'
 
 export class QuivrService {
   private apiUrl: string
@@ -123,6 +123,7 @@ export class QuivrService {
     prompt: string,
     ticketId: string,
     content: string,
+    user: ZendeskUser,
     onStreamMessage: (message: string) => void
   ): Promise<string> {
     const url = new URL(`${this.apiUrl}/zendesk/task/${task}`)
@@ -139,7 +140,14 @@ export class QuivrService {
         'Content-Type': 'application/json',
         Accept: 'text/event-stream'
       },
-      body: JSON.stringify({})
+      body: JSON.stringify({
+        support_agent: {
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          platform_user_id: user.id
+        }
+      })
     })
 
     if (!response.body) {
