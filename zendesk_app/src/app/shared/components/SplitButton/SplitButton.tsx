@@ -1,12 +1,12 @@
-import React, { type JSX, useEffect, useRef, useState } from 'react'
+import { type JSX, useEffect, useRef, useState } from 'react'
 
 import { SplitButtonType } from '../../../types/button'
 
 import styles from './SplitButton.module.scss'
 
 import { Color } from '../../../types/colors'
-import { Icon } from '../Icon/Icon'
 import { ZendeskTask } from '../../../types/zendesk'
+import { Icon } from '../Icon/Icon'
 
 interface SplitButtonProps {
   color: Color
@@ -17,10 +17,17 @@ interface SplitButtonProps {
   disabled?: boolean
 }
 
-export const SplitButton = ({ color, size = 'normal', splitButtons, important, onSubmit, disabled }: SplitButtonProps): JSX.Element => {
+export const SplitButton = ({
+  color,
+  size = 'normal',
+  splitButtons,
+  important,
+  onSubmit,
+  disabled
+}: SplitButtonProps): JSX.Element => {
   const [menuOpen, setMenuOpen] = useState<boolean>(false)
   const splitButtonRef = useRef<HTMLDivElement>(null)
-  const hasMultipleButtons = splitButtons.length > 1;
+  const hasMultipleButtons = splitButtons.length > 1
 
   const handleToggleMenu = () => {
     setMenuOpen(!menuOpen)
@@ -50,17 +57,17 @@ export const SplitButton = ({ color, size = 'normal', splitButtons, important, o
         <div
           className={defaultButtonClasses}
           onClick={() => {
-            onSubmit(splitButtons[0].task);
+            onSubmit(splitButtons[0].task)
           }}
         >
           <span className={styles.label}>{splitButtons[0].label}</span>
         </div>
         {hasMultipleButtons && (
           <div
-            className={`${styles.icon_button_wrapper} ${styles[color]} ${styles[size]} ${menuOpen ? styles.open : ''}`}
+            className={`${styles.icon_button_wrapper} ${styles[color]} ${styles[size]} ${menuOpen ? styles.open : ''} ${disabled ? styles.disabled : ''}`}
             onClick={handleToggleMenu}
-        >
-          <div className={styles.icon_button}>
+          >
+            <div className={styles.icon_button}>
               <Icon name="chevronDown" size="normal" color="white" />
             </div>
           </div>
@@ -73,7 +80,7 @@ export const SplitButton = ({ color, size = 'normal', splitButtons, important, o
               key={index}
               className={`${styles.menu_item} ${styles[color]} ${styles[size]} ${disabled ? styles.disabled : ''}`}
               onClick={() => {
-                onSubmit(button.task);
+                onSubmit(button.task)
                 setMenuOpen(false)
               }}
             >

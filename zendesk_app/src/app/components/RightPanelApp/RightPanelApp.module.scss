@@ -8,6 +8,7 @@
   overflow: hidden;
   max-height: 100dvh;
   height: 100dvh;
+  min-height: 100dvh;
   width: 100%;
   justify-content: space-between;
 
@@ -16,6 +17,7 @@
     flex-direction: column;
     gap: Spacings.$spacing05;
     overflow: hidden;
+    min-height: 40dvh;
 
     &.without_response {
       overflow: visible;

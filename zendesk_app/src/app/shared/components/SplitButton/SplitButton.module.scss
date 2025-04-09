@@ -108,6 +108,12 @@
       border-radius: 0 Radius.$normal Radius.$normal 0;
       background-color: var(--zendesk-black);
 
+      &.disabled {
+        border-color: var(--border-2);
+        background-color: var(--background-2);
+        pointer-events: none;
+      }
+
       &:hover {
         cursor: pointer;
         background-color: var(--zendesk-black-hover);
@@ -122,6 +128,7 @@
 
       &.open {
         border-radius: 0 Radius.$normal 0 0;
+
         .icon_button {
           transform: rotate(180deg);
         }
