@@ -46,6 +46,13 @@ export const RightPanelApp = (): JSX.Element => {
     return ['.', '..', '...'].includes(response)
   }
 
+  const onCopyDraft = async () => {
+    await pasteInEditor(client, await marked(response))
+
+    const ticketId = await getTicketId(client)
+    await quivrService?.acceptTicketAnswer(ticketId)
+  }
+
   return (
     <div className={styles.content_container}>
       <div className={`${styles.top_container} ${!response ? styles.without_response : ''}`}>
@@ -71,7 +78,7 @@ export const RightPanelApp = (): JSX.Element => {
           <QuivrButton
             label="Copy Draft"
             color="black"
-            onClick={async () => pasteInEditor(client, await marked(response))}
+            onClick={onCopyDraft}
             size="tiny"
             disabled={isLoadingText() || !response}
           />

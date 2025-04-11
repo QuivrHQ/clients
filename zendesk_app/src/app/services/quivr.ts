@@ -236,4 +236,24 @@ export class QuivrService {
       throw new Error('Failed to get auto draft')
     }
   }
+
+  async acceptTicketAnswer(ticketId: string): Promise<void> {
+    try {
+      await this.client.request({
+        url: `${this.apiUrl}/zendesk/ticket_answer/accepted`,
+        type: 'PUT',
+        headers: {
+          Authorization: `Bearer ${this.quivrApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        accepts: 'application/json',
+        data: JSON.stringify({
+          zendesk_ticket_id: ticketId,
+          accepted: true
+        })
+      })
+    } catch (error) {
+      console.error('Failed to accept ticket answer', error)
+    }
+  }
 }
