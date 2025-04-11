@@ -52,7 +52,6 @@ export const IterationTextbox = ({
           }}
           onKeyDown={handleKeyDown}
           rows={1}
-          style={{ overflow: 'hidden', resize: 'none' }}
         />
         <div className={styles.icon} onClick={onSubmit}>
           <Icon name="send" size="normal" color="accent" disabled={!value} />
