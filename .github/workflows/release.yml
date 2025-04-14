@@ -56,7 +56,8 @@ jobs:
         run: |
           # Replace API URLs with preview URL
           sed -i 's|https://api.quivr.app|https://api-preview.quivr.app|g' src/app/services/quivr.ts
-          sed -i 's|https://api.quivr.app|https://api-preview.quivr.app|g' src/app/contexts/QuivrApiProvider.tsx
+          sed -i 's|https://api.quivr.app|https://api-preview.quivr.app|g' src/app/contexts/QuivrApiProvider.tsx          sed -i 's|http://localhost:3000/modal|assets/modal.html|g' src/app/components/RightPanelApp/components/ResponseContainer/ResponseContainer.tsx
+          sed -i 's|http://localhost:3000/modal|assets/modal.html|g' src/app/components/RightPanelApp/components/ResponseContainer/ResponseContainer.tsx
           npm run build
           zcli apps:package dist
           ZIP_FILE=$(find . -name "app-*.zip" -type f)
