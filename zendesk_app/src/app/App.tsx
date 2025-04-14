@@ -12,7 +12,7 @@ interface AppProps {
 function App({ isEditorMode = false, isDisplayedModal = false }: AppProps) {
   return (
     <ThemeProvider theme={{ ...DEFAULT_THEME }}>
-      {isDisplayedModal ? <FeedbackModal></FeedbackModal> : isEditorMode ? <ReplyBoxApp /> : <RightPanelApp />}
+      {isDisplayedModal ? <FeedbackModal /> : isEditorMode ? <ReplyBoxApp /> : <RightPanelApp />}
     </ThemeProvider>
   )
 }

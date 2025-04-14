@@ -36,8 +36,7 @@ export const ResponseContainer = ({ responseContent, setResponseContent }: Respo
     client.invoke('instances.create', {
       location: 'modal',
       url: 'http://localhost:3000/modal',
-      size: { width: '280px', height: '300px' },
-      context: { message: 'hello' }
+      size: { width: '280px', height: '300px' }
     })
   }
 

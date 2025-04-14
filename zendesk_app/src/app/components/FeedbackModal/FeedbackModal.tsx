@@ -5,6 +5,8 @@ import QuivrButton from '../../shared/components/QuivrButton/QuivrButton'
 import TextAreaInput from '../../shared/components/TextAreaInput/TextAreaInput'
 import styles from './FeedbackModal.module.scss'
 
+const ratingDescriptions = ['Pas du tout pertinent', 'Un peu utile', 'Assez pertinent', 'Presque parfait', 'Parfait']
+
 export const FeedbackModal = (): JSX.Element => {
   const [rating, setRating] = useState(0)
   const [feedback, setFeedback] = useState('')
@@ -14,7 +16,6 @@ export const FeedbackModal = (): JSX.Element => {
   const handleStarClick = (value: number) => {
     setRating(value)
   }
-  const ratingDescriptions = ['Pas du tout pertinent', 'Un peu utile', 'Assez pertinent', 'Presque parfait', 'Parfait']
 
   return (
     <div className={styles.main_container}>
