@@ -1,28 +1,46 @@
 @use '@styles/Spacings.module';
 @use '@styles/Typography.module';
 
-.response_container {
-  position: relative;
-  max-height: 100%;
-  overflow-y: auto;
-  outline: none;
-  box-shadow: none;
-  background-color: var(--background-3);
-  padding: Spacings.$spacing05;
-  font-size: Typography.$tiny;
-  line-height: 18px;
+.main_container {
+  display: flex;
+  flex-direction: column;
+  gap: Spacings.$spacing02;
 
-  &:focus {
-    outline: none !important;
+  .response_container {
+    position: relative;
+    max-height: 100%;
+    overflow-y: auto;
+    outline: none;
     box-shadow: none;
-    border: none;
+    background-color: var(--background-3);
+    padding: Spacings.$spacing05;
+    font-size: Typography.$tiny;
+    line-height: 18px;
+
+    &:focus {
+      outline: none !important;
+      box-shadow: none;
+      border: none;
+    }
+
+    strong {
+      font-weight: 600;
+    }
+
+    em {
+      font-style: italic;
+    }
   }
 
-  strong {
-    font-weight: 600;
-  }
+  .feedback_button {
+    display: flex;
+    justify-content: flex-end;
+    font-size: Typography.$tiny;
+    font-weight: 500;
 
-  em {
-    font-style: italic;
+    &:hover {
+      cursor: pointer;
+      color: var(--primary-0);
+    }
   }
 }

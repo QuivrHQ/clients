@@ -40,7 +40,7 @@ export const ResponseContainer = ({ responseContent, setResponseContent }: Respo
   }
 
   return (
-    <div>
+    <div className={styles.main_container}>
       <div
         className={styles.response_container}
         contentEditable={true}
@@ -48,9 +48,9 @@ export const ResponseContainer = ({ responseContent, setResponseContent }: Respo
         onInput={handleInput}
         onBlur={() => setManualEditing(false)}
       ></div>
-      <button className={styles.feedback_button} onClick={openFeedbackModal}>
+      <span className={styles.feedback_button} onClick={openFeedbackModal}>
         Give us feedback
-      </button>
+      </span>
     </div>
   )
 }
