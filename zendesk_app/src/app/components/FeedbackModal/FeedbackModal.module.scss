@@ -1,0 +1,28 @@
+@use '@styles/Spacings.module';
+@use '@styles/Typography.module';
+
+.main_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, sans-serif;
+  justify-content: space-between;
+
+  .stars_container {
+    display: flex;
+
+    .star {
+      cursor: pointer;
+      transition: color 0.2s ease-in-out;
+
+      &:hover {
+        color: #ffcc00;
+      }
+    }
+
+    .filled {
+      color: #ffcc00;
+    }
+  }
+}
