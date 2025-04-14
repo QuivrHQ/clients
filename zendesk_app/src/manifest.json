@@ -20,6 +20,9 @@
       },
       "ticket_editor": {
         "url": "assets/editor.html"
+      },
+      "modal": {
+        "url": "assets/modal.html"
       }
     }
   },
