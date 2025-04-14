@@ -7,11 +7,12 @@ import './index.css'
 
 // Get the current URL to determine if we're in editor mode
 const isEditorMode = window.location.pathname.includes('/editor')
+const isDisplayedModal = window.location.pathname.includes('/modal')
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <ClientProvider>
     <QuivrApiProvider>
-      <App isEditorMode={isEditorMode} />
+      <App isEditorMode={isEditorMode} isDisplayedModal={isDisplayedModal} />
     </QuivrApiProvider>
   </ClientProvider>
 )

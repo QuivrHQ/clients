@@ -11,3 +11,4 @@ export type Color =
   | 'success'
   | 'warning'
   | 'static-white'
+  | 'zendesk'
