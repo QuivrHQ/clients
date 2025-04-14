@@ -5,6 +5,8 @@ import { useClient } from '../../../../hooks/useClient'
 import { ZAFClient } from 'src/app/contexts/ClientProvider'
 import styles from './ResponseContainer.module.scss'
 
+const SHOW_FEEDBACK_BUTTON = false
+
 interface ResponseContainerProps {
   responseContent: string
   setResponseContent: (content: string) => void
@@ -48,9 +50,11 @@ export const ResponseContainer = ({ responseContent, setResponseContent }: Respo
         onInput={handleInput}
         onBlur={() => setManualEditing(false)}
       ></div>
-      <span className={styles.feedback_button} onClick={openFeedbackModal}>
-        Give us feedback
-      </span>
+      {SHOW_FEEDBACK_BUTTON && (
+        <span className={styles.feedback_button} onClick={openFeedbackModal}>
+          Give us feedback
+        </span>
+      )}
     </div>
   )
 }

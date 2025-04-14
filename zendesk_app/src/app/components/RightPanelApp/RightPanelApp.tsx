@@ -1,21 +1,21 @@
-import React, { useEffect, useState, type JSX } from 'react'
+import { useEffect, useState, type JSX } from 'react'
+import { useActionButtons } from '../../hooks/useActionButtons'
 import { useClient } from '../../hooks/useClient'
-import { useZendesk } from '../../hooks/useZendesk'
 import { useQuivrApiContext } from '../../hooks/useQuivrApiContext'
+import { useZendesk } from '../../hooks/useZendesk'
 import { Icon } from '../../shared/components/Icon/Icon'
 import { MessageInfoBox } from '../../shared/components/MessageInfoBox/MessageInfoBox'
 import { ProgressBar } from '../../shared/components/ProgressBar/ProgressBar'
 import { QuivrButton } from '../../shared/components/QuivrButton/QuivrButton'
 import { SplitButton } from '../../shared/components/SplitButton/SplitButton'
-import { useActionButtons } from '../../hooks/useActionButtons'
 import { ZendeskTask } from '../../types/zendesk'
 import { IterationTextbox } from './components/IterationTextbox/IterationTextbox'
 import { ResponseContainer } from './components/ResponseContainer/ResponseContainer'
 
 import { marked } from 'marked'
 import { ZAFClient } from '../../contexts/ClientProvider'
-import styles from './RightPanelApp.module.scss'
 import { useExecuteZendeskTask } from '../../hooks/useExecuteZendeskTask'
+import styles from './RightPanelApp.module.scss'
 
 export const RightPanelApp = (): JSX.Element => {
   const { quivrService, ingestionStatus, setIngestionStatus } = useQuivrApiContext()
