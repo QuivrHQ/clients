@@ -46,7 +46,8 @@ export default ({ mode }) => {
       rollupOptions: {
         input: {
           main: resolve(__dirname, 'src/index.html'),
-          editor: resolve(__dirname, 'src/editor.html')
+          editor: resolve(__dirname, 'src/editor.html'),
+          modal: resolve(__dirname, 'src/modal.html')
         },
         output: {
           entryFileNames: `[name].js`,
