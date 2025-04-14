@@ -43,3 +43,56 @@ export interface ExternalAPIEndpoint {
   headers: Record<string, string>;
   params: Record<string, string>;
 }
+
+interface ZendeskTimeZone {
+  name: string;
+  translatedName: string;
+  ianaName: string;
+  offset: number;
+  formattedOffset: string;
+}
+
+interface ZendeskGroup {
+  id: number;
+  name: string;
+}
+
+interface ZendeskOrganization {
+  group: ZendeskGroup | null;
+  domains: string;
+  id: number;
+  name: string;
+  sharedComments: boolean;
+  sharedTickets: boolean;
+}
+
+interface ZendeskIdentity {
+  id: number; 
+  type: 'email' | 'twitter' | 'facebook' | 'google' | 'agent_forwarding' | 'phone_number';
+  value: string; 
+  verified: boolean; 
+  primary: boolean; 
+  userId: number; 
+  undeliverableCount?: number; 
+  deliverableState?: 'deliverable' | 'undeliverable'; 
+}
+
+export interface ZendeskUser {
+  alias: string;
+  avatarUrl: string;
+  details: string;
+  email: string;
+  externalId: string | null;
+  id: number;
+  identities: ZendeskIdentity[];
+  isSystemUser: boolean;
+  locale: string;
+  name: string;
+  notes: string;
+  role: 'end-user' | 'agent' | 'admin' | number;
+  signature: string;
+  tags: string[];
+  timeZone: ZendeskTimeZone;
+  groups: ZendeskGroup[];
+  organizations: ZendeskOrganization[];
+}
