@@ -57,6 +57,7 @@
       color: var(--text-0);
     }
   }
+
   &.primary:not(.disabled) {
     border-color: var(--primary-0);
     color: var(--primary-0);
@@ -65,6 +66,17 @@
     &.important {
       background-color: var(--primary-0);
       color: var(--text-0);
+    }
+  }
+
+  &.zendesk:not(.disabled) {
+    background-color: var(--zendesk-black);
+    color: var(--white-0);
+
+    &:hover,
+    &.important {
+      background-color: var(--zendesk-black-hover);
+      color: var(--white-0);
     }
   }
 
