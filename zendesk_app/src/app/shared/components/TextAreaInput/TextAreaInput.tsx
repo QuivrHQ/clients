@@ -10,6 +10,7 @@ type TextAreaInputProps = {
   expandable?: boolean
   isArray?: boolean
   autoFocus?: boolean
+  rows?: number
 }
 
 export const TextAreaInput = ({
@@ -20,7 +21,8 @@ export const TextAreaInput = ({
   disabled = false,
   expandable,
   isArray = false,
-  autoFocus = false
+  autoFocus = false,
+  rows
 }: TextAreaInputProps) => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -84,7 +86,7 @@ export const TextAreaInput = ({
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
         disabled={disabled}
-        rows={3}
+        rows={rows ?? 3}
         style={{ resize: 'none' }}
       />
     </div>
