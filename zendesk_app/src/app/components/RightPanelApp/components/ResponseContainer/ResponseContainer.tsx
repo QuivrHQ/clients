@@ -1,6 +1,8 @@
 import { marked } from 'marked'
 import React, { useEffect, useState, type JSX } from 'react'
+import { useClient } from '../../../../hooks/useClient'
 
+import { ZAFClient } from 'src/app/contexts/ClientProvider'
 import styles from './ResponseContainer.module.scss'
 
 interface ResponseContainerProps {
@@ -11,16 +13,30 @@ interface ResponseContainerProps {
 export const ResponseContainer = ({ responseContent, setResponseContent }: ResponseContainerProps): JSX.Element => {
   const [htmlContent, setHtmlContent] = useState('')
   const [manualEditing, setManualEditing] = useState(false)
+  const client = useClient() as ZAFClient
 
   useEffect(() => {
     if (!manualEditing) {
-      setHtmlContent(marked(responseContent))
+      const parseMarkdown = async () => {
+        const html = await marked(responseContent)
+        setHtmlContent(html)
+      }
+      void parseMarkdown()
     }
   }, [responseContent])
 
   const handleInput = (event: React.FormEvent<HTMLDivElement>) => {
     setManualEditing(true)
     setResponseContent(event.currentTarget.innerHTML)
+  }
+
+  const openFeedbackModal = () => {
+    client.invoke('instances.create', {
+      location: 'modal',
+      url: 'http://localhost:3000/modal',
+      size: { width: '400px', height: '200px' },
+      context: { message: 'hello' }
+    })
   }
 
   return (
@@ -32,6 +48,9 @@ export const ResponseContainer = ({ responseContent, setResponseContent }: Respo
         onInput={handleInput}
         onBlur={() => setManualEditing(false)}
       ></div>
+      <button className={styles.feedback_button} onClick={openFeedbackModal}>
+        Give us feedback
+      </button>
     </div>
   )
 }
