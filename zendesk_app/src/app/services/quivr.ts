@@ -236,4 +236,23 @@ export class QuivrService {
       throw new Error('Failed to get auto draft')
     }
   }
+
+  async rateGeneratedAnswer(ticketId: string, ratingScore: number, ratingComment: string): Promise<void> {
+    await this.client.request({
+      url: `${this.apiUrl}/zendesk/ticket_answer/rating`,
+      type: 'PUT',
+      headers: {
+        Authorization: `Bearer ${this.quivrApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      accepts: 'application/json',
+      data: JSON.stringify({
+        zendesk_ticket_id: ticketId,
+        support_agent_rating: {
+          score: ratingScore,
+          comment: ratingComment === '' ? null : ratingComment
+        }
+      })
+    })
+  }
 }
