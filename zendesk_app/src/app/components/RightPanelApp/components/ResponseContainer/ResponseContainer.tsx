@@ -60,7 +60,7 @@ export const ResponseContainer = ({ responseContent, setResponseContent }: Respo
         onBlur={() => setManualEditing(false)}
       ></div>
       <span className={styles.feedback_button} onClick={openFeedbackModal}>
-        Give us feedback
+        Provide feedback
       </span>
     </div>
   )
