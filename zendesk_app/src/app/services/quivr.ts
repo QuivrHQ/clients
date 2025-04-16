@@ -283,4 +283,25 @@ export class QuivrService {
       })
     })
   }
+
+  async updateSupportAgent(ticketId: string, user: ZendeskUser): Promise<void> {
+    await this.client.request({
+      url: `${this.apiUrl}/zendesk/ticket_answer/support_agent?step=autodraft`,
+      type: 'PUT',
+      headers: {
+        Authorization: `Bearer ${this.quivrApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      accepts: 'application/json',
+      data: JSON.stringify({
+        zendesk_ticket_id: ticketId,
+        support_agent: {
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          platform_user_id: user.id
+        }
+      })
+    })
+  }
 }
