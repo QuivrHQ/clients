@@ -23,8 +23,15 @@ export const RightPanelApp = (): JSX.Element => {
   const { actionButtons, isChatEnabled } = useActionButtons()
   const { loading, response, setResponse, submitTask } = useExecuteZendeskTask()
 
-  const { pasteInEditor, getTicketId } = useZendesk()
+  const { pasteInEditor, getTicketId, getAssignee } = useZendesk()
   const client = useClient() as ZAFClient
+
+  const updateSupportAgentWithAssignee = async (ticketId: string) => {
+    const assignee = await getAssignee(client);
+    if(assignee) {
+      await quivrService?.updateSupportAgent(ticketId, assignee)
+    }
+  }
 
   useEffect(() => {
     client.invoke('resize', { width: '100%', height: '450px' })
@@ -35,7 +42,17 @@ export const RightPanelApp = (): JSX.Element => {
       if (quivrService) {
         const ticketId = await getTicketId(client)
         const autoDraft = await quivrService.getAutoDraft(ticketId)
-        setResponse(autoDraft)
+
+        if(autoDraft) {
+          updateSupportAgentWithAssignee(ticketId)
+          setResponse(autoDraft)
+
+          client.on('ticket.assignee.user.id.changed', (assigneeId: string) => {
+            if(assigneeId) {
+              updateSupportAgentWithAssignee(ticketId)
+            }
+          })
+        }
       }
     }
 

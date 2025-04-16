@@ -36,6 +36,10 @@ export const useZendesk = () => {
     return client.get('ticket.requester').then((data) => data['ticket.requester'].email)
   }
 
+  async function getAssignee(client: ZAFClient): Promise<ZendeskUser> {
+    return client.get('ticket.assignee.user').then((data) => data['ticket.assignee.user'])
+  }
+
   async function getSubdomain(client: ZAFClient): Promise<string> {
     return client.context().then((context) => {
       return context.account.subdomain
@@ -56,6 +60,7 @@ export const useZendesk = () => {
     getUserEmail,
     getRequesterEmail,
     getSubdomain,
-    pasteInEditor
+    pasteInEditor,
+    getAssignee
   }
 }
