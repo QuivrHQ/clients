@@ -36,7 +36,6 @@ export const ResponseContainer = ({ responseContent, setResponseContent }: Respo
 
   const handleStarClick = async (value: number) => {
     setRating(value)
-
     const ticketId = await getTicketId(client)
 
     if (!ticketId) return
