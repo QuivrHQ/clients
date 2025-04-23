@@ -32,15 +32,41 @@
     }
   }
 
-  .feedback_button {
+  .feedback_wrapper {
     display: flex;
-    justify-content: flex-end;
-    font-size: Typography.$tiny;
-    font-weight: 500;
+    gap: Spacings.$spacing02;
+    margin-top: Spacings.$spacing05;
+    align-items: center;
+    align-self: flex-end;
 
-    &:hover {
-      cursor: pointer;
-      color: var(--primary-0);
+    .stars_container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+
+      .star {
+        cursor: pointer;
+        transition: color 0.2s ease-in-out;
+        font-size: Typography.$medium;
+        color: var(--text-1);
+      }
+
+      .filled {
+        color: var(--gold);
+      }
+    }
+
+    .feedback_button {
+      display: flex;
+      justify-content: flex-end;
+      font-size: Typography.$tiny;
+      font-weight: 500;
+
+      &:hover {
+        cursor: pointer;
+        color: var(--primary-0);
+      }
     }
   }
 }

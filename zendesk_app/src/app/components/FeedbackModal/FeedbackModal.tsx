@@ -1,11 +1,10 @@
 import { useEffect, useState, type JSX } from 'react'
 import { ZAFClient } from '../../contexts/ClientProvider'
 import { useClient } from '../../hooks/useClient'
+import { useQuivrApiContext } from '../../hooks/useQuivrApiContext'
 import QuivrButton from '../../shared/components/QuivrButton/QuivrButton'
 import TextAreaInput from '../../shared/components/TextAreaInput/TextAreaInput'
 import styles from './FeedbackModal.module.scss'
-import { useQuivrApiContext } from '../../hooks/useQuivrApiContext'
-import { useZendesk } from '../../hooks/useZendesk'
 
 const ratingDescriptions = ['Pas du tout pertinent', 'Un peu utile', 'Assez pertinent', 'Presque parfait', 'Parfait']
 
@@ -23,26 +22,26 @@ export const FeedbackModal = (): JSX.Element => {
   }
 
   useEffect(() => {
-    if (!client) return;
-    client.trigger('modal.ready');
+    if (!client) return
+    client.trigger('modal.ready')
 
-    client.on('modal.data', (incomingData: { ticketId: string }) => {
-      setTicketId(incomingData.ticketId)
-    });
-  }, [client]);
+    client.on('modal.data', (incomingData: { ticketId: string; rating: number }) => {
+      setTicketId(incomingData.ticketId), setRating(incomingData.rating)
+    })
+  }, [client])
 
   const handleSubmit = async () => {
-    if (!ticketId) return;
-    setLoading(true);
+    if (!ticketId) return
+    setLoading(true)
 
-    try{
+    try {
       await quivrService?.rateGeneratedAnswer(ticketId, rating, feedback)
-      setLoading(false);
+      setLoading(false)
       client.invoke('destroy')
     } catch (error) {
       console.error('Error rating generated answer', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
@@ -69,7 +68,7 @@ export const FeedbackModal = (): JSX.Element => {
         </div>
       </div>
       <TextAreaInput
-        label="Enter your feedback (optional)"
+        label="Enter your feedback"
         inputValue={feedback}
         setInputValue={setFeedback as (value: string | string[]) => void}
         expandable={true}
@@ -82,7 +81,7 @@ export const FeedbackModal = (): JSX.Element => {
           color="zendesk"
           iconName="send"
           isLoading={loading}
-          disabled={rating === 0}
+          disabled={feedback === '' || rating === 0}
         ></QuivrButton>
       </div>
     </div>
