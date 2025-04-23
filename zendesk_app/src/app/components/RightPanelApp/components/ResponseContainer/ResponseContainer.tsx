@@ -9,9 +9,14 @@ import styles from './ResponseContainer.module.scss'
 interface ResponseContainerProps {
   responseContent: string
   setResponseContent: (content: string) => void
+  ongoingTask: boolean
 }
 
-export const ResponseContainer = ({ responseContent, setResponseContent }: ResponseContainerProps): JSX.Element => {
+export const ResponseContainer = ({
+  responseContent,
+  setResponseContent,
+  ongoingTask
+}: ResponseContainerProps): JSX.Element => {
   const [htmlContent, setHtmlContent] = useState('')
   const [manualEditing, setManualEditing] = useState(false)
   const [rating, setRating] = useState(0)
@@ -28,6 +33,12 @@ export const ResponseContainer = ({ responseContent, setResponseContent }: Respo
       void parseMarkdown()
     }
   }, [responseContent])
+
+  useEffect(() => {
+    if (!ongoingTask) {
+      setRating(0)
+    }
+  }, [ongoingTask])
 
   const handleInput = (event: React.FormEvent<HTMLDivElement>) => {
     setManualEditing(true)
@@ -77,25 +88,27 @@ export const ResponseContainer = ({ responseContent, setResponseContent }: Respo
         onInput={handleInput}
         onBlur={() => setManualEditing(false)}
       ></div>
-      <div className={styles.feedback_wrapper}>
-        <div className={styles.stars_container}>
-          {[...Array(5)].map((_, index) => {
-            const starValue = index + 1
-            return (
-              <span
-                key={starValue}
-                className={`${styles.star} ${starValue <= rating ? styles.filled : ''}`}
-                onClick={() => handleStarClick(starValue)}
-              >
-                ★
-              </span>
-            )
-          })}
+      {!ongoingTask && (
+        <div className={styles.feedback_wrapper}>
+          <div className={styles.stars_container}>
+            {[...Array(5)].map((_, index) => {
+              const starValue = index + 1
+              return (
+                <span
+                  key={starValue}
+                  className={`${styles.star} ${starValue <= rating ? styles.filled : ''}`}
+                  onClick={() => handleStarClick(starValue)}
+                >
+                  ★
+                </span>
+              )
+            })}
+          </div>
+          <span className={styles.feedback_button} onClick={openFeedbackModal}>
+            - Add details
+          </span>
         </div>
-        <span className={styles.feedback_button} onClick={openFeedbackModal}>
-          - Add details
-        </span>
-      </div>
+      )}
     </div>
   )
 }

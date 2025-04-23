@@ -22,6 +22,7 @@ export const RightPanelApp = (): JSX.Element => {
   const [iterationRequest, setIterationRequest] = useState('')
   const { actionButtons, isChatEnabled } = useActionButtons()
   const { loading, response, setResponse, submitTask } = useExecuteZendeskTask()
+  const [ongoingTask, setOngoingTask] = useState(false)
 
   const { pasteInEditor, getTicketId } = useZendesk()
   const client = useClient() as ZAFClient
@@ -53,6 +54,12 @@ export const RightPanelApp = (): JSX.Element => {
     await quivrService?.acceptTicketAnswer(ticketId)
   }
 
+  const handleSubmitTask = async (action: ZendeskTask) => {
+    setOngoingTask(true)
+    await submitTask(action, { iterationRequest })
+    setOngoingTask(false)
+  }
+
   return (
     <div className={styles.content_container}>
       <div className={`${styles.top_container} ${!response ? styles.without_response : ''}`}>
@@ -82,18 +89,17 @@ export const RightPanelApp = (): JSX.Element => {
             size="tiny"
             disabled={isLoadingText() || !response}
           />
-          <SplitButton
-            color="black"
-            splitButtons={actionButtons}
-            disabled={loading}
-            onSubmit={(action: ZendeskTask) => submitTask(action, { iterationRequest })}
-          />
+          <SplitButton color="black" splitButtons={actionButtons} disabled={loading} onSubmit={handleSubmitTask} />
         </div>
         {response && (
           <>
             <div className={styles.response_separator}></div>
             <div className={styles.response_container}>
-              <ResponseContainer responseContent={response} setResponseContent={setResponse}></ResponseContainer>
+              <ResponseContainer
+                responseContent={response}
+                setResponseContent={setResponse}
+                ongoingTask={ongoingTask}
+              ></ResponseContainer>
             </div>
             <div className={styles.response_separator}></div>
           </>
@@ -104,7 +110,7 @@ export const RightPanelApp = (): JSX.Element => {
           <IterationTextbox
             value={iterationRequest}
             setValue={setIterationRequest}
-            onSubmit={() => void submitTask('iterate', { iterationRequest })}
+            onSubmit={() => void handleSubmitTask('iterate')} // Utilise la nouvelle fonction
             hasDraftResponse={!!response}
           ></IterationTextbox>
         </div>
