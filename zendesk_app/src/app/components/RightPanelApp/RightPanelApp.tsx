@@ -22,7 +22,7 @@ export const RightPanelApp = (): JSX.Element => {
   const [iterationRequest, setIterationRequest] = useState('')
   const { actionButtons, isChatEnabled } = useActionButtons()
   const { loading, response, setResponse, submitTask } = useExecuteZendeskTask()
-  const [signal, setSignal] = useState(false) // Nouvel état pour le signal
+  const [ongoingTask, setOngoingTask] = useState(false)
 
   const { pasteInEditor, getTicketId } = useZendesk()
   const client = useClient() as ZAFClient
@@ -55,9 +55,9 @@ export const RightPanelApp = (): JSX.Element => {
   }
 
   const handleSubmitTask = async (action: ZendeskTask) => {
-    setSignal(true)
+    setOngoingTask(true)
     await submitTask(action, { iterationRequest })
-    setSignal(false)
+    setOngoingTask(false)
   }
 
   return (
@@ -98,7 +98,7 @@ export const RightPanelApp = (): JSX.Element => {
               <ResponseContainer
                 responseContent={response}
                 setResponseContent={setResponse}
-                signal={signal}
+                ongoingTask={ongoingTask}
               ></ResponseContainer>
             </div>
             <div className={styles.response_separator}></div>

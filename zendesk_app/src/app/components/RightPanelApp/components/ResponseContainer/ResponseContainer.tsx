@@ -9,13 +9,13 @@ import styles from './ResponseContainer.module.scss'
 interface ResponseContainerProps {
   responseContent: string
   setResponseContent: (content: string) => void
-  signal: boolean
+  ongoingTask: boolean
 }
 
 export const ResponseContainer = ({
   responseContent,
   setResponseContent,
-  signal
+  ongoingTask
 }: ResponseContainerProps): JSX.Element => {
   const [htmlContent, setHtmlContent] = useState('')
   const [manualEditing, setManualEditing] = useState(false)
@@ -35,10 +35,10 @@ export const ResponseContainer = ({
   }, [responseContent])
 
   useEffect(() => {
-    if (!signal) {
+    if (!ongoingTask) {
       setRating(0)
     }
-  }, [signal])
+  }, [ongoingTask])
 
   const handleInput = (event: React.FormEvent<HTMLDivElement>) => {
     setManualEditing(true)
@@ -88,7 +88,7 @@ export const ResponseContainer = ({
         onInput={handleInput}
         onBlur={() => setManualEditing(false)}
       ></div>
-      {!signal && (
+      {!ongoingTask && (
         <div className={styles.feedback_wrapper}>
           <div className={styles.stars_container}>
             {[...Array(5)].map((_, index) => {
