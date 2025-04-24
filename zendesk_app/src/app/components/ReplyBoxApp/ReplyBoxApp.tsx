@@ -8,13 +8,18 @@ import ActionButton from './ActionButton/ActionButton'
 import styles from './ReplyBoxApp.module.scss'
 import { useActionButtons } from '../../hooks/useActionButtons'
 import { useExecuteZendeskTask } from '../../hooks/useExecuteZendeskTask'
+import { useQuivrApiContext } from '../../hooks/useQuivrApiContext'
+import { useZendesk } from '../../hooks/useZendesk'
 
 const ACTION_BUTTON_HEIGHT = 34
 
 export const ReplyBoxApp = (): JSX.Element => {
   const client = useClient() as ZAFClient
   const { actionButtons } = useActionButtons()
-  const { loading, response, submitTask } = useExecuteZendeskTask()
+  const { quivrService, zendeskConnection } = useQuivrApiContext()
+  const { loading, response, submitTask, setResponse } = useExecuteZendeskTask()
+  const { getTicketId } = useZendesk()
+
 
   useEffect(() => {
     client.invoke('resize', { width: '200px', height: `${ACTION_BUTTON_HEIGHT * actionButtons.length + 8}px` })
@@ -25,6 +30,18 @@ export const ReplyBoxApp = (): JSX.Element => {
       client.set('ticket.comment.text', marked(response.replace(/<br>/g, '\n')))
     }
   }, [response, client])
+
+  useEffect(() => {
+    const getAutoDraft = async () => {
+      if (quivrService && zendeskConnection?.enable_autodraft_in_reply_box) {
+        const ticketId = await getTicketId(client)
+        const autoDraft = await quivrService.getAutoDraft(ticketId)
+        setResponse(autoDraft)
+      }
+    }
+
+    getAutoDraft()
+  }, [quivrService, zendeskConnection?.enable_autodraft_in_reply_box])
 
   return (
     <div className={`${styles.content_container} ${loading ? styles.loading : ''}`}>

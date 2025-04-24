@@ -22,6 +22,7 @@ export interface ZendeskConnection {
   display_correct_button: boolean;
   display_summarize_button: boolean;
   display_translate_button: boolean;
+  enable_autodraft_in_reply_box: boolean;
 }
 
 export interface ZendeskBrain {
