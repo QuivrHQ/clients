@@ -4,6 +4,7 @@ import { ZAFClient } from '../../../../contexts/ClientProvider'
 import { useClient } from '../../../../hooks/useClient'
 import { useQuivrApiContext } from '../../../../hooks/useQuivrApiContext'
 import { useZendesk } from '../../../../hooks/useZendesk'
+import { Icon } from '../../../../shared/components/Icon/Icon'
 import styles from './ResponseContainer.module.scss'
 
 interface ResponseContainerProps {
@@ -20,6 +21,7 @@ export const ResponseContainer = ({
   const [htmlContent, setHtmlContent] = useState('')
   const [manualEditing, setManualEditing] = useState(false)
   const [rating, setRating] = useState(0)
+  const [isError, setIsError] = useState(false)
   const client = useClient() as ZAFClient
   const { getTicketId } = useZendesk()
   const { quivrService } = useQuivrApiContext()
@@ -37,6 +39,7 @@ export const ResponseContainer = ({
   useEffect(() => {
     if (!ongoingTask) {
       setRating(0)
+      setIsError(false)
     }
   }, [ongoingTask])
 
@@ -81,6 +84,12 @@ export const ResponseContainer = ({
 
   return (
     <div className={styles.main_container}>
+      {isError && (
+        <div className={styles.warning}>
+          <Icon name="warning" size="small" color="warning" />
+          <span>Failed to load API responses</span>
+        </div>
+      )}
       <div
         className={styles.response_container}
         contentEditable={true}
