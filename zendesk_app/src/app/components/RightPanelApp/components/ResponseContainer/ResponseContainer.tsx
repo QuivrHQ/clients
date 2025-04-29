@@ -52,7 +52,7 @@ export const ResponseContainer = ({
     if (!ticketId) return
 
     try {
-      await quivrService?.rateGeneratedAnswer(ticketId, rating, '')
+      await quivrService?.rateGeneratedAnswer(ticketId, value, '')
     } catch (error) {
       console.error('Error rating generated answer', error)
     }
