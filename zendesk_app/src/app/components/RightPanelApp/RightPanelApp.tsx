@@ -18,7 +18,7 @@ import { useExecuteZendeskTask } from '../../hooks/useExecuteZendeskTask'
 import styles from './RightPanelApp.module.scss'
 
 export const RightPanelApp = (): JSX.Element => {
-  const { quivrService, ingestionStatus, setIngestionStatus } = useQuivrApiContext()
+  const { quivrService, ingestionStatus, setIngestionStatus, zendeskConnection } = useQuivrApiContext()
   const [iterationRequest, setIterationRequest] = useState('')
   const { actionButtons, isChatEnabled } = useActionButtons()
   const { loading, response, setResponse, submitTask } = useExecuteZendeskTask()
@@ -33,7 +33,7 @@ export const RightPanelApp = (): JSX.Element => {
 
   useEffect(() => {
     const getAutoDraft = async () => {
-      if (quivrService) {
+      if (quivrService && zendeskConnection?.brain_links.some((link) => link.auto_draft_front)) {
         const ticketId = await getTicketId(client)
         const autoDraft = await quivrService.getAutoDraft(ticketId)
         setResponse(autoDraft)
