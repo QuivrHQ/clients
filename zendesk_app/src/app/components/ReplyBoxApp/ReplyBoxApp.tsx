@@ -10,6 +10,7 @@ import { useActionButtons } from '../../hooks/useActionButtons'
 import { useExecuteZendeskTask } from '../../hooks/useExecuteZendeskTask'
 import { useQuivrApiContext } from '../../hooks/useQuivrApiContext'
 import { useZendesk } from '../../hooks/useZendesk'
+import { normalizeNewlinesToHtml } from '../../shared/helpers/html'
 
 const ACTION_BUTTON_HEIGHT = 34
 
@@ -27,7 +28,7 @@ export const ReplyBoxApp = (): JSX.Element => {
 
   useEffect(() => {
     if (response && response !== '.' && response !== '..' && response !== '...') {
-      client.set('ticket.comment.text', marked(response.replace(/<br>/g, '\n')))
+      client.set('ticket.comment.text', marked(normalizeNewlinesToHtml(response)))
     }
   }, [response, client])
 
@@ -41,7 +42,7 @@ export const ReplyBoxApp = (): JSX.Element => {
     }
 
     getAutoDraft()
-  }, [quivrService, zendeskConnection?.enable_autodraft_in_reply_box])
+  }, [quivrService, zendeskConnection?.enable_autodraft_in_reply_box, zendeskConnection?.brain_links])
 
   return (
     <div className={`${styles.content_container} ${loading ? styles.loading : ''}`}>

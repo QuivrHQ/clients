@@ -46,8 +46,8 @@ export const useExecuteZendeskTask = () => {
             onFinish?.()
             setResponse((prevResponse: string) =>
               ['.', '..', '...'].includes(prevResponse)
-                ? message.replace(/\\n/g, '\n').replace(/\n/g, '<br>')
-                : prevResponse + message.replace(/\\n/g, '\n').replace(/\n/g, '<br>')
+                ? message
+                : prevResponse + message
             )
           }
         }

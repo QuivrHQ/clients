@@ -15,6 +15,7 @@ import { ResponseContainer } from './components/ResponseContainer/ResponseContai
 import { marked } from 'marked'
 import { ZAFClient } from '../../contexts/ClientProvider'
 import { useExecuteZendeskTask } from '../../hooks/useExecuteZendeskTask'
+import { normalizeNewlinesToHtml } from '../../shared/helpers/html'
 import styles from './RightPanelApp.module.scss'
 
 export const RightPanelApp = (): JSX.Element => {
@@ -41,14 +42,14 @@ export const RightPanelApp = (): JSX.Element => {
     }
 
     getAutoDraft()
-  }, [quivrService])
+  }, [quivrService, zendeskConnection?.brain_links])
 
   const isLoadingText = (): boolean => {
     return ['.', '..', '...'].includes(response)
   }
 
   const onCopyDraft = async () => {
-    await pasteInEditor(client, await marked(response))
+    await pasteInEditor(client, await marked(normalizeNewlinesToHtml(response)))
 
     const ticketId = await getTicketId(client)
     await quivrService?.acceptTicketAnswer(ticketId)

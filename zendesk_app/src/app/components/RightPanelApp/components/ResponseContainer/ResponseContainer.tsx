@@ -5,6 +5,7 @@ import { useClient } from '../../../../hooks/useClient'
 import { useQuivrApiContext } from '../../../../hooks/useQuivrApiContext'
 import { useZendesk } from '../../../../hooks/useZendesk'
 import styles from './ResponseContainer.module.scss'
+import { normalizeNewlinesToHtml } from '../../../../shared/helpers/html'
 
 interface ResponseContainerProps {
   responseContent: string
@@ -27,7 +28,7 @@ export const ResponseContainer = ({
   useEffect(() => {
     if (!manualEditing) {
       const parseMarkdown = async () => {
-        const html = await marked(responseContent)
+        const html = await marked(normalizeNewlinesToHtml(responseContent))
         setHtmlContent(html)
       }
       void parseMarkdown()
