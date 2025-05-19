@@ -80,6 +80,18 @@
     }
   }
 
+  &.zendesk-secondary:not(.disabled) {
+    background-color: var(--white-0);
+    border-color: var(--zendesk-black);
+    color: var(--zendesk-black);
+
+    &:hover,
+    &.important {
+      background-color: var(--zendesk-black);
+      color: var(--white-0);
+    }
+  }
+
   &.dangerous:not(.disabled) {
     border-color: var(--dangerous);
     color: var(--dangerous);

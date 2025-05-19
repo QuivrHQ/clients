@@ -8,7 +8,7 @@ import { MessageInfoBox } from '../../shared/components/MessageInfoBox/MessageIn
 import { ProgressBar } from '../../shared/components/ProgressBar/ProgressBar'
 import { QuivrButton } from '../../shared/components/QuivrButton/QuivrButton'
 import { SplitButton } from '../../shared/components/SplitButton/SplitButton'
-import { ZendeskTask } from '../../types/zendesk'
+import { Autodraft, ZendeskTask } from '../../types/zendesk'
 import { IterationTextbox } from './components/IterationTextbox/IterationTextbox'
 import { ResponseContainer } from './components/ResponseContainer/ResponseContainer'
 
@@ -24,7 +24,7 @@ export const RightPanelApp = (): JSX.Element => {
   const { actionButtons, isChatEnabled } = useActionButtons()
   const { loading, response, setResponse, submitTask } = useExecuteZendeskTask()
   const [ongoingTask, setOngoingTask] = useState(false)
-
+  const [autoDraft, setAutoDraft] = useState<Autodraft | null>(null)
   const { pasteInEditor, getTicketId } = useZendesk()
   const client = useClient() as ZAFClient
 
@@ -37,7 +37,10 @@ export const RightPanelApp = (): JSX.Element => {
       if (quivrService && zendeskConnection?.brain_links.some((link) => link.auto_draft_front)) {
         const ticketId = await getTicketId(client)
         const autoDraft = await quivrService.getAutoDraft(ticketId)
-        setResponse(autoDraft)
+        if (autoDraft?.generated_answer) {
+          setResponse(autoDraft.generated_answer)
+          setAutoDraft(autoDraft)
+        }
       }
     }
 
@@ -98,6 +101,8 @@ export const RightPanelApp = (): JSX.Element => {
             <div className={styles.response_container}>
               <ResponseContainer
                 responseContent={response}
+                autoDraft={autoDraft}
+                onCopyDraft={onCopyDraft}
                 setResponseContent={setResponse}
                 ongoingTask={ongoingTask}
               ></ResponseContainer>

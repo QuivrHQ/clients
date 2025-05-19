@@ -1,5 +1,6 @@
 @use '@styles/Spacings.module';
 @use '@styles/Typography.module';
+@use '@styles/Radius.module';
 
 .main_container {
   display: flex;
@@ -16,6 +17,11 @@
     padding: Spacings.$spacing05;
     font-size: Typography.$tiny;
     line-height: 18px;
+    border-radius: Radius.$normal;
+
+    &.autosendable {
+      border: 1px solid var(--success);
+    }
 
     &:focus {
       outline: none !important;
@@ -38,6 +44,27 @@
     margin-top: Spacings.$spacing05;
     align-items: center;
     align-self: flex-end;
+
+    .autosend_container {
+      display: flex;
+      align-items: center;
+      gap: Spacings.$spacing04;
+      font-size: Typography.$small;
+
+      .autosend_buttons_container {
+        display: flex;
+        gap: Spacings.$spacing02;
+        align-items: center;
+
+        .autosend_button {
+          background-color: transparent;
+          border: none;
+          cursor: pointer;
+          padding: Spacings.$spacing01;
+          line-height: 0;
+        }
+      }
+    }
 
     .stars_container {
       display: flex;

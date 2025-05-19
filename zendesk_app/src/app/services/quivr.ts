@@ -1,4 +1,4 @@
-import { TicketIngestionProgress, ZendeskConnection, ZendeskTask, ZendeskUser } from '../types/zendesk'
+import { Autodraft, TicketIngestionProgress, ZendeskConnection, ZendeskTask, ZendeskUser } from '../types/zendesk'
 
 export class QuivrService {
   private apiUrl: string
@@ -228,10 +228,10 @@ export class QuivrService {
     }
   }
 
-  async getAutoDraft(ticketId: string): Promise<string> {
+  async getAutoDraft(ticketId: string): Promise<Autodraft | null> {
     try {
       const response = await this.client.request({
-        url: `${this.apiUrl}/zendesk/autodraft?ticket_id=${ticketId}`,
+        url: `${this.apiUrl}/zendesk/autodraft_v2?ticket_id=${ticketId}`,
         type: 'GET',
         headers: {
           Authorization: `Bearer ${this.quivrApiKey}`
@@ -243,6 +243,22 @@ export class QuivrService {
     } catch (error) {
       throw new Error('Failed to get auto draft')
     }
+  }
+
+  async updatePredictionAcceptance(predictionId: string, ticketAnswerId: string, isAccepted: boolean): Promise<void> {
+    await this.client.request({
+      url: `${this.apiUrl}/zendesk/prediction/${predictionId}`,
+      type: 'PUT',
+      headers: {
+        Authorization: `Bearer ${this.quivrApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      accepts: 'application/json',
+      data: JSON.stringify({
+        ticket_answer_id: ticketAnswerId,
+        is_accepted: isAccepted
+      })
+    })
   }
 
   async acceptTicketAnswer(ticketId: string): Promise<void> {

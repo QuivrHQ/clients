@@ -97,3 +97,15 @@ export interface ZendeskUser {
   groups: ZendeskGroup[];
   organizations: ZendeskOrganization[];
 }
+
+
+export interface Autodraft {
+  ticket_answer_id: string;
+  generated_answer: string;
+  prediction?: {
+    prediction_id: string;
+    confidence_score?: number;
+    is_autosendable?: boolean;
+    is_accepted: boolean | null;
+  };
+}
