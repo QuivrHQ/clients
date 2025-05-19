@@ -42,6 +42,23 @@ export const useZendesk = () => {
     })
   }
 
+  async function sendMessage(client: ZAFClient, message: string): Promise<void> {
+    const ticketId = await getTicketId(client)
+    await client.request({
+      url: `/api/v2/tickets/${ticketId}.json`,
+      type: 'PUT',
+      contentType: 'application/json',
+      data: JSON.stringify({
+        ticket: {
+          comment: {
+            body: message,
+            public: true
+          }
+        }
+      })
+    })
+  }
+
   async function pasteInEditor(client: ZAFClient, reformulatedText: string): Promise<void> {
     return client.set('ticket.comment.text', reformulatedText, { html: true })
   }
@@ -56,6 +73,7 @@ export const useZendesk = () => {
     getUserEmail,
     getRequesterEmail,
     getSubdomain,
-    pasteInEditor
+    pasteInEditor,
+    sendMessage
   }
 }

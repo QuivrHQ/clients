@@ -37,7 +37,9 @@ export const ReplyBoxApp = (): JSX.Element => {
       if (quivrService && zendeskConnection?.enable_autodraft_in_reply_box && zendeskConnection?.brain_links.some((link) => link.auto_draft_front)) {
         const ticketId = await getTicketId(client)
         const autoDraft = await quivrService.getAutoDraft(ticketId)
-        setResponse(autoDraft)
+        if (autoDraft?.generated_answer) {
+          setResponse(autoDraft.generated_answer)
+        }
       }
     }
 
