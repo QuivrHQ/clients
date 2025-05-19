@@ -45,7 +45,7 @@ export const AutosendModal = ({ ticketAnswerId, predictionId }: AutosendModalPro
         <p>Thank you for your feedback!</p>
         <p>Quivr has marked this message as ready to send.</p>
         </div>
-        <p>Would you like to send it now, as is?</p>
+        <p>Would you like to send it like this, or make a quick edit first?</p>
       </div>
       <div className={styles.buttons}>
         <QuivrButton
