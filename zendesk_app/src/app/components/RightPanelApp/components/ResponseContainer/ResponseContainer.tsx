@@ -16,6 +16,7 @@ interface ResponseContainerProps {
   ongoingTask: boolean
   autoDraft: Autodraft | null
   onCopyDraft: () => Promise<void>
+  ticketAnswerId?: string
 }
 
 export const ResponseContainer = ({
@@ -23,13 +24,14 @@ export const ResponseContainer = ({
   setResponseContent,
   ongoingTask,
   autoDraft,
-  onCopyDraft
+  onCopyDraft,
+  ticketAnswerId
 }: ResponseContainerProps): JSX.Element => {
   const [htmlContent, setHtmlContent] = useState('')
   const [manualEditing, setManualEditing] = useState(false)
   const [rating, setRating] = useState(0)
   const client = useClient() as ZAFClient
-  const { getTicketId, sendMessage } = useZendesk()
+  const { sendMessage } = useZendesk()
   const { quivrService } = useQuivrApiContext()
   const [isAutosendableFeedbackOpen, setIsAutosendableFeedbackOpen] = useState(true)
 
@@ -63,12 +65,13 @@ export const ResponseContainer = ({
 
   const handleStarClick = async (value: number) => {
     setRating(value)
-    const ticketId = await getTicketId(client)
 
-    if (!ticketId) return
+    if (!ticketAnswerId) return
 
     try {
-      await quivrService?.rateGeneratedAnswer(ticketId, value, '')
+      await quivrService?.updateTicketAnswer(ticketAnswerId, {
+        support_agent_rating_score: value
+      })
     } catch (error) {
       console.error('Error rating generated answer', error)
     }
@@ -105,11 +108,9 @@ export const ResponseContainer = ({
             }
           })
         } else {
-          const ticketId = await getTicketId(client)
-
           modalClient.on('modal.ready', function () {
             modalClient.trigger('modal.data', {
-              ticketId: ticketId,
+              ticketAnswerId: ticketAnswerId,
               rating: rating
             })
           })
@@ -148,7 +149,9 @@ export const ResponseContainer = ({
       ></div>
       {!ongoingTask && (
         <>
-          {autoDraft?.prediction?.is_autosendable && autoDraft?.prediction?.is_accepted === null && isAutosendableFeedbackOpen ? (
+          {autoDraft?.prediction?.is_autosendable &&
+          autoDraft?.prediction?.is_accepted === null &&
+          isAutosendableFeedbackOpen ? (
             <div className={styles.feedback_wrapper}>
               <div className={styles.autosend_container}>
                 <Tooltip
