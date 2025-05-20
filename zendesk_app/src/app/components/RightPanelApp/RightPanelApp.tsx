@@ -8,22 +8,23 @@ import { MessageInfoBox } from '../../shared/components/MessageInfoBox/MessageIn
 import { ProgressBar } from '../../shared/components/ProgressBar/ProgressBar'
 import { QuivrButton } from '../../shared/components/QuivrButton/QuivrButton'
 import { SplitButton } from '../../shared/components/SplitButton/SplitButton'
-import { ZendeskTask } from '../../types/zendesk'
+import { Autodraft, ZendeskTask } from '../../types/zendesk'
 import { IterationTextbox } from './components/IterationTextbox/IterationTextbox'
 import { ResponseContainer } from './components/ResponseContainer/ResponseContainer'
 
 import { marked } from 'marked'
 import { ZAFClient } from '../../contexts/ClientProvider'
 import { useExecuteZendeskTask } from '../../hooks/useExecuteZendeskTask'
+import { normalizeNewlinesToHtml } from '../../shared/helpers/html'
 import styles from './RightPanelApp.module.scss'
 
 export const RightPanelApp = (): JSX.Element => {
-  const { quivrService, ingestionStatus, setIngestionStatus } = useQuivrApiContext()
+  const { quivrService, ingestionStatus, setIngestionStatus, zendeskConnection } = useQuivrApiContext()
   const [iterationRequest, setIterationRequest] = useState('')
   const { actionButtons, isChatEnabled } = useActionButtons()
   const { loading, response, setResponse, submitTask } = useExecuteZendeskTask()
   const [ongoingTask, setOngoingTask] = useState(false)
-
+  const [autoDraft, setAutoDraft] = useState<Autodraft | null>(null)
   const { pasteInEditor, getTicketId } = useZendesk()
   const client = useClient() as ZAFClient
 
@@ -33,22 +34,25 @@ export const RightPanelApp = (): JSX.Element => {
 
   useEffect(() => {
     const getAutoDraft = async () => {
-      if (quivrService) {
+      if (quivrService && zendeskConnection?.brain_links.some((link) => link.auto_draft_front)) {
         const ticketId = await getTicketId(client)
         const autoDraft = await quivrService.getAutoDraft(ticketId)
-        setResponse(autoDraft)
+        if (autoDraft?.generated_answer) {
+          setResponse(autoDraft.generated_answer)
+          setAutoDraft(autoDraft)
+        }
       }
     }
 
     getAutoDraft()
-  }, [quivrService])
+  }, [quivrService, zendeskConnection?.brain_links])
 
   const isLoadingText = (): boolean => {
     return ['.', '..', '...'].includes(response)
   }
 
   const onCopyDraft = async () => {
-    await pasteInEditor(client, await marked(response))
+    await pasteInEditor(client, await marked(normalizeNewlinesToHtml(response)))
 
     const ticketId = await getTicketId(client)
     await quivrService?.acceptTicketAnswer(ticketId)
@@ -97,6 +101,8 @@ export const RightPanelApp = (): JSX.Element => {
             <div className={styles.response_container}>
               <ResponseContainer
                 responseContent={response}
+                autoDraft={autoDraft}
+                onCopyDraft={onCopyDraft}
                 setResponseContent={setResponse}
                 ongoingTask={ongoingTask}
               ></ResponseContainer>
