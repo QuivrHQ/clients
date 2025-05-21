@@ -9,11 +9,11 @@ import styles from './FeedbackModal.module.scss'
 const ratingDescriptions = ['Pas du tout pertinent', 'Un peu utile', 'Assez pertinent', 'Presque parfait', 'Parfait']
 
 export interface FeedbackModalProps {
-  ticketId: string
+  ticketAnswerId: string
   rating: number
 }
 
-export const FeedbackModal = ({ ticketId, rating }: FeedbackModalProps): JSX.Element => {
+export const FeedbackModal = ({ ticketAnswerId, rating }: FeedbackModalProps): JSX.Element => {
   const [feedback, setFeedback] = useState('')
   const [loading, setLoading] = useState(false)
   const [localRating, setLocalRating] = useState(rating)
@@ -30,11 +30,14 @@ export const FeedbackModal = ({ ticketId, rating }: FeedbackModalProps): JSX.Ele
   }
 
   const handleSubmit = async () => {
-    if (!ticketId) return
+    if (!ticketAnswerId) return
     setLoading(true)
 
     try {
-      await quivrService?.rateGeneratedAnswer(ticketId, localRating, feedback)
+      await quivrService?.updateTicketAnswer(ticketAnswerId, {
+        support_agent_rating_score: localRating,
+        support_agent_rating_comment: feedback
+      })
       setLoading(false)
       client.invoke('destroy')
     } catch (error) {

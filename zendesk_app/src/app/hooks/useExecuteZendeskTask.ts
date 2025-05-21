@@ -12,15 +12,17 @@ export const useExecuteZendeskTask = () => {
   const { getTicketId, getUserInput, getUser } = useZendesk()
   const [loading, setLoading] = useState(false)
   const [response, setResponse] = useState('')
+  const [ticketAnswerId, setTicketAnswerId] = useState<string | undefined>(undefined)
   const client = useClient() as ZAFClient
 
-  const submitTask = async (task: ZendeskTask, options: { iterationRequest?: string; onFinish?: () => void }) => {    
+  const submitTask = async (task: ZendeskTask, options: { iterationRequest?: string; onFinish?: () => void }) => {
     if (!quivrService) return
     const { iterationRequest, onFinish } = options
 
     setLoading(true)
     let loadingText = '.'
     setResponse(loadingText)
+    setTicketAnswerId(undefined)
     const loadingInterval = setInterval(() => {
       loadingText = loadingText.length < 3 ? loadingText + '.' : '.'
       setResponse(loadingText)
@@ -39,15 +41,17 @@ export const useExecuteZendeskTask = () => {
         ticketId,
         task === 'iterate' ? response : userInput,
         user,
-        (message: string) => {
+        (message: string, ticketAnswerId?: string) => {
+          if (ticketAnswerId) {
+            setTicketAnswerId(ticketAnswerId)
+          }
+
           if (message.length) {
             clearInterval(loadingInterval)
             setLoading(false)
             onFinish?.()
             setResponse((prevResponse: string) =>
-              ['.', '..', '...'].includes(prevResponse)
-                ? message
-                : prevResponse + message
+              ['.', '..', '...'].includes(prevResponse) ? message : prevResponse + message
             )
           }
         }
@@ -62,5 +66,5 @@ export const useExecuteZendeskTask = () => {
     }
   }
 
-  return { loading, response, setResponse, submitTask }
+  return { loading, response, setResponse, submitTask, ticketAnswerId, setTicketAnswerId }
 }
