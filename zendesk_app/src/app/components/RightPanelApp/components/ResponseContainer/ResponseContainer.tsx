@@ -1,5 +1,6 @@
 import { marked } from 'marked'
 import React, { useEffect, useState, type JSX } from 'react'
+import { useExecuteZendeskTask } from 'src/app/hooks/useExecuteZendeskTask'
 import { ZAFClient } from '../../../../contexts/ClientProvider'
 import { useClient } from '../../../../hooks/useClient'
 import { useQuivrApiContext } from '../../../../hooks/useQuivrApiContext'
@@ -28,9 +29,9 @@ export const ResponseContainer = ({
   const [htmlContent, setHtmlContent] = useState('')
   const [manualEditing, setManualEditing] = useState(false)
   const [rating, setRating] = useState(0)
-  const [isError, setIsError] = useState(false)
   const client = useClient() as ZAFClient
   const { getTicketId, sendMessage } = useZendesk()
+  const { setIsError } = useExecuteZendeskTask()
   const { quivrService } = useQuivrApiContext()
   const [isAutosendableFeedbackOpen, setIsAutosendableFeedbackOpen] = useState(true)
 
@@ -141,12 +142,6 @@ export const ResponseContainer = ({
 
   return (
     <div className={styles.main_container}>
-      {isError && (
-        <div className={styles.warning}>
-          <Icon name="warning" size="small" color="warning" />
-          <span>Failed to load API responses</span>
-        </div>
-      )}
       <div
         className={`${styles.response_container} ${autoDraft?.prediction?.is_autosendable ? styles.autosendable : ''}`}
         contentEditable={true}

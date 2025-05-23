@@ -64,5 +64,5 @@ export const useExecuteZendeskTask = () => {
     }
   }
 
-  return { loading, response, setResponse, submitTask, isError }
+  return { loading, response, setResponse, submitTask, isError, setIsError }
 }
