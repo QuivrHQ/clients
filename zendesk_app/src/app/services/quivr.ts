@@ -131,7 +131,8 @@ export class QuivrService {
     ticketId: string,
     content: string,
     user: ZendeskUser,
-    onStreamMessage: (message: string) => void
+    onStreamMessage: (message: string) => void,
+    onStreamError?: (error: string | null) => void
   ): Promise<string> {
     const url = new URL(`${this.apiUrl}/zendesk/task/${task}`)
     url.searchParams.append('chat_id', chatId)
@@ -161,12 +162,13 @@ export class QuivrService {
       throw new Error('ReadableStream not supported or no body in response.')
     }
 
-    return this.processStream(response.body, onStreamMessage)
+    return this.processStream(response.body, onStreamMessage, onStreamError)
   }
 
   private async processStream(
     body: ReadableStream<Uint8Array>,
-    onStreamMessage: (message: string, ticketAnswerId?: string) => void
+    onStreamMessage: (message: string, ticketAnswerId?: string) => void,
+    onStreamError?: (error: string | null) => void
   ): Promise<string> {
     const reader = body.getReader()
     const decoder = new TextDecoder('utf-8')
@@ -181,12 +183,12 @@ export class QuivrService {
         isDone = done
 
         if (done) {
-          this.processIncompleteData(buffer, onStreamMessage)
+          this.processIncompleteData(buffer, onStreamMessage, onStreamError)
           reader.releaseLock()
           break
         }
 
-        buffer = this.processStreamData(value, buffer, decoder, onStreamMessage)
+        buffer = this.processStreamData(value, buffer, decoder, onStreamMessage, onStreamError)
       }
     } catch (error) {
       console.error('Error processing stream:', error)
@@ -201,7 +203,8 @@ export class QuivrService {
     value: Uint8Array,
     buffer: string,
     decoder: TextDecoder,
-    onStreamMessage: (message: string, ticketAnswerId?: string) => void
+    onStreamMessage: (message: string, ticketAnswerId?: string) => void,
+    onStreamError?: (error: string | null) => void
   ): string {
     const rawData = buffer + decoder.decode(value)
     const dataStrings = rawData.split('data: ').filter(Boolean)
@@ -215,6 +218,9 @@ export class QuivrService {
           const newContent = parsedData.assistant ?? ''
           const ticketAnswerId = parsedData.ticket_answer_id
           onStreamMessage(newContent, ticketAnswerId)
+          if (onStreamError) {
+            onStreamError(parsedData.errors ?? null)
+          }
         } catch (e) {
           console.error('Error parsing data string', e)
         }
@@ -224,7 +230,11 @@ export class QuivrService {
     return buffer
   }
 
-  private processIncompleteData(buffer: string, onStreamMessage: (message: string, ticketAnswerId?: string) => void) {
+  private processIncompleteData(
+    buffer: string,
+    onStreamMessage: (message: string, ticketAnswerId?: string) => void,
+    onStreamError?: (error: string | null) => void
+  ) {
     if (buffer !== '') {
       try {
         const parsedData = JSON.parse(buffer)
@@ -232,6 +242,9 @@ export class QuivrService {
         const ticketAnswerId = parsedData.ticket_answer_id
 
         onStreamMessage(newContent, ticketAnswerId)
+        if (onStreamError) {
+          onStreamError(parsedData.errors ?? null)
+        }
       } catch (e) {
         console.error('Error parsing incomplete data at stream end', e)
       }

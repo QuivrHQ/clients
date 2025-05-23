@@ -1,14 +1,15 @@
 import { marked } from 'marked'
 import React, { useEffect, useState, type JSX } from 'react'
+import { useExecuteZendeskTask } from 'src/app/hooks/useExecuteZendeskTask'
 import { ZAFClient } from '../../../../contexts/ClientProvider'
 import { useClient } from '../../../../hooks/useClient'
 import { useQuivrApiContext } from '../../../../hooks/useQuivrApiContext'
 import { useZendesk } from '../../../../hooks/useZendesk'
-import styles from './ResponseContainer.module.scss'
-import { normalizeNewlinesToHtml } from '../../../../shared/helpers/html'
-import { Autodraft } from '../../../../types/zendesk'
 import { Icon } from '../../../../shared/components/Icon/Icon'
 import Tooltip from '../../../../shared/components/Tooltip/Tooltip'
+import { normalizeNewlinesToHtml } from '../../../../shared/helpers/html'
+import { Autodraft } from '../../../../types/zendesk'
+import styles from './ResponseContainer.module.scss'
 
 interface ResponseContainerProps {
   responseContent: string
@@ -31,6 +32,7 @@ export const ResponseContainer = ({
   const [manualEditing, setManualEditing] = useState(false)
   const [rating, setRating] = useState(0)
   const client = useClient() as ZAFClient
+  const { setIsError } = useExecuteZendeskTask()
   const { sendMessage } = useZendesk()
   const { quivrService } = useQuivrApiContext()
   const [isAutosendableFeedbackOpen, setIsAutosendableFeedbackOpen] = useState(true)
@@ -51,6 +53,7 @@ export const ResponseContainer = ({
     }
     if (!ongoingTask) {
       setRating(0)
+      setIsError(false)
     }
   }, [ongoingTask])
 

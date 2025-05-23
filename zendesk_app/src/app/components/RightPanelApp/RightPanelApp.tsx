@@ -22,7 +22,8 @@ export const RightPanelApp = (): JSX.Element => {
   const { quivrService, ingestionStatus, setIngestionStatus, zendeskConnection } = useQuivrApiContext()
   const [iterationRequest, setIterationRequest] = useState('')
   const { actionButtons, isChatEnabled } = useActionButtons()
-  const { loading, response, setResponse, submitTask, ticketAnswerId, setTicketAnswerId } = useExecuteZendeskTask()
+  const { loading, response, setResponse, submitTask, ticketAnswerId, setTicketAnswerId, isError } =
+    useExecuteZendeskTask()
   const [ongoingTask, setOngoingTask] = useState(false)
   const [autoDraft, setAutoDraft] = useState<Autodraft | null>(null)
   const { pasteInEditor, getTicketId, getUser } = useZendesk()
@@ -108,6 +109,13 @@ export const RightPanelApp = (): JSX.Element => {
         </div>
         {response && (
           <>
+            {isError && (
+              <MessageInfoBox type="warning">
+                <span className={styles.error}>
+                  An error has occurred and may interfere with the generation of a relevant response.
+                </span>
+              </MessageInfoBox>
+            )}
             <div className={styles.response_separator}></div>
             <div className={styles.response_container}>
               <ResponseContainer
