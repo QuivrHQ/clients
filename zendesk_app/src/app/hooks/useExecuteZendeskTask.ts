@@ -1,9 +1,9 @@
 import { useState } from 'react'
+import { ZAFClient } from '../contexts/ClientProvider'
 import { ZendeskTask } from '../types/zendesk'
+import { useClient } from './useClient'
 import { useQuivrApiContext } from './useQuivrApiContext'
 import { useZendesk } from './useZendesk'
-import { ZAFClient } from '../contexts/ClientProvider'
-import { useClient } from './useClient'
 
 const agentPrompt = 'Vous êtes un assistant attentionné,  votre objectif est de satisfaire la demande du client.'
 
@@ -12,9 +12,10 @@ export const useExecuteZendeskTask = () => {
   const { getTicketId, getUserInput, getUser } = useZendesk()
   const [loading, setLoading] = useState(false)
   const [response, setResponse] = useState('')
+  const [isError, setIsError] = useState<boolean>(false)
   const client = useClient() as ZAFClient
 
-  const submitTask = async (task: ZendeskTask, options: { iterationRequest?: string; onFinish?: () => void }) => {    
+  const submitTask = async (task: ZendeskTask, options: { iterationRequest?: string; onFinish?: () => void }) => {
     if (!quivrService) return
     const { iterationRequest, onFinish } = options
 
@@ -45,11 +46,12 @@ export const useExecuteZendeskTask = () => {
             setLoading(false)
             onFinish?.()
             setResponse((prevResponse: string) =>
-              ['.', '..', '...'].includes(prevResponse)
-                ? message
-                : prevResponse + message
+              ['.', '..', '...'].includes(prevResponse) ? message : prevResponse + message
             )
           }
+        },
+        (error: string | null) => {
+          setIsError(error !== null)
         }
       )
     } catch (error) {
@@ -62,5 +64,5 @@ export const useExecuteZendeskTask = () => {
     }
   }
 
-  return { loading, response, setResponse, submitTask }
+  return { loading, response, setResponse, submitTask, isError }
 }
