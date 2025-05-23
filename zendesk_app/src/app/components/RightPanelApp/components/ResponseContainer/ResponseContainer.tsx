@@ -5,11 +5,10 @@ import { useClient } from '../../../../hooks/useClient'
 import { useQuivrApiContext } from '../../../../hooks/useQuivrApiContext'
 import { useZendesk } from '../../../../hooks/useZendesk'
 import { Icon } from '../../../../shared/components/Icon/Icon'
-import styles from './ResponseContainer.module.scss'
+import Tooltip from '../../../../shared/components/Tooltip/Tooltip'
 import { normalizeNewlinesToHtml } from '../../../../shared/helpers/html'
 import { Autodraft } from '../../../../types/zendesk'
-import { Icon } from '../../../../shared/components/Icon/Icon'
-import Tooltip from '../../../../shared/components/Tooltip/Tooltip'
+import styles from './ResponseContainer.module.scss'
 
 interface ResponseContainerProps {
   responseContent: string
@@ -157,7 +156,9 @@ export const ResponseContainer = ({
       ></div>
       {!ongoingTask && (
         <>
-          {autoDraft?.prediction?.is_autosendable && autoDraft?.prediction?.is_accepted === null && isAutosendableFeedbackOpen ? (
+          {autoDraft?.prediction?.is_autosendable &&
+          autoDraft?.prediction?.is_accepted === null &&
+          isAutosendableFeedbackOpen ? (
             <div className={styles.feedback_wrapper}>
               <div className={styles.autosend_container}>
                 <Tooltip
