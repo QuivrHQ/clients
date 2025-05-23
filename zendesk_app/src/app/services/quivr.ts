@@ -1,4 +1,11 @@
-import { Autodraft, TicketIngestionProgress, ZendeskConnection, ZendeskTask, ZendeskUser } from '../types/zendesk'
+import {
+  Autodraft,
+  TicketIngestionProgress,
+  UpdateTicketAnswer,
+  ZendeskConnection,
+  ZendeskTask,
+  ZendeskUser
+} from '../types/zendesk'
 
 export class QuivrService {
   private apiUrl: string
@@ -159,7 +166,7 @@ export class QuivrService {
 
   private async processStream(
     body: ReadableStream<Uint8Array>,
-    onStreamMessage: (message: string) => void
+    onStreamMessage: (message: string, ticketAnswerId?: string) => void
   ): Promise<string> {
     const reader = body.getReader()
     const decoder = new TextDecoder('utf-8')
@@ -194,7 +201,7 @@ export class QuivrService {
     value: Uint8Array,
     buffer: string,
     decoder: TextDecoder,
-    onStreamMessage: (message: string) => void
+    onStreamMessage: (message: string, ticketAnswerId?: string) => void
   ): string {
     const rawData = buffer + decoder.decode(value)
     const dataStrings = rawData.split('data: ').filter(Boolean)
@@ -206,7 +213,8 @@ export class QuivrService {
         try {
           const parsedData = JSON.parse(data.trim())
           const newContent = parsedData.assistant ?? ''
-          onStreamMessage(newContent)
+          const ticketAnswerId = parsedData.ticket_answer_id
+          onStreamMessage(newContent, ticketAnswerId)
         } catch (e) {
           console.error('Error parsing data string', e)
         }
@@ -216,12 +224,14 @@ export class QuivrService {
     return buffer
   }
 
-  private processIncompleteData(buffer: string, onStreamMessage: (message: string) => void) {
+  private processIncompleteData(buffer: string, onStreamMessage: (message: string, ticketAnswerId?: string) => void) {
     if (buffer !== '') {
       try {
         const parsedData = JSON.parse(buffer)
         const newContent = parsedData.assistant ?? ''
-        onStreamMessage(newContent)
+        const ticketAnswerId = parsedData.ticket_answer_id
+
+        onStreamMessage(newContent, ticketAnswerId)
       } catch (e) {
         console.error('Error parsing incomplete data at stream end', e)
       }
@@ -251,7 +261,7 @@ export class QuivrService {
       type: 'PUT',
       headers: {
         Authorization: `Bearer ${this.quivrApiKey}`,
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
       accepts: 'application/json',
       data: JSON.stringify({
@@ -261,24 +271,17 @@ export class QuivrService {
     })
   }
 
-  async acceptTicketAnswer(ticketId: string): Promise<void> {
-    try {
-      await this.client.request({
-        url: `${this.apiUrl}/zendesk/ticket_answer/accepted`,
-        type: 'PUT',
-        headers: {
-          Authorization: `Bearer ${this.quivrApiKey}`,
-          'Content-Type': 'application/json'
-        },
-        accepts: 'application/json',
-        data: JSON.stringify({
-          zendesk_ticket_id: ticketId,
-          accepted: true
-        })
-      })
-    } catch (error) {
-      console.error('Failed to accept ticket answer', error)
-    }
+  async updateTicketAnswer(ticketAnswerId: string, payload: UpdateTicketAnswer): Promise<void> {
+    await this.client.request({
+      url: `${this.apiUrl}/zendesk/ticket_answer/${ticketAnswerId}`,
+      type: 'PUT',
+      headers: {
+        Authorization: `Bearer ${this.quivrApiKey}`,
+        'Content-Type': 'application/json'
+      },
+      accepts: 'application/json',
+      data: JSON.stringify(payload)
+    })
   }
 
   async rateGeneratedAnswer(ticketId: string, ratingScore: number, ratingComment: string): Promise<void> {

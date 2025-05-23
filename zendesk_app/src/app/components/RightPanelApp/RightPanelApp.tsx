@@ -22,10 +22,11 @@ export const RightPanelApp = (): JSX.Element => {
   const { quivrService, ingestionStatus, setIngestionStatus, zendeskConnection } = useQuivrApiContext()
   const [iterationRequest, setIterationRequest] = useState('')
   const { actionButtons, isChatEnabled } = useActionButtons()
-  const { loading, response, setResponse, submitTask, isError } = useExecuteZendeskTask()
+  const { loading, response, setResponse, submitTask, ticketAnswerId, setTicketAnswerId, isError } =
+    useExecuteZendeskTask()
   const [ongoingTask, setOngoingTask] = useState(false)
   const [autoDraft, setAutoDraft] = useState<Autodraft | null>(null)
-  const { pasteInEditor, getTicketId } = useZendesk()
+  const { pasteInEditor, getTicketId, getUser } = useZendesk()
   const client = useClient() as ZAFClient
 
   useEffect(() => {
@@ -39,6 +40,7 @@ export const RightPanelApp = (): JSX.Element => {
         const autoDraft = await quivrService.getAutoDraft(ticketId)
         if (autoDraft?.generated_answer) {
           setResponse(autoDraft.generated_answer)
+          setTicketAnswerId(autoDraft.ticket_answer_id)
           setAutoDraft(autoDraft)
         }
       }
@@ -54,8 +56,18 @@ export const RightPanelApp = (): JSX.Element => {
   const onCopyDraft = async () => {
     await pasteInEditor(client, await marked(normalizeNewlinesToHtml(response)))
 
-    const ticketId = await getTicketId(client)
-    await quivrService?.acceptTicketAnswer(ticketId)
+    if (ticketAnswerId) {
+      const user = await getUser(client)
+      await quivrService?.updateTicketAnswer(ticketAnswerId, {
+        accepted: true,
+        support_agent: {
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          platform_user_id: user.id
+        }
+      })
+    }
   }
 
   const handleSubmitTask = async (action: ZendeskTask) => {
@@ -112,6 +124,7 @@ export const RightPanelApp = (): JSX.Element => {
                 onCopyDraft={onCopyDraft}
                 setResponseContent={setResponse}
                 ongoingTask={ongoingTask}
+                ticketAnswerId={ticketAnswerId}
               ></ResponseContainer>
             </div>
             <div className={styles.response_separator}></div>

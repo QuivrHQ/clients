@@ -13,6 +13,7 @@ export const useExecuteZendeskTask = () => {
   const [loading, setLoading] = useState(false)
   const [response, setResponse] = useState('')
   const [isError, setIsError] = useState<boolean>(false)
+  const [ticketAnswerId, setTicketAnswerId] = useState<string | undefined>(undefined)
   const client = useClient() as ZAFClient
 
   const submitTask = async (task: ZendeskTask, options: { iterationRequest?: string; onFinish?: () => void }) => {
@@ -22,6 +23,7 @@ export const useExecuteZendeskTask = () => {
     setLoading(true)
     let loadingText = '.'
     setResponse(loadingText)
+    setTicketAnswerId(undefined)
     const loadingInterval = setInterval(() => {
       loadingText = loadingText.length < 3 ? loadingText + '.' : '.'
       setResponse(loadingText)
@@ -40,7 +42,11 @@ export const useExecuteZendeskTask = () => {
         ticketId,
         task === 'iterate' ? response : userInput,
         user,
-        (message: string) => {
+        (message: string, ticketAnswerId?: string) => {
+          if (ticketAnswerId) {
+            setTicketAnswerId(ticketAnswerId)
+          }
+
           if (message.length) {
             clearInterval(loadingInterval)
             setLoading(false)
@@ -64,5 +70,5 @@ export const useExecuteZendeskTask = () => {
     }
   }
 
-  return { loading, response, setResponse, submitTask, isError, setIsError }
+  return { loading, response, setResponse, submitTask, ticketAnswerId, setTicketAnswerId, isError, setIsError }
 }
