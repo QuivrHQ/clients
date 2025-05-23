@@ -11,7 +11,7 @@
   "location": {
     "support": {
       "ticket_sidebar": {
-        "url": "http://localhost:3000",
+        "url": "http://assets/index.html",
         "flexible": true
       },
       "ticket_editor": {
@@ -30,12 +30,18 @@
       "secure": false
     },
     {
+      "name": "quivr_workspace_id",
+      "type": "text",
+      "required": true,
+      "secure": false
+    },
+    {
       "name": "zendesk_api_key",
       "type": "text",
       "required": true,
       "secure": true
     }
   ],
-  "version": "1.9.0",
+  "version": "1.10.0",
   "frameworkVersion": "2.0"
 }
