@@ -1,13 +1,26 @@
-import { useState } from 'react'
-import { ZAFClient } from '../contexts/ClientProvider'
+import { createContext, ReactNode, useContext, useState } from 'react'
+import { useClient } from '../hooks/useClient'
+import { useQuivrApiContext } from '../hooks/useQuivrApiContext'
+import { useZendesk } from '../hooks/useZendesk'
 import { ZendeskTask } from '../types/zendesk'
-import { useClient } from './useClient'
-import { useQuivrApiContext } from './useQuivrApiContext'
-import { useZendesk } from './useZendesk'
+import { ZAFClient } from './ClientProvider'
 
 const agentPrompt = 'Vous êtes un assistant attentionné,  votre objectif est de satisfaire la demande du client.'
 
-export const useExecuteZendeskTask = () => {
+interface ExecuteZendeskTaskContextProps {
+  loading: boolean
+  response: string
+  setResponse: (r: string) => void
+  submitTask: (task: ZendeskTask, options: { iterationRequest?: string; onFinish?: () => void }) => Promise<void>
+  ticketAnswerId?: string
+  setTicketAnswerId: (id?: string) => void
+  isError: boolean
+  setIsError: (b: boolean) => void
+}
+
+export const ExecuteZendeskTaskContext = createContext<ExecuteZendeskTaskContextProps | undefined>(undefined)
+
+export const ExecuteZendeskTaskProvider = ({ children }: { children: ReactNode }) => {
   const { quivrService } = useQuivrApiContext()
   const { getTicketId, getUserInput, getUser } = useZendesk()
   const [loading, setLoading] = useState(false)
@@ -70,5 +83,28 @@ export const useExecuteZendeskTask = () => {
     }
   }
 
-  return { loading, response, setResponse, submitTask, ticketAnswerId, setTicketAnswerId, isError, setIsError }
+  return (
+    <ExecuteZendeskTaskContext.Provider
+      value={{
+        loading,
+        response,
+        setResponse,
+        submitTask,
+        ticketAnswerId,
+        setTicketAnswerId,
+        isError,
+        setIsError
+      }}
+    >
+      {children}
+    </ExecuteZendeskTaskContext.Provider>
+  )
+}
+
+export const useExecuteZendeskTaskContext = () => {
+  const context = useContext(ExecuteZendeskTaskContext)
+  if (!context) {
+    throw new Error('useExecuteZendeskTaskContext must be used within an ExecuteZendeskTaskProvider')
+  }
+  return context
 }

@@ -13,8 +13,8 @@ import { IterationTextbox } from './components/IterationTextbox/IterationTextbox
 import { ResponseContainer } from './components/ResponseContainer/ResponseContainer'
 
 import { marked } from 'marked'
+import { useExecuteZendeskTaskContext } from 'src/app/contexts/ExecuteZendeskTaskProvider'
 import { ZAFClient } from '../../contexts/ClientProvider'
-import { useExecuteZendeskTask } from '../../hooks/useExecuteZendeskTask'
 import { normalizeNewlinesToHtml } from '../../shared/helpers/html'
 import styles from './RightPanelApp.module.scss'
 
@@ -23,7 +23,7 @@ export const RightPanelApp = (): JSX.Element => {
   const [iterationRequest, setIterationRequest] = useState('')
   const { actionButtons, isChatEnabled } = useActionButtons()
   const { loading, response, setResponse, submitTask, ticketAnswerId, setTicketAnswerId, isError } =
-    useExecuteZendeskTask()
+    useExecuteZendeskTaskContext()
   const [ongoingTask, setOngoingTask] = useState(false)
   const [autoDraft, setAutoDraft] = useState<Autodraft | null>(null)
   const { pasteInEditor, getTicketId, getUser } = useZendesk()
