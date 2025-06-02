@@ -37,9 +37,16 @@
       }
     }
 
-    .icon {
+    .submit_button {
       cursor: pointer;
       display: flex;
+      background-color: transparent;
+      border: none;
+      outline: none;
+
+      &:disabled {
+        cursor: default;
+      }
     }
   }
 }

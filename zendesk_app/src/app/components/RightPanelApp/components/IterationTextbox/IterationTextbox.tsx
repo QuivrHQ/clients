@@ -8,13 +8,15 @@ interface IterationTextboxProps {
   hasDraftResponse: boolean
   setValue: (value: string) => void
   onSubmit: () => void
+  ongoingTask: boolean
 }
 
 export const IterationTextbox = ({
   value,
   setValue,
   onSubmit,
-  hasDraftResponse
+  hasDraftResponse,
+  ongoingTask
 }: IterationTextboxProps): JSX.Element => {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -53,9 +55,9 @@ export const IterationTextbox = ({
           onKeyDown={handleKeyDown}
           rows={1}
         />
-        <div className={styles.icon} onClick={onSubmit}>
-          <Icon name="send" size="normal" color="accent" disabled={!value} />
-        </div>
+        <button className={styles.submit_button} onClick={onSubmit} disabled={ongoingTask || !value}>
+          <Icon name="send" size="normal" color="accent" disabled={ongoingTask || !value} />
+        </button>
       </div>
     </div>
   )

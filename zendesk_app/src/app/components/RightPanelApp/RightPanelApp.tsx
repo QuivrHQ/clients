@@ -130,6 +130,7 @@ export const RightPanelApp = (): JSX.Element => {
             setValue={setIterationRequest}
             onSubmit={() => void handleSubmitTask('iterate')} // Utilise la nouvelle fonction
             hasDraftResponse={!!response}
+            ongoingTask={ongoingTask}
           ></IterationTextbox>
         </div>
       )}
