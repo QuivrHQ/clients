@@ -23,8 +23,11 @@ export const IterationTextbox = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      onSubmit()
-      setValue('')
+
+      if (!ongoingTask) {
+        onSubmit()
+        setValue('')
+      }
     }
   }
 
