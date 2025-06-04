@@ -56,19 +56,28 @@ export const AutosendModal = ({
   }
 
   const getEndUserContentHtml = (conversationEntry: ZendeskConversationEntry) => {
-    return `${conversationEntry.message.content || ''}
-    ${conversationEntry.attachments
+    const messageContent = (conversationEntry.message.content || '').replace(
+      /<a\b(?![^>]*\btarget=)[^>]*>/gi,
+      (match: string) => {
+        // Add target and rel attributes to open links in a new tab
+        return match.replace(/<a/, '<a target="_blank" rel="noopener noreferrer"');
+      }
+    );
+  
+    const attachmentLinks = conversationEntry.attachments
       ?.map(
         (att: any) => `
-      <div style="margin-top: 1em;">
-        <a href="${att.contentUrl}" target="_blank" rel="noopener noreferrer">
-          📎 ${att.filename}
-        </a>
-      </div>
-    `
+        <div style="margin-top: 1em;">
+          <a href="${att.contentUrl}" target="_blank" rel="noopener noreferrer">
+            📎 ${att.filename}
+          </a>
+        </div>
+      `
       )
-      .join('')}`
-  }
+      .join('') || '';
+  
+    return `${messageContent}${attachmentLinks}`;
+  };
 
   return (
     <div className={styles.main_container}>

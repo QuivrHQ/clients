@@ -76,7 +76,6 @@ export const useZendesk = () => {
     return client.set('ticket.comment.text', reformulatedText, { html: true })
   }
 
-
   return {
     getHistoric,
     getUserInput,
