@@ -122,3 +122,34 @@ interface SupportAgent {
   role: ZendeskUser['role']
   platform_user_id: number
 }
+
+
+export interface ZendeskConversationEntry {
+  attachments: Attachment[];
+  author: Author;
+  channel: Channel;
+  message: Message;
+  timestamp: string; // ISO 8601 format
+}
+
+export interface ZendeskAttachment {
+  contentType: string;
+  contentUrl: string;
+  filename: string;
+}
+
+export interface ZendeskAuthor {
+  id: number | null;
+  avatar: string;
+  name: string;
+  role: string;
+}
+
+export interface ZendeskChannel {
+  name: string;
+}
+
+export interface ZendeskMessage {
+  content: string | null;
+  contentType: string | null;
+}
