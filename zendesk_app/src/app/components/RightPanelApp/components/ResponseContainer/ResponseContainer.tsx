@@ -10,6 +10,8 @@ import { Autodraft } from '../../../../types/zendesk'
 import { Icon } from '../../../../shared/components/Icon/Icon'
 import Tooltip from '../../../../shared/components/Tooltip/Tooltip'
 
+const subdomainsEligibleToAutosend = ['getquivr', 'd3v-quivr', 'trusk']
+
 interface ResponseContainerProps {
   responseContent: string
   setResponseContent: (content: string) => void
@@ -31,7 +33,7 @@ export const ResponseContainer = ({
   const [manualEditing, setManualEditing] = useState(false)
   const [rating, setRating] = useState(0)
   const client = useClient() as ZAFClient
-  const { sendMessage } = useZendesk()
+  const { sendMessage, getLatestEndUserMessage, getSubdomain } = useZendesk()
   const { quivrService } = useQuivrApiContext()
   const [isAutosendableFeedbackOpen, setIsAutosendableFeedbackOpen] = useState(true)
 
@@ -53,6 +55,21 @@ export const ResponseContainer = ({
       setRating(0)
     }
   }, [ongoingTask])
+
+  useEffect(() => {
+    const checkAutosendModal = async () => {
+      const subdomain = await getSubdomain(client)
+      if (
+        autoDraft?.prediction?.is_autosendable &&
+        autoDraft?.prediction?.is_accepted === null &&
+        htmlContent !== '' &&
+        subdomainsEligibleToAutosend.includes(subdomain)
+      ) {
+        openFeedbackModal({ autosendable: true, askForFeedback: true })
+      }
+    }
+    void checkAutosendModal()
+  }, [autoDraft, htmlContent, client])
 
   const handleInput = (event: React.FormEvent<HTMLDivElement>) => {
     if (autoDraft?.prediction?.is_autosendable) {
@@ -77,22 +94,36 @@ export const ResponseContainer = ({
     }
   }
 
-  const openFeedbackModal = ({ autosendable = false }: { autosendable?: boolean }) => {
+  const openFeedbackModal = async ({
+    autosendable = false,
+    askForFeedback = false
+  }: {
+    autosendable?: boolean
+    askForFeedback?: boolean
+  }) => {
     client
       .invoke('instances.create', {
         location: 'modal',
         url: 'http://localhost:3000/modal',
-        size: { width: '280px', height: autosendable ? '150px' : '300px' }
+        size: {
+          width: askForFeedback ? '600px' : '280px',
+          height: autosendable ? (askForFeedback ? '500px' : '150px') : '300px'
+        }
       })
       .then(async (modalContext) => {
         const modalGuid = modalContext['instances.create'][0].instanceGuid
         const modalClient = client.instance(modalGuid)
 
         if (autosendable) {
+          const latestEndUserMessage = await getLatestEndUserMessage(client)
+
           modalClient.on('modal.ready', function () {
             modalClient.trigger('modal.data_autosend', {
               ticketAnswerId: autoDraft?.ticket_answer_id,
-              predictionId: autoDraft?.prediction?.prediction_id
+              predictionId: autoDraft?.prediction?.prediction_id,
+              askForFeedback: askForFeedback,
+              response: htmlContent,
+              endUserMessage: latestEndUserMessage
             })
           })
 
@@ -106,6 +137,10 @@ export const ResponseContainer = ({
             if (autoDraft?.generated_answer) {
               await sendMessage(client, autoDraft?.generated_answer)
             }
+          })
+
+          modalClient.on('modal.reject_draft', function () {
+            setIsAutosendableFeedbackOpen(false)
           })
         } else {
           modalClient.on('modal.ready', function () {
@@ -162,7 +197,7 @@ export const ResponseContainer = ({
                 </Tooltip>
                 <div className={styles.autosend_buttons_container}>
                   <button className={styles.autosend_button} onClick={approveDraftResponse}>
-                    <Icon name="check" color="success" size="small" />
+                    <Icon name="check" color="success" size="normal" />
                   </button>
                   <button className={styles.autosend_button} onClick={rejectDraftResponse}>
                     <Icon name="close" color="dangerous" size="normal" />

@@ -1,5 +1,5 @@
 import { ZAFClient } from '../contexts/ClientProvider'
-import { ZendeskUser } from '../types/zendesk'
+import { ZendeskConversationEntry, ZendeskUser } from '../types/zendesk'
 
 export const useZendesk = () => {
   async function getHistoric(client: ZAFClient): Promise<string[]> {
@@ -22,6 +22,19 @@ export const useZendesk = () => {
 
   async function getRequesterName(client: ZAFClient): Promise<string> {
     return client.get('ticket.requester').then((data) => data['ticket.requester'].name)
+  }
+
+  async function getLatestEndUserMessage(client: ZAFClient): Promise<ZendeskConversationEntry | null> {
+    const data = await client.get('ticket.conversation');
+    const conversation = data['ticket.conversation'];
+  
+    if (!Array.isArray(conversation)) return null;
+  
+    const latestMessage = conversation
+      .filter(msg => msg.author.role === 'end-user' && msg.message?.content)
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
+  
+    return latestMessage || null;
   }
 
   async function getTicketId(client: ZAFClient): Promise<string> {
@@ -74,6 +87,7 @@ export const useZendesk = () => {
     getRequesterEmail,
     getSubdomain,
     pasteInEditor,
-    sendMessage
+    sendMessage,
+    getLatestEndUserMessage
   }
 }
