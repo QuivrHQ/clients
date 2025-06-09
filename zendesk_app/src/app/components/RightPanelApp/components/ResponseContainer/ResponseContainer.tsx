@@ -36,6 +36,7 @@ export const ResponseContainer = ({
   const { sendMessage, getLatestEndUserMessage, getSubdomain } = useZendesk()
   const { quivrService } = useQuivrApiContext()
   const [isAutosendableFeedbackOpen, setIsAutosendableFeedbackOpen] = useState(true)
+  const [feedbackModalViewed, setFeedbackModalViewed] = useState(false)
 
   useEffect(() => {
     if (!manualEditing) {
@@ -63,13 +64,15 @@ export const ResponseContainer = ({
         autoDraft?.prediction?.is_autosendable &&
         autoDraft?.prediction?.is_accepted === null &&
         htmlContent !== '' &&
-        subdomainsEligibleToAutosend.includes(subdomain)
+        subdomainsEligibleToAutosend.includes(subdomain) &&
+        !feedbackModalViewed
       ) {
+        setFeedbackModalViewed(true);
         openFeedbackModal({ autosendable: true, askForFeedback: true })
       }
     }
     void checkAutosendModal()
-  }, [autoDraft, htmlContent, client])
+  }, [autoDraft, htmlContent, client, feedbackModalViewed])
 
   const handleInput = (event: React.FormEvent<HTMLDivElement>) => {
     if (autoDraft?.prediction?.is_autosendable) {
