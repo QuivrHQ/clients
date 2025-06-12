@@ -6,7 +6,11 @@
     "url": "https://www.quivr.com"
   },
   "defaultLocale": "en",
-  "domainWhitelist": ["api.quivr.app", "api-gobocom.quivr.app", "api-preview.quivr.app"],
+  "domainWhitelist": [
+    "api.quivr.app",
+    "api-gobocom.quivr.app",
+    "api-preview.quivr.app"
+  ],
   "private": false,
   "location": {
     "support": {
@@ -42,6 +46,6 @@
       "secure": true
     }
   ],
-  "version": "1.10.3",
+  "version": "1.10.4",
   "frameworkVersion": "2.0"
 }
