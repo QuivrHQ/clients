@@ -13,7 +13,7 @@ import { IterationTextbox } from './components/IterationTextbox/IterationTextbox
 import { ResponseContainer } from './components/ResponseContainer/ResponseContainer'
 
 import { marked } from 'marked'
-import { useExecuteZendeskTaskContext } from 'src/app/contexts/ExecuteZendeskTaskProvider'
+import { useExecuteZendeskTaskContext } from '../../contexts/ExecuteZendeskTaskProvider'
 import { ZAFClient } from '../../contexts/ClientProvider'
 import { normalizeNewlinesToHtml } from '../../shared/helpers/html'
 import styles from './RightPanelApp.module.scss'

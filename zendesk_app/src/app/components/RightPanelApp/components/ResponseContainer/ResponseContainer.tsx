@@ -52,11 +52,11 @@ export const ResponseContainer = ({
 
   useEffect(() => {
     if (ongoingTask) {
+      setIsError(false)
       setIsAutosendableFeedbackOpen(false)
     }
     if (!ongoingTask) {
       setRating(0)
-      setIsError(false)
     }
   }, [ongoingTask])
 

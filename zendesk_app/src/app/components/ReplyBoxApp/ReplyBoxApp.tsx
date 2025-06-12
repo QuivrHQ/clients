@@ -2,7 +2,7 @@ import { marked } from 'marked'
 import { useEffect, type JSX } from 'react'
 import { useClient } from '../../hooks/useClient'
 
-import { useExecuteZendeskTaskContext } from 'src/app/contexts/ExecuteZendeskTaskProvider'
+import { useExecuteZendeskTaskContext } from '../../contexts/ExecuteZendeskTaskProvider'
 import { ZAFClient } from '../../contexts/ClientProvider'
 import { useActionButtons } from '../../hooks/useActionButtons'
 import { useQuivrApiContext } from '../../hooks/useQuivrApiContext'
