@@ -72,5 +72,9 @@
       justify-content: space-between;
       align-items: center;
     }
+
+    .error {
+      font-size: Typography.$tiny;
+    }
   }
 }

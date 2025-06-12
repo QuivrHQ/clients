@@ -1,14 +1,15 @@
 import { marked } from 'marked'
 import React, { useEffect, useState, type JSX } from 'react'
 import { ZAFClient } from '../../../../contexts/ClientProvider'
+import { useExecuteZendeskTaskContext } from '../../../../contexts/ExecuteZendeskTaskProvider'
 import { useClient } from '../../../../hooks/useClient'
 import { useQuivrApiContext } from '../../../../hooks/useQuivrApiContext'
 import { useZendesk } from '../../../../hooks/useZendesk'
-import styles from './ResponseContainer.module.scss'
-import { normalizeNewlinesToHtml } from '../../../../shared/helpers/html'
-import { Autodraft } from '../../../../types/zendesk'
 import { Icon } from '../../../../shared/components/Icon/Icon'
 import Tooltip from '../../../../shared/components/Tooltip/Tooltip'
+import { normalizeNewlinesToHtml } from '../../../../shared/helpers/html'
+import { Autodraft } from '../../../../types/zendesk'
+import styles from './ResponseContainer.module.scss'
 
 const subdomainsEligibleToAutosend = ['getquivr', 'd3v-quivr', 'trusk']
 
@@ -33,6 +34,7 @@ export const ResponseContainer = ({
   const [manualEditing, setManualEditing] = useState(false)
   const [rating, setRating] = useState(0)
   const client = useClient() as ZAFClient
+  const { setIsError } = useExecuteZendeskTaskContext()
   const { sendMessage, getLatestEndUserMessage, getSubdomain } = useZendesk()
   const { quivrService } = useQuivrApiContext()
   const [isAutosendableFeedbackOpen, setIsAutosendableFeedbackOpen] = useState(true)
@@ -50,6 +52,7 @@ export const ResponseContainer = ({
 
   useEffect(() => {
     if (ongoingTask) {
+      setIsError(false)
       setIsAutosendableFeedbackOpen(false)
     }
     if (!ongoingTask) {
@@ -67,7 +70,7 @@ export const ResponseContainer = ({
         subdomainsEligibleToAutosend.includes(subdomain) &&
         !feedbackModalViewed
       ) {
-        setFeedbackModalViewed(true);
+        setFeedbackModalViewed(true)
         openFeedbackModal({ autosendable: true, askForFeedback: true })
       }
     }
