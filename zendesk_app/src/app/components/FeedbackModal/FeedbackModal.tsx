@@ -8,34 +8,36 @@ import styles from './FeedbackModal.module.scss'
 
 const ratingDescriptions = ['Pas du tout pertinent', 'Un peu utile', 'Assez pertinent', 'Presque parfait', 'Parfait']
 
-export const FeedbackModal = (): JSX.Element => {
-  const [rating, setRating] = useState(0)
+export interface FeedbackModalProps {
+  ticketAnswerId: string
+  rating: number
+}
+
+export const FeedbackModal = ({ ticketAnswerId, rating }: FeedbackModalProps): JSX.Element => {
   const [feedback, setFeedback] = useState('')
-  const [ticketId, setTicketId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [localRating, setLocalRating] = useState(rating)
   const { quivrService } = useQuivrApiContext()
 
   const client = useClient() as ZAFClient
 
+  useEffect(() => {
+    setLocalRating(rating)
+  }, [rating])
+
   const handleStarClick = (value: number) => {
-    setRating(value)
+    setLocalRating(value)
   }
 
-  useEffect(() => {
-    if (!client) return
-    client.trigger('modal.ready')
-
-    client.on('modal.data', (incomingData: { ticketId: string; rating: number }) => {
-      setTicketId(incomingData.ticketId), setRating(incomingData.rating)
-    })
-  }, [client])
-
   const handleSubmit = async () => {
-    if (!ticketId) return
+    if (!ticketAnswerId) return
     setLoading(true)
 
     try {
-      await quivrService?.rateGeneratedAnswer(ticketId, rating, feedback)
+      await quivrService?.updateTicketAnswer(ticketAnswerId, {
+        support_agent_rating_score: localRating,
+        support_agent_rating_comment: feedback
+      })
       setLoading(false)
       client.invoke('destroy')
     } catch (error) {
@@ -56,7 +58,7 @@ export const FeedbackModal = (): JSX.Element => {
               return (
                 <span
                   key={starValue}
-                  className={`${styles.star} ${starValue <= rating ? styles.filled : ''}`}
+                  className={`${styles.star} ${starValue <= localRating ? styles.filled : ''}`}
                   onClick={() => handleStarClick(starValue)}
                 >
                   ★
@@ -64,7 +66,7 @@ export const FeedbackModal = (): JSX.Element => {
               )
             })}
           </div>
-          {rating > 0 && <span className={styles.explaination}> {ratingDescriptions[rating - 1]}</span>}
+          {localRating > 0 && <span className={styles.explaination}> {ratingDescriptions[localRating - 1]}</span>}
         </div>
       </div>
       <TextAreaInput
@@ -81,7 +83,7 @@ export const FeedbackModal = (): JSX.Element => {
           color="zendesk"
           iconName="send"
           isLoading={loading}
-          disabled={feedback === '' || rating === 0}
+          disabled={feedback === '' || localRating === 0}
         ></QuivrButton>
       </div>
     </div>

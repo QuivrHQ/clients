@@ -1,5 +1,5 @@
 import { ZAFClient } from '../contexts/ClientProvider'
-import { ZendeskUser } from '../types/zendesk'
+import { ZendeskConversationEntry, ZendeskUser } from '../types/zendesk'
 
 export const useZendesk = () => {
   async function getHistoric(client: ZAFClient): Promise<string[]> {
@@ -24,6 +24,19 @@ export const useZendesk = () => {
     return client.get('ticket.requester').then((data) => data['ticket.requester'].name)
   }
 
+  async function getLatestEndUserMessage(client: ZAFClient): Promise<ZendeskConversationEntry | null> {
+    const data = await client.get('ticket.conversation');
+    const conversation = data['ticket.conversation'];
+  
+    if (!Array.isArray(conversation)) return null;
+  
+    const latestMessage = conversation
+      .filter(msg => msg.author.role === 'end-user' && msg.message?.content)
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())[0];
+  
+    return latestMessage || null;
+  }
+
   async function getTicketId(client: ZAFClient): Promise<string> {
     return client.get('ticket.id').then((data) => data['ticket.id'])
   }
@@ -42,6 +55,23 @@ export const useZendesk = () => {
     })
   }
 
+  async function sendMessage(client: ZAFClient, message: string): Promise<void> {
+    const ticketId = await getTicketId(client)
+    await client.request({
+      url: `/api/v2/tickets/${ticketId}.json`,
+      type: 'PUT',
+      contentType: 'application/json',
+      data: JSON.stringify({
+        ticket: {
+          comment: {
+            body: message,
+            public: true
+          }
+        }
+      })
+    })
+  }
+
   async function pasteInEditor(client: ZAFClient, reformulatedText: string): Promise<void> {
     return client.set('ticket.comment.text', reformulatedText, { html: true })
   }
@@ -56,6 +86,8 @@ export const useZendesk = () => {
     getUserEmail,
     getRequesterEmail,
     getSubdomain,
-    pasteInEditor
+    pasteInEditor,
+    sendMessage,
+    getLatestEndUserMessage
   }
 }

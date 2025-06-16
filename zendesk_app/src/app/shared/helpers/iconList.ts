@@ -117,6 +117,7 @@ import { RiDeleteBackLine, RiDeleteBin6Line, RiHashtag, RiNotification2Line } fr
 import { SlOptionsVertical } from 'react-icons/sl'
 import { TbNetwork, TbProgress, TbRobot } from 'react-icons/tb'
 import { VscGraph } from 'react-icons/vsc'
+import { IoMdCheckmark } from "react-icons/io";
 
 export const iconList: { [name: string]: IconType } = {
   addWithoutCircle: IoIosAdd,
@@ -131,7 +132,7 @@ export const iconList: { [name: string]: IconType } = {
   calendar: FaCalendar,
   chair: PiOfficeChairFill,
   chat: IoChatbubbleEllipsesOutline,
-  check: FaCheck,
+  check: IoMdCheckmark,
   checkCircle: FaCheckCircle,
   chevronDown: LuChevronDown,
   chevronLeft: LuChevronLeft,

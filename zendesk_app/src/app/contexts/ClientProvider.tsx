@@ -28,6 +28,13 @@ export interface ZAFClient {
   metadata(): Promise<Metadata>
   context(): Promise<Context>
   instance(instanceGuid: string): ZAFClient
+  request<T = any>(options: { 
+    url: string; 
+    type: string; 
+    contentType?: string; 
+    data?: string;
+    [key: string]: any 
+  }): Promise<T>
 }
 
 export const ClientContext = createContext({})
