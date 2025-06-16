@@ -28,7 +28,7 @@ export const QuivrApiProvider = ({ children }: ProviderProps) => {
 
   useEffect(() => {
     const initializeQuivrService = async () => {
-      const service = new QuivrService('https://api.quivr.app', client)
+      const service = new QuivrService(import.meta.env.VITE_QUIVR_API_URL, client)
       setQuivrService(service)
     }
 

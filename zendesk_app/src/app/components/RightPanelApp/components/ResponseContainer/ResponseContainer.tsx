@@ -110,7 +110,7 @@ export const ResponseContainer = ({
     client
       .invoke('instances.create', {
         location: 'modal',
-        url: 'http://localhost:3000/modal',
+        url: import.meta.env.VITE_ZENDESK_MODAL_LOCATION,
         size: {
           width: askForFeedback ? '600px' : '280px',
           height: autosendable ? (askForFeedback ? '500px' : '150px') : '300px'

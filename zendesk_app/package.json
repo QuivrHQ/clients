@@ -5,15 +5,16 @@
   "type": "module",
   "scripts": {
     "test": "vitest",
-    "dev": "node scripts/toggle-env.js dev && vite --port 3000",
+    "dev": "vite --port 3000",
     "watch": "vite build --watch --mode development",
     "build:dev": "vite build --mode development",
-    "build": "node scripts/toggle-env.js prod && vite build --mode production && cp manifest.json dist && cp zcli.apps.config.json dist",
+    "build": "vite build --mode production && cp manifest.json dist && cp zcli.apps.config.json dist",
     "lint": "eslint . --ext js,jsx --max-warnings 0",
     "start": "zcli apps:server src",
     "start:prod": "zcli apps:server dist",
     "switch:dev": "node scripts/toggle-env.js dev",
-    "switch:prod": "node scripts/toggle-env.js prod"
+    "switch:prod": "node scripts/toggle-env.js prod",
+    "prepare": "husky"
   },
   "dependencies": {
     "@radix-ui/react-tooltip": "^1.2.6",
@@ -41,11 +42,18 @@
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "fast-glob": "^3.3.2",
+    "husky": "^9.1.7",
     "jsdom": "^24.1.0",
     "prettier": "^3.2.5",
     "sass": "^1.83.4",
     "typescript-plugin-css-modules": "^5.1.0",
     "vite": "^5.2.0",
     "vitest": "^1.6.0"
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx}": [
+      "eslint --fix --max-warnings 0",
+      "prettier --write"
+    ]
   }
 }
