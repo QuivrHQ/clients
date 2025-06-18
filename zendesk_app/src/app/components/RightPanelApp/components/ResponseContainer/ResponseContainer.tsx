@@ -107,6 +107,14 @@ export const ResponseContainer = ({
     autosendable?: boolean
     askForFeedback?: boolean
   }) => {
+    let latestEndUserMessage = null
+    try {
+      latestEndUserMessage = autosendable ? await getLatestEndUserMessage(client) : null
+    } catch (error) {
+      console.error('Error getting latest end user message', error);
+      return;
+    }
+
     client
       .invoke('instances.create', {
         location: 'modal',
@@ -121,8 +129,6 @@ export const ResponseContainer = ({
         const modalClient = client.instance(modalGuid)
 
         if (autosendable) {
-          const latestEndUserMessage = await getLatestEndUserMessage(client)
-
           modalClient.on('modal.ready', function () {
             modalClient.trigger('modal.data_autosend', {
               ticketAnswerId: autoDraft?.ticket_answer_id,
