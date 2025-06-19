@@ -20,14 +20,18 @@ export const IterationTextbox = ({
 }: IterationTextboxProps): JSX.Element => {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
+  const handleSubmit = () => {
+    if (!ongoingTask) {
+      onSubmit()
+      setValue('')
+    }
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
 
-      if (!ongoingTask) {
-        onSubmit()
-        setValue('')
-      }
+      handleSubmit()
     }
   }
 
@@ -58,7 +62,7 @@ export const IterationTextbox = ({
           onKeyDown={handleKeyDown}
           rows={1}
         />
-        <button className={styles.submit_button} onClick={onSubmit} disabled={ongoingTask || !value}>
+        <button className={styles.submit_button} onClick={handleSubmit} disabled={ongoingTask || !value}>
           <Icon name="send" size="normal" color="accent" disabled={ongoingTask || !value} />
         </button>
       </div>
