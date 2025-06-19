@@ -4,19 +4,22 @@ on:
   push:
     branches: [main]
     paths:
-      - "zendesk_app/src/manifest.json"
       - "zendesk_app/manifest.json"
+      - "zendesk_app/src/manifest.json"
 
 jobs:
-  get-version:
+  release:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
     defaults:
       run:
         working-directory: zendesk_app
-    outputs:
-      version: ${{ steps.get_version.outputs.version }}
+
     steps:
       - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
 
       - name: Use Node.js
         uses: actions/setup-node@v3
@@ -31,15 +34,22 @@ jobs:
           VERSION=$(node -p "require('./src/manifest.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-  build:
-    needs: get-version
+      - name: Create and push tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+        run: |
+          git config user.email "stan@quivr.app"
+          git config user.name "StanGirard"
+          git tag -a "v${{ steps.get_version.outputs.version }}" -m "Version ${{ steps.get_version.outputs.version }}"
+          git push origin "v${{ steps.get_version.outputs.version }}"
+
+  build-preview:
+    needs: release
     runs-on: ubuntu-latest
+    environment: preview
     defaults:
       run:
         working-directory: zendesk_app
-    strategy:
-      matrix:
-        env: [preview, production]
 
     steps:
       - uses: actions/checkout@v3
@@ -51,58 +61,114 @@ jobs:
           cache: "npm"
           cache-dependency-path: zendesk_app/package-lock.json
 
-      - name: Install dependencies
-        run: npm install
+      - run: npm install
 
-      - name: Install ZCLI
-        run: npm i @zendesk/zcli -g
+      - run: npm i @zendesk/zcli -g
 
-      - name: Build and package ${{ matrix.env }}
+      - run: |
+          npm run build
+          zcli apps:package dist
+          ZIP_FILE=$(find . -name "app-*.zip" -type f)
+          mv "$ZIP_FILE" preview.zip
         env:
-          ZENDESK_API_TOKEN: ${{ secrets.ZENDESK_API_TOKEN }}
-          VITE_ZENDESK_API_KEY: "{{setting.zendesk_api_key}}"
-        run: |
+          ZENDESK_SUBDOMAIN: ${{ secrets.ZENDESK_PREVIEW_SUBDOMAIN }}
+          ZENDESK_EMAIL: ${{ secrets.ZENDESK_PREVIEW_EMAIL }}
+          ZENDESK_API_TOKEN: ${{ secrets.ZENDESK_PREVIEW_API_TOKEN }}
+          VITE_QUIVR_API_URL: ${{ vars.VITE_QUIVR_API_URL }}
+          VITE_QUIVR_GOBOCOM_API_URL: ${{ vars.VITE_QUIVR_GOBOCOM_API_URL }}
+          VITE_ZENDESK_LOCATION: ${{ vars.VITE_ZENDESK_LOCATION }}
+          VITE_ZENDESK_MODAL_LOCATION: ${{ vars.VITE_ZENDESK_MODAL_LOCATION }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: preview.zip
+          path: zendesk_app/preview.zip
+
+  build-production:
+    needs: release
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: zendesk_app
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.x"
+          cache: "npm"
+          cache-dependency-path: zendesk_app/package-lock.json
+
+      - run: npm install
+
+      - run: npm i @zendesk/zcli -g
+
+      - run: |
           rm -rf dist
           npm run build
           zcli apps:package dist
           ZIP_FILE=$(find . -name "app-*.zip" -type f)
-          if [ $(echo "$ZIP_FILE" | wc -l) -ne 1 ]; then
-            echo "Error: Found multiple or no zip files"
-            exit 1
-          fi
-          mv "$ZIP_FILE" "${{ matrix.env }}.zip"
+          mv "$ZIP_FILE" production.zip
+        env:
+          ZENDESK_SUBDOMAIN: ${{ secrets.ZENDESK_PROD_SUBDOMAIN }}
+          ZENDESK_EMAIL: ${{ secrets.ZENDESK_PROD_EMAIL }}
+          ZENDESK_API_TOKEN: ${{ secrets.ZENDESK_PROD_API_TOKEN }}
+          VITE_QUIVR_API_URL: ${{ vars.VITE_QUIVR_API_URL }}
+          VITE_QUIVR_GOBOCOM_API_URL: ${{ vars.VITE_QUIVR_GOBOCOM_API_URL }}
+          VITE_ZENDESK_LOCATION: ${{ vars.VITE_ZENDESK_LOCATION }}
+          VITE_ZENDESK_MODAL_LOCATION: ${{ vars.VITE_ZENDESK_MODAL_LOCATION }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: production.zip
+          path: zendesk_app/production.zip
 
   create-release:
-    needs: [get-version, build]
+    needs: [release, build-preview, build-production]
     runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
+
     steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: preview.zip
+          path: .
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: production.zip
+          path: .
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
         with:
-          tag_name: v${{ needs.get-version.outputs.version }}
-          release_name: Release v${{ needs.get-version.outputs.version }}
+          tag_name: v${{ needs.release.outputs.version }}
+          release_name: Release v${{ needs.release.outputs.version }}
           draft: false
           prerelease: false
 
-  upload-assets:
-    needs: [create-release, build]
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        env: [preview, production]
-
-    steps:
-      - name: Upload ${{ matrix.env }}.zip
+      - name: Upload Preview ZIP
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./${{ matrix.env }}.zip
-          asset_name: ${{ matrix.env }}.zip
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./preview.zip
+          asset_name: preview.zip
+          asset_content_type: application/zip
+
+      - name: Upload Production ZIP
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./production.zip
+          asset_name: production.zip
           asset_content_type: application/zip
