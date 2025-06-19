@@ -35,7 +35,7 @@ export const ResponseContainer = ({
   const [rating, setRating] = useState(0)
   const client = useClient() as ZAFClient
   const { setIsError } = useExecuteZendeskTaskContext()
-  const { sendMessage, getLatestEndUserMessage, getSubdomain } = useZendesk()
+  const { sendMessage, getLatestEndUserMessage, getSubdomain, pasteInEditor } = useZendesk()
   const { quivrService } = useQuivrApiContext()
   const [isAutosendableFeedbackOpen, setIsAutosendableFeedbackOpen] = useState(true)
   const [feedbackModalViewed, setFeedbackModalViewed] = useState(false)
@@ -148,6 +148,7 @@ export const ResponseContainer = ({
             setIsAutosendableFeedbackOpen(false)
             if (autoDraft?.generated_answer) {
               await sendMessage(client, autoDraft?.generated_answer)
+              await pasteInEditor(client, "")
             }
           })
 
