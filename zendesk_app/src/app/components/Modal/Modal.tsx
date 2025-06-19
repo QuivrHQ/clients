@@ -11,16 +11,25 @@ export const Modal = (): JSX.Element => {
 
   useEffect(() => {
     if (!client) return
-    client.trigger('modal.ready')
-
-    client.on('modal.data', (incomingData: FeedbackModalProps) => {
+  
+    const handleData = (incomingData: FeedbackModalProps) => {
       setModalType('feedback')
       setModalContent(incomingData)
-    })
-    client.on('modal.data_autosend', (incomingData: AutosendModalProps) => {
+    }
+    const handleAutosend = (incomingData: AutosendModalProps) => {
       setModalType('autosend')
       setModalContent(incomingData)
-    })
+    }
+  
+    client.on('modal.data', handleData)
+    client.on('modal.data_autosend', handleAutosend)
+
+    client.trigger('modal.ready')
+    
+    return () => {
+      client.off('modal.data', handleData)
+      client.off('modal.data_autosend', handleAutosend)
+    }
   }, [client])
 
   
