@@ -1,4 +1,6 @@
+import posthog from 'posthog-js/'
 import { createContext, useEffect, useMemo, useState, ReactNode } from 'react'
+import { useZendesk } from '../hooks/useZendesk'
 
 declare global {
   interface Window {
@@ -28,12 +30,12 @@ export interface ZAFClient {
   metadata(): Promise<Metadata>
   context(): Promise<Context>
   instance(instanceGuid: string): ZAFClient
-  request<T = any>(options: { 
-    url: string; 
-    type: string; 
-    contentType?: string; 
-    data?: string;
-    [key: string]: any 
+  request<T = any>(options: {
+    url: string
+    type: string
+    contentType?: string
+    data?: string
+    [key: string]: any
   }): Promise<T>
 }
 
@@ -41,11 +43,16 @@ export const ClientContext = createContext({})
 
 export function ClientProvider({ children }: { children: ReactNode }) {
   const client: ZAFClient = useMemo(() => window.ZAFClient.init(), [])
+  const { getSubdomain, getUser } = useZendesk()
+
   const [appRegistered, setAppRegistered] = useState(false)
 
   useEffect(() => {
-    client.on('app.registered', function () {
+    client.on('app.registered', async function () {
       setAppRegistered(true)
+      const subdomain = await getSubdomain(client)
+      const user = await getUser(client)
+      posthog.identify(user.id.toString(), { subdomain, email: user.email })
     })
   }, [client])
 

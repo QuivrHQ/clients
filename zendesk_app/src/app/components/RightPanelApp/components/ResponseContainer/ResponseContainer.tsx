@@ -11,6 +11,10 @@ import { normalizeNewlinesToHtml } from '../../../../shared/helpers/html'
 import { Autodraft } from '../../../../types/zendesk'
 import styles from './ResponseContainer.module.scss'
 import { useModal } from '../../../../hooks/useModal'
+import { useFeatureFlagEnabled } from 'posthog-js/react'
+import { featureFlags } from '@constants/feature-flags'
+import posthog from 'posthog-js'
+import { copyDraftSource, trackingEvents } from '@constants/tracking-events'
 
 const subdomainsEligibleToAutosend = ['getquivr', 'd3v-quivr', 'trusk']
 
@@ -41,6 +45,7 @@ export const ResponseContainer = ({
   const [isAutosendableFeedbackOpen, setIsAutosendableFeedbackOpen] = useState(true)
   const [feedbackModalViewed, setFeedbackModalViewed] = useState(false)
   const openModal = useModal(client)
+  const autosendFeedbackModalEnabled = useFeatureFlagEnabled(featureFlags.AUTOSEND_FEEDBACK_MODAL)
 
   useEffect(() => {
     if (!manualEditing) {
@@ -70,7 +75,8 @@ export const ResponseContainer = ({
         autoDraft?.prediction?.is_accepted === null &&
         htmlContent !== '' &&
         subdomainsEligibleToAutosend.includes(subdomain) &&
-        !feedbackModalViewed
+        !feedbackModalViewed &&
+        autosendFeedbackModalEnabled
       ) {
         setFeedbackModalViewed(true)
         launchModalFeedback({ autosendable: true, askForFeedback: true })
@@ -132,6 +138,10 @@ export const ResponseContainer = ({
       onCopyDraft: () => {
         onCopyDraft()
         setIsAutosendableFeedbackOpen(false)
+        posthog.capture(trackingEvents.COPY_DRAFT, {
+          autosendable: true,
+          source: copyDraftSource.MODAL
+        })
       },
       onSendDraft: async () => {
         setIsAutosendableFeedbackOpen(false)
@@ -172,6 +182,12 @@ export const ResponseContainer = ({
         dangerouslySetInnerHTML={{ __html: htmlContent }}
         onInput={handleInput}
         onBlur={() => setManualEditing(false)}
+        onCopy={() => {
+          posthog.capture(trackingEvents.COPY_DRAFT, {
+            autosendable: autoDraft?.prediction?.is_autosendable,
+            source: copyDraftSource.TEXT_EDITOR
+          })
+        }}
       ></div>
       {!ongoingTask && (
         <>
