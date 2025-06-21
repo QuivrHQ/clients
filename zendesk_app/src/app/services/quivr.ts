@@ -21,9 +21,9 @@ export class QuivrService {
   private async initialize(client: any) {
     this.apiUrl = await client.context().then(function (context: { account: { subdomain: string } }) {
       if (context.account.subdomain === 'locservice') {
-        return 'https://api-gobocom.quivr.app'
+        return import.meta.env.VITE_QUIVR_GOBOCOM_API_URL
       }
-      return 'https://api.quivr.app'
+      return import.meta.env.VITE_QUIVR_API_URL
     })
     this.quivrApiKey = await client.metadata().then(function (metadata: { settings: { quivr_api_token: any } }) {
       return metadata.settings.quivr_api_token
@@ -66,7 +66,7 @@ export class QuivrService {
         data: JSON.stringify({
           subdomain: `${subdomain}.zendesk.com`,
           email: userEmail,
-          api_key: '{{setting.zendesk_api_key}}',
+          api_key: import.meta.env.VITE_ZENDESK_API_KEY,
           time_range: 30
         })
       })
