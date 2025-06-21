@@ -17,6 +17,8 @@ import { useExecuteZendeskTaskContext } from '../../contexts/ExecuteZendeskTaskP
 import { ZAFClient } from '../../contexts/ClientProvider'
 import { normalizeNewlinesToHtml } from '../../shared/helpers/html'
 import styles from './RightPanelApp.module.scss'
+import { copyDraftSource, trackingEvents } from '@constants/tracking-events'
+import posthog from 'posthog-js'
 
 export const RightPanelApp = (): JSX.Element => {
   const { quivrService, ingestionStatus, setIngestionStatus, zendeskConnection } = useQuivrApiContext()
@@ -101,7 +103,13 @@ export const RightPanelApp = (): JSX.Element => {
           <QuivrButton
             label="Copy Draft"
             color="black"
-            onClick={onCopyDraft}
+            onClick={() => {
+              posthog.capture(trackingEvents.COPY_DRAFT, {
+                autosendable: autoDraft?.prediction?.is_autosendable,
+                source: copyDraftSource.BUTTON
+              })
+              onCopyDraft()
+            }}
             size="tiny"
             disabled={isLoadingText() || !response}
           />
