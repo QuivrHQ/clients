@@ -10,6 +10,16 @@ interface ModalOptions {
   onRejectDraft?: () => void
 }
 
+const getModalSize = (autosendable: boolean, askForFeedback: boolean) => {
+  if (autosendable) {
+    return {
+      width: askForFeedback ? '600px' : '280px',
+      height: askForFeedback ? '500px' : '150px'
+    }
+  }
+  return { width: '280px', height: '300px' }
+}
+
 export function useModal(client: ZAFClient) {
   return useCallback(
     async ({
@@ -22,11 +32,8 @@ export function useModal(client: ZAFClient) {
     }: ModalOptions) => {
       const { 'instances.create': instances } = await client.invoke('instances.create', {
         location: 'modal',
-        url: 'http://localhost:3000/modal',
-        size: {
-          width: askForFeedback ? '600px' : '280px',
-          height: autosendable ? (askForFeedback ? '500px' : '150px') : '300px'
-        }
+        url: import.meta.env.VITE_ZENDESK_MODAL_LOCATION,
+        size: getModalSize(autosendable, askForFeedback)
       })
 
       const guid = instances[0].instanceGuid
