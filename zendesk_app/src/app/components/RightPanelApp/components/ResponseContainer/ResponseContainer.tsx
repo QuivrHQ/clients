@@ -10,6 +10,7 @@ import Tooltip from '../../../../shared/components/Tooltip/Tooltip'
 import { normalizeNewlinesToHtml } from '../../../../shared/helpers/html'
 import { Autodraft } from '../../../../types/zendesk'
 import styles from './ResponseContainer.module.scss'
+import { useModal } from '../../../../hooks/useModal'
 
 const subdomainsEligibleToAutosend = ['getquivr', 'd3v-quivr', 'trusk']
 
@@ -39,6 +40,7 @@ export const ResponseContainer = ({
   const { quivrService } = useQuivrApiContext()
   const [isAutosendableFeedbackOpen, setIsAutosendableFeedbackOpen] = useState(true)
   const [feedbackModalViewed, setFeedbackModalViewed] = useState(false)
+  const openModal = useModal(client)
 
   useEffect(() => {
     if (!manualEditing) {
@@ -71,7 +73,7 @@ export const ResponseContainer = ({
         !feedbackModalViewed
       ) {
         setFeedbackModalViewed(true)
-        openFeedbackModal({ autosendable: true, askForFeedback: true })
+        launchModalFeedback({ autosendable: true, askForFeedback: true })
       }
     }
     void checkAutosendModal()
@@ -100,74 +102,50 @@ export const ResponseContainer = ({
     }
   }
 
-  const openFeedbackModal = async ({
-    autosendable = false,
-    askForFeedback = false
+  const launchModalFeedback = async ({
+    askForFeedback = false,
+    autosendable = false
   }: {
-    autosendable?: boolean
-    askForFeedback?: boolean
+    askForFeedback: boolean
+    autosendable: boolean
   }) => {
+    if (!autoDraft) return
+
     let latestEndUserMessage = null
     try {
       latestEndUserMessage = autosendable ? await getLatestEndUserMessage(client) : null
     } catch (error) {
-      console.error('Error getting latest end user message', error);
-      return;
+      console.error('Error getting latest end user message', error)
+      return
     }
 
-    client
-      .invoke('instances.create', {
-        location: 'modal',
-        url: import.meta.env.VITE_ZENDESK_MODAL_LOCATION,
-        size: {
-          width: askForFeedback ? '600px' : '280px',
-          height: autosendable ? (askForFeedback ? '500px' : '150px') : '300px'
+    openModal({
+      autosendable,
+      askForFeedback,
+      payload: {
+        ticketAnswerId: autoDraft.ticket_answer_id,
+        predictionId: autoDraft.prediction?.prediction_id,
+        askForFeedback,
+        response: htmlContent,
+        endUserMessage: latestEndUserMessage
+      },
+      onCopyDraft: () => {
+        onCopyDraft()
+        setIsAutosendableFeedbackOpen(false)
+      },
+      onSendDraft: async () => {
+        setIsAutosendableFeedbackOpen(false)
+        if (autoDraft.generated_answer) {
+          await sendMessage(client, autoDraft.generated_answer)
+          await pasteInEditor(client, '')
         }
-      })
-      .then(async (modalContext) => {
-        const modalGuid = modalContext['instances.create'][0].instanceGuid
-        const modalClient = client.instance(modalGuid)
-
-        if (autosendable) {
-          modalClient.on('modal.ready', function () {
-            modalClient.trigger('modal.data_autosend', {
-              ticketAnswerId: autoDraft?.ticket_answer_id,
-              predictionId: autoDraft?.prediction?.prediction_id,
-              askForFeedback: askForFeedback,
-              response: htmlContent,
-              endUserMessage: latestEndUserMessage
-            })
-          })
-
-          modalClient.on('modal.copy_draft', function () {
-            setIsAutosendableFeedbackOpen(false)
-            void onCopyDraft()
-          })
-
-          modalClient.on('modal.send_draft', async function () {
-            setIsAutosendableFeedbackOpen(false)
-            if (autoDraft?.generated_answer) {
-              await sendMessage(client, autoDraft?.generated_answer)
-              await pasteInEditor(client, "")
-            }
-          })
-
-          modalClient.on('modal.reject_draft', function () {
-            setIsAutosendableFeedbackOpen(false)
-          })
-        } else {
-          modalClient.on('modal.ready', function () {
-            modalClient.trigger('modal.data', {
-              ticketAnswerId: ticketAnswerId,
-              rating: rating
-            })
-          })
-        }
-      })
+      },
+      onRejectDraft: () => setIsAutosendableFeedbackOpen(false)
+    })
   }
 
   const approveDraftResponse = () => {
-    openFeedbackModal({ autosendable: true })
+    launchModalFeedback({ autosendable: true, askForFeedback: false })
   }
 
   const rejectDraftResponse = async () => {
@@ -234,7 +212,10 @@ export const ResponseContainer = ({
                   )
                 })}
               </div>
-              <span className={styles.feedback_button} onClick={() => openFeedbackModal({ autosendable: false })}>
+              <span
+                className={styles.feedback_button}
+                onClick={() => launchModalFeedback({ autosendable: false, askForFeedback: false })}
+              >
                 - Add details
               </span>
             </div>
