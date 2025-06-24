@@ -32,7 +32,13 @@ export default ({ mode }) => {
     ],
     resolve: {
       alias: {
-        '@styles': resolve(__dirname, 'src/app/shared/styles')
+        '@styles': resolve(__dirname, 'src/app/shared/styles'),
+        '@constants': resolve(__dirname, 'src/app/constants'),
+        '@components': resolve(__dirname, 'src/app/components'),
+        '@hooks': resolve(__dirname, 'src/app/hooks'),
+        '@contexts': resolve(__dirname, 'src/app/contexts'),
+        '@types': resolve(__dirname, 'src/app/types'),
+        '@services': resolve(__dirname, 'src/app/services')
       }
     },
     root: 'src',
