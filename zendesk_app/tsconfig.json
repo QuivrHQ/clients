@@ -9,7 +9,12 @@
     "baseUrl": "./",
     "paths": {
       "@types/*": ["./types/*"],
-      "@styles/*": ["src/app/shared/styles/*"]
+      "@styles/*": ["src/app/shared/styles/*"],
+      "@constants/*": ["src/app/constants/*"],
+      "@components/*": ["src/app/components/*"],
+      "@hooks/*": ["src/app/hooks/*"],
+      "@contexts/*": ["src/app/contexts/*"],
+      "@services/*": ["src/app/services/*"]
     },
     "typeRoots": ["./types", "./node_modules/@types"],
     "allowSyntheticDefaultImports": true,

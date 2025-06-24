@@ -78,6 +78,8 @@ jobs:
           VITE_QUIVR_GOBOCOM_API_URL: ${{ vars.VITE_QUIVR_GOBOCOM_API_URL }}
           VITE_ZENDESK_LOCATION: ${{ vars.VITE_ZENDESK_LOCATION }}
           VITE_ZENDESK_MODAL_LOCATION: ${{ vars.VITE_ZENDESK_MODAL_LOCATION }}
+          VITE_POSTHOG_HOST: ${{ vars.VITE_POSTHOG_HOST }}
+          VITE_POSTHOG_KEY: ${{ vars.VITE_POSTHOG_KEY }}
 
       - uses: actions/upload-artifact@v4
         with:
@@ -120,6 +122,8 @@ jobs:
           VITE_QUIVR_GOBOCOM_API_URL: ${{ vars.VITE_QUIVR_GOBOCOM_API_URL }}
           VITE_ZENDESK_LOCATION: ${{ vars.VITE_ZENDESK_LOCATION }}
           VITE_ZENDESK_MODAL_LOCATION: ${{ vars.VITE_ZENDESK_MODAL_LOCATION }}
+          VITE_POSTHOG_HOST: ${{ vars.VITE_POSTHOG_HOST }}
+          VITE_POSTHOG_KEY: ${{ vars.VITE_POSTHOG_KEY }}
 
       - uses: actions/upload-artifact@v4
         with:
