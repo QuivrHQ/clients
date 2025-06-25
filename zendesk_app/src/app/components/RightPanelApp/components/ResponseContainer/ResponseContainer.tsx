@@ -129,7 +129,7 @@ export const ResponseContainer = ({
       autosendable,
       askForFeedback,
       payload: {
-        ticketAnswerId: autoDraft.ticket_answer_id,
+        ticketAnswerId: ticketAnswerId,
         predictionId: autoDraft.prediction?.prediction_id,
         askForFeedback,
         response: htmlContent,
