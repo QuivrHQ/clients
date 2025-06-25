@@ -1,10 +1,18 @@
 import { useCallback } from 'react'
 import { ZAFClient } from '../contexts/ClientProvider'
+import { ZendeskConversationEntry } from '../types/zendesk'
 
 interface ModalOptions {
   autosendable?: boolean
   askForFeedback?: boolean
-  payload: Record<string, unknown>
+  payload: {
+    ticketAnswerId?: string
+    predictionId?: string
+    askForFeedback?: boolean
+    response: string
+    endUserMessage: ZendeskConversationEntry | null
+    rating: number
+  }
   onCopyDraft?: () => void
   onSendDraft?: () => Promise<void>
   onRejectDraft?: () => void
