@@ -133,7 +133,8 @@ export const ResponseContainer = ({
         predictionId: autoDraft.prediction?.prediction_id,
         askForFeedback,
         response: htmlContent,
-        endUserMessage: latestEndUserMessage
+        endUserMessage: latestEndUserMessage,
+        rating: rating
       },
       onCopyDraft: () => {
         onCopyDraft()
