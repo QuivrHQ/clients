@@ -46,6 +46,9 @@ export const ResponseContainer = ({
   const [feedbackModalViewed, setFeedbackModalViewed] = useState(false)
   const openModal = useModal(client)
   const autosendFeedbackModalEnabled = useFeatureFlagEnabled(featureFlags.AUTOSEND_FEEDBACK_MODAL)
+  const autosendFeedbackEnabled = useFeatureFlagEnabled(featureFlags.AUTOSEND_FEEDBACK)
+  const showAutosendFeedbackButtons =
+    autoDraft?.prediction?.is_autosendable && autoDraft?.prediction?.is_accepted === null && autosendFeedbackEnabled
 
   useEffect(() => {
     if (!manualEditing) {
@@ -76,7 +79,8 @@ export const ResponseContainer = ({
         htmlContent !== '' &&
         subdomainsEligibleToAutosend.includes(subdomain) &&
         !feedbackModalViewed &&
-        autosendFeedbackModalEnabled
+        autosendFeedbackModalEnabled &&
+        autosendFeedbackEnabled
       ) {
         setFeedbackModalViewed(true)
         launchModalFeedback({ autosendable: true, askForFeedback: true })
@@ -178,7 +182,7 @@ export const ResponseContainer = ({
   return (
     <div className={styles.main_container}>
       <div
-        className={`${styles.response_container} ${autoDraft?.prediction?.is_autosendable ? styles.autosendable : ''}`}
+        className={`${styles.response_container} ${showAutosendFeedbackButtons ? styles.autosendable : ''}`}
         contentEditable={true}
         dangerouslySetInnerHTML={{ __html: htmlContent }}
         onInput={handleInput}
@@ -192,9 +196,7 @@ export const ResponseContainer = ({
       ></div>
       {!ongoingTask && (
         <>
-          {autoDraft?.prediction?.is_autosendable &&
-          autoDraft?.prediction?.is_accepted === null &&
-          isAutosendableFeedbackOpen ? (
+          {showAutosendFeedbackButtons && isAutosendableFeedbackOpen ? (
             <div className={styles.feedback_wrapper}>
               <div className={styles.autosend_container}>
                 <Tooltip
