@@ -14,7 +14,7 @@ export interface ZendeskConnection {
   time_range: number
   triggers_id?: string[]
   webhook_id?: string
-  brain_links: ZendeskBrain[]
+  helpdesk_brains: ZendeskBrain[]
   external_endpoints: ExternalAPIEndpoint[]
   display_generate_button: boolean
   display_iterate_button: boolean
@@ -123,33 +123,32 @@ interface SupportAgent {
   platform_user_id: number
 }
 
-
 export interface ZendeskConversationEntry {
-  attachments: Attachment[];
-  author: Author;
-  channel: Channel;
-  message: Message;
-  timestamp: string; // ISO 8601 format
+  attachments: Attachment[]
+  author: Author
+  channel: Channel
+  message: Message
+  timestamp: string // ISO 8601 format
 }
 
 export interface ZendeskAttachment {
-  contentType: string;
-  contentUrl: string;
-  filename: string;
+  contentType: string
+  contentUrl: string
+  filename: string
 }
 
 export interface ZendeskAuthor {
-  id: number | null;
-  avatar: string;
-  name: string;
-  role: string;
+  id: number | null
+  avatar: string
+  name: string
+  role: string
 }
 
 export interface ZendeskChannel {
-  name: string;
+  name: string
 }
 
 export interface ZendeskMessage {
-  content: string | null;
-  contentType: string | null;
+  content: string | null
+  contentType: string | null
 }

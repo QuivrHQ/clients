@@ -36,7 +36,7 @@ export const ReplyBoxApp = (): JSX.Element => {
       if (
         quivrService &&
         zendeskConnection?.enable_autodraft_in_reply_box &&
-        zendeskConnection?.brain_links.some((link) => link.auto_draft_front)
+        zendeskConnection?.helpdesk_brains.some((link) => link.auto_draft_front)
       ) {
         const ticketId = await getTicketId(client)
         const autoDraft = await quivrService.getAutoDraft(ticketId)
@@ -47,7 +47,7 @@ export const ReplyBoxApp = (): JSX.Element => {
     }
 
     getAutoDraft()
-  }, [quivrService, zendeskConnection?.enable_autodraft_in_reply_box, zendeskConnection?.brain_links])
+  }, [quivrService, zendeskConnection?.enable_autodraft_in_reply_box, zendeskConnection?.helpdesk_brains])
 
   return (
     <div className={`${styles.content_container} ${loading ? styles.loading : ''}`}>

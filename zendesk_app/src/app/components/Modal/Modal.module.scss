@@ -1,0 +1,10 @@
+@use '@styles/Spacings.module';
+@use '@styles/Typography.module';
+
+.loader_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100dvh;
+  padding: Spacings.$spacing05;
+}

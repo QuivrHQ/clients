@@ -119,8 +119,6 @@ export const ResponseContainer = ({
     askForFeedback: boolean
     autosendable: boolean
   }) => {
-    if (!autoDraft) return
-
     let latestEndUserMessage = null
     try {
       latestEndUserMessage = autosendable ? await getLatestEndUserMessage(client) : null
@@ -134,7 +132,7 @@ export const ResponseContainer = ({
       askForFeedback,
       payload: {
         ticketAnswerId: ticketAnswerId,
-        predictionId: autoDraft.prediction?.prediction_id,
+        predictionId: autoDraft?.prediction?.prediction_id,
         askForFeedback,
         response: htmlContent,
         endUserMessage: latestEndUserMessage,
@@ -150,7 +148,7 @@ export const ResponseContainer = ({
       },
       onSendDraft: async () => {
         setIsAutosendableFeedbackOpen(false)
-        if (autoDraft.generated_answer) {
+        if (autoDraft?.generated_answer) {
           await sendMessage(client, autoDraft.generated_answer)
           await pasteInEditor(client, '')
         }

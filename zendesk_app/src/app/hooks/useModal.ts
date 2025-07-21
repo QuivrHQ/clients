@@ -50,7 +50,9 @@ export function useModal(client: ZAFClient) {
       const emitPayload = () => modalClient.trigger(autosendable ? 'modal.data_autosend' : 'modal.data', payload)
 
       modalClient.on('modal.ready', emitPayload)
-      emitPayload()
+      setTimeout(() => {
+        emitPayload()
+      }, 1000)
 
       if (autosendable) {
         const dispose = () => {
