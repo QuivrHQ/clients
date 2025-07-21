@@ -37,7 +37,7 @@ export const RightPanelApp = (): JSX.Element => {
 
   useEffect(() => {
     const getAutoDraft = async () => {
-      if (quivrService && zendeskConnection?.brain_links.some((link) => link.auto_draft_front)) {
+      if (quivrService && zendeskConnection?.helpdesk_brains.some((link) => link.auto_draft_front)) {
         const ticketId = await getTicketId(client)
         const autoDraft = await quivrService.getAutoDraft(ticketId)
         if (autoDraft?.generated_answer) {
@@ -49,7 +49,7 @@ export const RightPanelApp = (): JSX.Element => {
     }
 
     getAutoDraft()
-  }, [quivrService, zendeskConnection?.brain_links])
+  }, [quivrService, zendeskConnection?.helpdesk_brains])
 
   const isLoadingText = (): boolean => {
     return ['.', '..', '...'].includes(response)
