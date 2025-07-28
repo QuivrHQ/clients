@@ -7,7 +7,7 @@
     "parameters": {
       "quivr_api_token": {
         "label": "Quivr API Key",
-        "description": "Your Quivr API key, found in the user section of [quivr.app](https://quivr.app)"
+        "description": "Your Quivr API key, found in the user section of [admin.quivr.app](https://admin.quivr.app)"
       },
       "zendesk_api_key": {
         "label": "Zendesk API Key",
