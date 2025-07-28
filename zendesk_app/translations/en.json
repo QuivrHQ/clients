@@ -1,17 +1,13 @@
 {
   "app": {
     "name": "Quivr",
-    "short_description": "Generate and rephrase responses to Zendesk tickets with AI-powered assistance.",
-    "long_description": "## Quivr  \nQuivr is an open-source Retrieval-Augmented Generation (RAG) AI designed to enhance knowledge management and content generation. It enables users to efficiently retrieve, generate, and refine text using advanced AI capabilities, making it a powerful tool for automation and productivity.  \n\n\n## Quivr for Zendesk  \nQuivr for Zendesk integrates Quivr directly into your Zendesk workflow, empowering support agents with AI-driven assistance:  \n\n- ✨ **AI-Powered Suggestions**: Generate, refine, and improve responses effortlessly.  \n- 🔍 **Context-Aware AI**: Uses full ticket context, including customer details and conversation history.  \n- 🏆 **Efficiency Boost**: Speeds up ticket resolution and enhances agent productivity.  \n- 🔄 **Seamless Integration**: Work with Quivr AI directly inside Zendesk.  \n\n**Note:** Requires an active Quivr account.",
-    "installation_instructions": "## Installation Instructions  \nClick **Install**, then provide:  \n- 🗝️ Your **Quivr API key**  \n- 🔑 Your **Zendesk API key**  \n- 🏢 Your **Quivr Workspace ID** (found in the user section of [quivr.app](https://quivr.app))  \n\nYou're all set to enhance your Zendesk experience!",
+    "short_description": "Automate ticket resolutions, increase CSAT & save money.",
+    "long_description": "## Quivr  \nQuivr is an AI-powered tool that automates customer ticket replies, directly inside your ticketing system. It helps support teams save time, improve CSAT, and scale their operations.  \n\n## Quivr for Zendesk  \nQuivr integrates into your Zendesk workflow and offers powerful features to assist your agents:  \n\n- 🚀 Automatic Replies: Quivr can auto-send responses when confidence is high and conditions are met. \n-  ✨ Reply Drafts: Quivr suggests high-quality responses based on the full ticket context, ready for agent review and editing.\n- ✍️ Draft Assistant: Summarize, translate, correct, or rephrase any draft in one click.  \n- 🔍 Deep Context Awareness: Understands ticket history, customer messages, metadata, and even connects to your internal tools.  \n- 🏆 Productivity Boost: Speeds up response time and reduces cognitive load.  \n- 🔄 Fully Integrated: Use Quivr directly within Zendesk, no tab switching.  \n\nNote: Requires an active Quivr account.",
+    "installation_instructions": "## Installation Instructions  \nBook a call, we’ll handle the 5-minute setup for you 👉 [Schedule here](https://cal.com/team/quivr/quivr-installation)",
     "parameters": {
       "quivr_api_token": {
-        "label": "Quivr API Token",
-        "description": "Your Quivr API Token, found in the user section of [quivr.app](https://quivr.app)"
-      },
-      "quivr_workspace_id": {
-        "label": "Quivr Workspace ID",
-        "description": "Your Quivr Workspace ID, found in the user section of [quivr.app](https://quivr.app)"
+        "label": "Quivr API Key",
+        "description": "Your Quivr API key, found in the user section of [quivr.app](https://quivr.app)"
       },
       "zendesk_api_key": {
         "label": "Zendesk API Key",
