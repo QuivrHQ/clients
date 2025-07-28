@@ -1,6 +1,6 @@
 *Use of this software is subject to important terms and conditions as set forth in the License file*
 
-# Quivr Zendesk App
+# Quivr Zendesk App.
 
 This is the Quivr Zendesk App. It is a React application that is used to interact with the Quivr API.
 
