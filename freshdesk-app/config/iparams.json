@@ -1,0 +1,8 @@
+{
+  "quivrApiKey": {
+    "display_name": "Quivr API Key",
+    "type": "text",
+    "required": true,
+    "secure": true
+  }
+}

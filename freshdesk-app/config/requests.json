@@ -1,0 +1,13 @@
+{
+  "getHelpdeskAccount": {
+    "schema": {
+      "method": "GET",
+      "host": "<%= app_settings.quivrApiUrl %>",
+      "path": "/helpdesk-accounts",
+      "headers": {
+        "Authorization": "Bearer <%= iparam.quivrApiKey %>",
+        "Content-Type": "application/json"
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+src/**/*.js
+app/*
+!app/*.svg
+node_modules
+log
+dist
+coverage
