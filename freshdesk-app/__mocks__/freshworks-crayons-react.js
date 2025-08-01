@@ -7,3 +7,7 @@ export function FwButton(props) {
     </button>
   )
 }
+
+export const FwTextarea = React.forwardRef(function FwTextarea(props, ref) {
+  return <textarea {...props} ref={ref} onChange={() => {}} />
+})

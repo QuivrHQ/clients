@@ -8,7 +8,9 @@
         }
       },
       "requests": {
-        "getHelpdeskAccount": {}
+        "getHelpdeskAccount": {},
+        "createHelpdeskAccount": {},
+        "getAutodraft": {}
       }
     },
     "support_ticket": {

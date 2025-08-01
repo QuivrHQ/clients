@@ -1,5 +1,6 @@
-import HelloUser from './components/HelloUser'
-import { useFreshdeskClient } from './context/FreshdeskClientContext'
+import ResponseContainer from './components/ResponseContainer/ResponseContainer'
+import { AccountConfigProvider } from './context/AccountConfigContext/AccountConfigContext'
+import { useFreshdeskClient } from './context/FreshdeskClientContext/FreshdeskClientContext'
 import './index.css'
 
 const App = () => {
@@ -9,7 +10,11 @@ const App = () => {
     return <div>Loading...</div>
   }
 
-  return <HelloUser />
+  return (
+    <AccountConfigProvider>
+      <ResponseContainer />
+    </AccountConfigProvider>
+  )
 }
 
 export default App

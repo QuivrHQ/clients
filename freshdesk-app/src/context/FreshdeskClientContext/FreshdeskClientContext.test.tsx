@@ -1,12 +1,12 @@
 import { render, screen } from '@testing-library/react'
 import { FreshdeskProvider, useFreshdeskClient } from './FreshdeskClientContext'
 
-jest.mock('../hooks/useScript', () => ({
+jest.mock('../../hooks/useScript/useScript', () => ({
   __esModule: true,
   default: jest.fn()
 }))
 
-const mockUseScript = require('../hooks/useScript').default as jest.Mock
+const mockUseScript = require('../../hooks/useScript/useScript').default as jest.Mock
 
 describe('FreshdeskProvider / useFreshdeskClient', () => {
   beforeEach(() => {
@@ -15,7 +15,11 @@ describe('FreshdeskProvider / useFreshdeskClient', () => {
 
   it('provides the Freshdesk client once the SDK is loaded and initialised', async () => {
     // Arrange
-    const mockClient = { foo: 'bar' }
+    const mockClient = {
+      instance: {
+        resize: jest.fn()
+      }
+    }
 
     // Simulate the SDK script being loaded immediately
     mockUseScript.mockReturnValue(true)

@@ -25,3 +25,22 @@ export interface HelpdeskAccount {
   daily_autosend_limit: number
   question_categories: Record<string, unknown>
 }
+
+export interface CreateHelpdeskAccount {
+  subdomain: string
+  email: string
+  api_key: string
+  provider: string
+  time_range: number
+}
+
+export interface Autodraft {
+  ticket_answer_id: string
+  generated_answer: string
+  prediction?: {
+    prediction_id: string
+    confidence_score?: number
+    is_autosendable?: boolean
+    is_accepted: boolean | null
+  }
+}
