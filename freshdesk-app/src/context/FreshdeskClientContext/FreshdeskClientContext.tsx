@@ -1,6 +1,6 @@
 import { createContext, useContext, useLayoutEffect, useState } from 'react'
-import useScript from '../hooks/useScript'
-import type { FreshdeskClient } from '../types/freshdesk'
+import useScript from '../../hooks/useScript/useScript'
+import type { FreshdeskClient } from '../../types/freshdesk'
 
 declare global {
   const app: any
@@ -19,6 +19,9 @@ export const FreshdeskProvider = ({ children }: { children: React.ReactNode }) =
 
     const init = async () => {
       const client = await app.initialized()
+      client.instance.resize({
+        height: '460px'
+      })
       setClient(client)
     }
 

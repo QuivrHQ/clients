@@ -9,5 +9,30 @@
         "Content-Type": "application/json"
       }
     }
+  },
+  "createHelpdeskAccount": {
+    "schema": {
+      "method": "POST",
+      "host": "<%= app_settings.quivrApiUrl %>",
+      "path": "/helpdesk-accounts",
+      "headers": {
+        "Authorization": "Bearer <%= iparam.quivrApiKey %>",
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  "getAutodraft": {
+    "schema": {
+      "method": "GET",
+      "host": "<%= app_settings.quivrApiUrl %>",
+      "path": "/helpdesk-accounts/autodraft",
+      "headers": {
+        "Authorization": "Bearer <%= iparam.quivrApiKey %>",
+        "Content-Type": "application/json"
+      },
+      "query": {
+        "helpdesk_ticket_id": "<%= context.ticket_id %>"
+      }
+    }
   }
 }

@@ -2,6 +2,12 @@ import { TemplateRequestService, TemplateRequestError, type TemplateRequestOptio
 import type { FreshdeskClient } from '../types/freshdesk'
 
 const createMockClient = (): jest.Mocked<FreshdeskClient> => ({
+  interface: {
+    trigger: jest.fn()
+  },
+  data: {
+    get: jest.fn()
+  },
   request: {
     invokeTemplate: jest.fn()
   }

@@ -4,5 +4,23 @@
     "type": "text",
     "required": true,
     "secure": true
+  },
+  "freshdeskApiKey": {
+    "display_name": "Freshdesk API Key",
+    "description": "Follow this tutorial to get your API key: https://support.freshdesk.com/support/solutions/articles/215517-how-to-find-your-api-key",
+    "type": "text",
+    "required": true,
+    "secure": true
+  },
+  "email": {
+    "display_name": "Email",
+    "type": "text",
+    "required": true
+  },
+  "historicalLookupWindow": {
+    "display_name": "Historical lookup window in days (default: 180)",
+    "description": "Defines how far back (in days) Quivr will retrieve historical tickets to use as context when generating responses.",
+    "type": "number",
+    "required": false
   }
 }

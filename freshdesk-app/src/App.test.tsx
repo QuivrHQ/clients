@@ -2,37 +2,29 @@ import { screen, render } from '@testing-library/react'
 import App from './App'
 
 // Mock the context to provide a client
-jest.mock('./context/FreshdeskClientContext', () => ({
+jest.mock('./context/FreshdeskClientContext/FreshdeskClientContext', () => ({
   useFreshdeskClient: jest.fn()
 }))
 
 jest.mock('@freshworks/crayons/react', () => require('../__mocks__/freshworks-crayons-react'))
 
-test('renders the app with HelloUser component', () => {
-  // Mock the context to return a client
-  const { useFreshdeskClient } = require('./context/FreshdeskClientContext')
-  useFreshdeskClient.mockReturnValue({
-    // Mock client object
-  })
-
-  render(<App />)
-
-  // Check for the button text
-  const buttonElement = screen.getByText(/get helpdesk account/i)
-  expect(buttonElement).toBeInTheDocument()
-
-  // Check for the welcome text
-  const welcomeText = screen.getByText(/welcome to your first react app in freshdesk/i)
-  expect(welcomeText).toBeInTheDocument()
+// Mock ResponseContainer component
+jest.mock('./components/ResponseContainer/ResponseContainer', () => {
+  return function MockResponseContainer() {
+    return 'MOCK_RESPONSE_CONTAINER'
+  }
 })
 
-test('renders loading state when client is not available', () => {
-  // Mock the context to return null client
-  const { useFreshdeskClient } = require('./context/FreshdeskClientContext')
-  useFreshdeskClient.mockReturnValue(null)
+// Mock AccountConfigContext
+jest.mock('./context/AccountConfigContext/AccountConfigContext', () => ({
+  AccountConfigProvider: ({ children }: { children: any }) => children
+}))
+
+test('renders App component', () => {
+  const { useFreshdeskClient } = require('./context/FreshdeskClientContext/FreshdeskClientContext')
+  useFreshdeskClient.mockReturnValue({})
 
   render(<App />)
 
-  const loadingElement = screen.getByText(/loading/i)
-  expect(loadingElement).toBeInTheDocument()
+  expect(screen.getByText('MOCK_RESPONSE_CONTAINER')).toBeInTheDocument()
 })
