@@ -20,6 +20,10 @@ interface ExecuteZendeskTaskContextProps {
 
 export const ExecuteZendeskTaskContext = createContext<ExecuteZendeskTaskContextProps | undefined>(undefined)
 
+const shouldGenerateNewChatId = (previousTask: ZendeskTask | undefined) => {
+  return !(previousTask === 'iterate' || previousTask === 'reformulate')
+}
+
 export const ExecuteZendeskTaskProvider = ({ children }: { children: ReactNode }) => {
   const { quivrService } = useQuivrApiContext()
   const { getTicketId, getUserInput, getUser } = useZendesk()
@@ -27,6 +31,7 @@ export const ExecuteZendeskTaskProvider = ({ children }: { children: ReactNode }
   const [response, setResponse] = useState('')
   const [isError, setIsError] = useState<boolean>(false)
   const [ticketAnswerId, setTicketAnswerId] = useState<string | undefined>(undefined)
+  const [previousTask, setPreviousTask] = useState<{ task: ZendeskTask; chatId: string } | null>(null)
   const client = useClient() as ZAFClient
 
   const submitTask = async (task: ZendeskTask, options: { iterationRequest?: string; onFinish?: () => void }) => {
@@ -43,7 +48,10 @@ export const ExecuteZendeskTaskProvider = ({ children }: { children: ReactNode }
     }, 300)
 
     try {
-      const chatId = await quivrService.getNewChatId('Zendesk Chat')
+      let chatId = previousTask?.chatId
+      if (!chatId || shouldGenerateNewChatId(previousTask?.task)) {
+        chatId = await quivrService.getNewChatId('Zendesk Chat')
+      }
       const ticketId = await getTicketId(client)
       const userInput = await getUserInput(client)
       const user = await getUser(client)
@@ -73,6 +81,7 @@ export const ExecuteZendeskTaskProvider = ({ children }: { children: ReactNode }
           setIsError(error !== null)
         }
       )
+      setPreviousTask({ task, chatId })
     } catch (error) {
       console.error(error)
       setResponse('Error occurred while generating response.')
