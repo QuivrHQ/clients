@@ -42,7 +42,7 @@ const ResponseContainer: React.FC = () => {
     loadDraft()
   }, [client, accountConfig])
 
-  return (
+  return draft ? (
     <div className="fw-p-4 fw-gap-2 fw-flex fw-flex-column">
       <div className="fw-flex">
         <FwButton
@@ -56,11 +56,13 @@ const ResponseContainer: React.FC = () => {
             })
           }}
         >
-          Copy draft
+          Copy Draft
         </FwButton>
       </div>
-      <FwTextarea ref={editorRef} rows={20} value={draft ?? ''} state="normal" />
+      <FwTextarea ref={editorRef} rows={20} value={draft} state="normal" />
     </div>
+  ) : (
+    <p>No draft response found.</p>
   )
 }
 

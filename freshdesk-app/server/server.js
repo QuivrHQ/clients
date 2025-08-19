@@ -1,6 +1,20 @@
 exports = {
   onAppInstallHandler: async function (payload) {
     console.log('onAppInstallHandler invoked with following data: \n', payload)
+
+    try {
+      const response = await $request.invokeTemplate('getHelpdeskAccount')
+
+      const account = JSON.parse(response.response)
+      if (account.id) {
+        console.log('Helpdesk account already exists.', { id: account.id })
+        renderData()
+        return
+      }
+    } catch (error) {
+      console.log('No helpdesk account found. Creating new one...')
+    }
+
     try {
       await $request.invokeTemplate('createHelpdeskAccount', {
         body: JSON.stringify({
@@ -13,7 +27,7 @@ exports = {
       })
       renderData()
     } catch (error) {
-      renderData({ message: 'Failed to create helpdesk account' })
+      renderData({ message: 'Quivr API key or Freshdesk API key is incorrect.' })
     }
   },
   onSettingsUpdate: function (args) {

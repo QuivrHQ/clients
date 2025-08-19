@@ -14,7 +14,7 @@
   },
   "email": {
     "display_name": "Email",
-    "type": "text",
+    "type": "email",
     "required": true
   },
   "historicalLookupWindow": {
