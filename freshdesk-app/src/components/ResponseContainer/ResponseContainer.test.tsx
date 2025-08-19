@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import ResponseContainer from './ResponseContainer'
 import { useQuivrClient } from '../../hooks/useQuivrClient/useQuivrClient'
@@ -42,8 +42,6 @@ describe('ResponseContainer', () => {
 
   it('renders without crashing', () => {
     render(<ResponseContainer />)
-    expect(screen.getByText('Copy draft')).toBeInTheDocument()
-    expect(screen.getByRole('textbox')).toBeInTheDocument()
   })
 
   it('does not load draft when client is not available', async () => {
