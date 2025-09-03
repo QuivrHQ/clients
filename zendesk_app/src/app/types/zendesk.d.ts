@@ -107,6 +107,7 @@ export interface Autodraft {
     is_autosendable?: boolean
     is_accepted: boolean | null
   }
+  context_is_enough: boolean
 }
 
 export interface UpdateTicketAnswer {

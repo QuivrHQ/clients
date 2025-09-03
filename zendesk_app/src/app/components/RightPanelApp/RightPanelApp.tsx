@@ -19,6 +19,8 @@ import { normalizeNewlinesToHtml } from '../../shared/helpers/html'
 import styles from './RightPanelApp.module.scss'
 import { copyDraftSource, trackingEvents } from '@constants/tracking-events'
 import posthog from 'posthog-js'
+import { featureFlags } from '@constants/feature-flags'
+import { useFeatureFlagEnabled } from 'posthog-js/react'
 
 export const RightPanelApp = (): JSX.Element => {
   const { quivrService, ingestionStatus, setIngestionStatus, zendeskConnection } = useQuivrApiContext()
@@ -30,6 +32,7 @@ export const RightPanelApp = (): JSX.Element => {
   const [autoDraft, setAutoDraft] = useState<Autodraft | null>(null)
   const { pasteInEditor, getTicketId, getUser } = useZendesk()
   const client = useClient() as ZAFClient
+  const lowConfidenceWarningEnabled = useFeatureFlagEnabled(featureFlags.LOW_CONFIDENCE_WARNING)
 
   useEffect(() => {
     client.invoke('resize', { width: '100%', height: '450px' })
@@ -121,6 +124,14 @@ export const RightPanelApp = (): JSX.Element => {
               <MessageInfoBox type="warning">
                 <span className={styles.error}>
                   An error has occurred and may interfere with the generation of a relevant response.
+                </span>
+              </MessageInfoBox>
+            )}
+            {autoDraft && !autoDraft.context_is_enough && lowConfidenceWarningEnabled && (
+              <MessageInfoBox type="warning">
+                <span className={styles.error}>
+                  This draft may be incomplete or inaccurate because not all the necessary information is available.
+                  Please review carefully if you use it.
                 </span>
               </MessageInfoBox>
             )}

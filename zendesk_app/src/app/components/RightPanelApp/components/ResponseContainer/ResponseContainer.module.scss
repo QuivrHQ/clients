@@ -31,6 +31,10 @@
       border: 1px solid var(--success);
     }
 
+    &.low_confidence {
+      border: 1px solid var(--warning);
+    }
+
     &:focus {
       outline: none !important;
       box-shadow: none;
