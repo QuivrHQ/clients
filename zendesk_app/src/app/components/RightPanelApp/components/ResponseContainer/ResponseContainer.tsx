@@ -47,8 +47,12 @@ export const ResponseContainer = ({
   const openModal = useModal(client)
   const autosendFeedbackModalEnabled = useFeatureFlagEnabled(featureFlags.AUTOSEND_FEEDBACK_MODAL)
   const autosendFeedbackEnabled = useFeatureFlagEnabled(featureFlags.AUTOSEND_FEEDBACK)
+  const lowConfidenceWarningEnabled = useFeatureFlagEnabled(featureFlags.LOW_CONFIDENCE_WARNING)
   const showAutosendFeedbackButtons =
-    autoDraft?.prediction?.is_autosendable && autoDraft?.prediction?.is_accepted === null && autosendFeedbackEnabled
+    autoDraft?.prediction?.is_autosendable &&
+    autoDraft?.prediction?.is_accepted === null &&
+    autosendFeedbackEnabled &&
+    autoDraft?.context_is_enough
 
   useEffect(() => {
     if (!manualEditing) {
@@ -76,6 +80,7 @@ export const ResponseContainer = ({
       if (
         autoDraft?.prediction?.is_autosendable &&
         autoDraft?.prediction?.is_accepted === null &&
+        autoDraft?.context_is_enough &&
         htmlContent !== '' &&
         subdomainsEligibleToAutosend.includes(subdomain) &&
         !feedbackModalViewed &&
@@ -180,7 +185,7 @@ export const ResponseContainer = ({
   return (
     <div className={styles.main_container}>
       <div
-        className={`${styles.response_container} ${showAutosendFeedbackButtons ? styles.autosendable : ''}`}
+        className={`${styles.response_container} ${showAutosendFeedbackButtons ? styles.autosendable : ''} ${!autoDraft?.context_is_enough && lowConfidenceWarningEnabled ? styles.low_confidence : ''}`}
         contentEditable={true}
         dangerouslySetInnerHTML={{ __html: htmlContent }}
         onInput={handleInput}

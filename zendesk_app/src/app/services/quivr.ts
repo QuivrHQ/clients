@@ -254,7 +254,7 @@ export class QuivrService {
   async getAutoDraft(ticketId: string): Promise<Autodraft | null> {
     try {
       const response = await this.client.request({
-        url: `${this.apiUrl}/zendesk/autodraft_v2?ticket_id=${ticketId}`,
+        url: `${this.apiUrl}/helpdesk-accounts/autodraft?helpdesk_ticket_id=${ticketId}`,
         type: 'GET',
         headers: {
           Authorization: `Bearer ${this.quivrApiKey}`
