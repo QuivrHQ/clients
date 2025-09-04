@@ -124,6 +124,47 @@ export class QuivrService {
     }
   }
 
+  async executeZendeskTaskV2(
+    task: ZendeskTask,
+    chatId: string,
+    custom_instructions: string,
+    ticketId: string,
+    draft_answer: string,
+    user: ZendeskUser,
+    onStreamMessage: (message: string, ticketAnswerId?: string) => void,
+    onStreamError?: (error: string | null) => void
+  ): Promise<string> {
+    const url = new URL(`${this.apiUrl}/helpdesk-accounts/tickets/${ticketId}/tasks/${task}`)
+
+    const response = await fetch(url.toString(), {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${this.quivrApiKey}`,
+        'Content-Type': 'application/json',
+        Accept: 'text/event-stream'
+      },
+      body: JSON.stringify({
+        draft_answer: draft_answer,
+        custom_instructions: custom_instructions,
+        chat_id: chatId,
+        zt_input: {
+          support_agent: {
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            platform_user_id: user.id
+          }
+        }
+      })
+    })
+
+    if (!response.body) {
+      throw new Error('ReadableStream not supported or no body in response.')
+    }
+
+    return this.processStream(response.body, onStreamMessage, onStreamError)
+  }
+
   async executeZendeskTask(
     task: ZendeskTask,
     chatId: string,
@@ -131,7 +172,7 @@ export class QuivrService {
     ticketId: string,
     content: string,
     user: ZendeskUser,
-    onStreamMessage: (message: string) => void,
+    onStreamMessage: (message: string, ticketAnswerId?: string) => void,
     onStreamError?: (error: string | null) => void
   ): Promise<string> {
     const url = new URL(`${this.apiUrl}/zendesk/task/${task}`)

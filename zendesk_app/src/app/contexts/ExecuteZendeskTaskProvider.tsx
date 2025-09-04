@@ -4,12 +4,15 @@ import { useQuivrApiContext } from '../hooks/useQuivrApiContext'
 import { useZendesk } from '../hooks/useZendesk'
 import { ZendeskTask } from '../types/zendesk'
 import { ZAFClient } from './ClientProvider'
+import { featureFlags } from '@constants/feature-flags'
+import { useFeatureFlagEnabled } from 'posthog-js/react'
 
 const agentPrompt = 'Vous êtes un assistant attentionné,  votre objectif est de satisfaire la demande du client.'
 
 interface ExecuteZendeskTaskContextProps {
   loading: boolean
   response: string
+  isAutoDraftDisplayed: boolean
   setResponse: (r: string) => void
   submitTask: (task: ZendeskTask, options: { iterationRequest?: string; onFinish?: () => void }) => Promise<void>
   ticketAnswerId?: string
@@ -33,6 +36,7 @@ export const ExecuteZendeskTaskProvider = ({ children }: { children: ReactNode }
   const [ticketAnswerId, setTicketAnswerId] = useState<string | undefined>(undefined)
   const [previousTask, setPreviousTask] = useState<{ task: ZendeskTask; chatId: string } | null>(null)
   const client = useClient() as ZAFClient
+  const generateV2Enabled = useFeatureFlagEnabled(featureFlags.GENERATE_V2)
 
   const submitTask = async (task: ZendeskTask, options: { iterationRequest?: string; onFinish?: () => void }) => {
     if (!quivrService) return
@@ -56,7 +60,11 @@ export const ExecuteZendeskTaskProvider = ({ children }: { children: ReactNode }
       const userInput = await getUserInput(client)
       const user = await getUser(client)
 
-      await quivrService.executeZendeskTask(
+      const executeTask = (
+        generateV2Enabled ? quivrService.executeZendeskTaskV2 : quivrService.executeZendeskTask
+      ).bind(quivrService)
+
+      await executeTask(
         task,
         chatId,
         task === 'iterate' && iterationRequest ? iterationRequest : agentPrompt,
@@ -98,6 +106,7 @@ export const ExecuteZendeskTaskProvider = ({ children }: { children: ReactNode }
         loading,
         response,
         setResponse,
+        isAutoDraftDisplayed: !Boolean(previousTask),
         submitTask,
         ticketAnswerId,
         setTicketAnswerId,

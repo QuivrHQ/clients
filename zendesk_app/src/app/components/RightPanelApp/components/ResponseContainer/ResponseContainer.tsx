@@ -25,6 +25,7 @@ interface ResponseContainerProps {
   autoDraft: Autodraft | null
   onCopyDraft: () => Promise<void>
   ticketAnswerId?: string
+  showLowConfidenceWarning: boolean
 }
 
 export const ResponseContainer = ({
@@ -33,7 +34,8 @@ export const ResponseContainer = ({
   ongoingTask,
   autoDraft,
   onCopyDraft,
-  ticketAnswerId
+  ticketAnswerId,
+  showLowConfidenceWarning
 }: ResponseContainerProps): JSX.Element => {
   const [htmlContent, setHtmlContent] = useState('')
   const [manualEditing, setManualEditing] = useState(false)
@@ -47,7 +49,6 @@ export const ResponseContainer = ({
   const openModal = useModal(client)
   const autosendFeedbackModalEnabled = useFeatureFlagEnabled(featureFlags.AUTOSEND_FEEDBACK_MODAL)
   const autosendFeedbackEnabled = useFeatureFlagEnabled(featureFlags.AUTOSEND_FEEDBACK)
-  const lowConfidenceWarningEnabled = useFeatureFlagEnabled(featureFlags.LOW_CONFIDENCE_WARNING)
   const showAutosendFeedbackButtons =
     autoDraft?.prediction?.is_autosendable &&
     autoDraft?.prediction?.is_accepted === null &&
@@ -185,7 +186,7 @@ export const ResponseContainer = ({
   return (
     <div className={styles.main_container}>
       <div
-        className={`${styles.response_container} ${showAutosendFeedbackButtons ? styles.autosendable : ''} ${!autoDraft?.context_is_enough && lowConfidenceWarningEnabled ? styles.low_confidence : ''}`}
+        className={`${styles.response_container} ${showAutosendFeedbackButtons ? styles.autosendable : ''} ${showLowConfidenceWarning ? styles.low_confidence : ''}`}
         contentEditable={true}
         dangerouslySetInnerHTML={{ __html: htmlContent }}
         onInput={handleInput}
