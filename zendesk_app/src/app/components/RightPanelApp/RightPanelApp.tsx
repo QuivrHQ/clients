@@ -26,13 +26,24 @@ export const RightPanelApp = (): JSX.Element => {
   const { quivrService, ingestionStatus, setIngestionStatus, zendeskConnection } = useQuivrApiContext()
   const [iterationRequest, setIterationRequest] = useState('')
   const { actionButtons, isChatEnabled } = useActionButtons()
-  const { loading, response, setResponse, submitTask, ticketAnswerId, setTicketAnswerId, isError } =
-    useExecuteZendeskTaskContext()
+  const {
+    loading,
+    response,
+    setResponse,
+    submitTask,
+    ticketAnswerId,
+    isAutoDraftDisplayed,
+    setTicketAnswerId,
+    isError
+  } = useExecuteZendeskTaskContext()
   const [ongoingTask, setOngoingTask] = useState(false)
   const [autoDraft, setAutoDraft] = useState<Autodraft | null>(null)
   const { pasteInEditor, getTicketId, getUser } = useZendesk()
   const client = useClient() as ZAFClient
   const lowConfidenceWarningEnabled = useFeatureFlagEnabled(featureFlags.LOW_CONFIDENCE_WARNING)
+  const showLowConfidenceWarning = Boolean(
+    autoDraft && !autoDraft.context_is_enough && lowConfidenceWarningEnabled && isAutoDraftDisplayed && !ongoingTask
+  )
 
   useEffect(() => {
     client.invoke('resize', { width: '100%', height: '450px' })
@@ -127,7 +138,7 @@ export const RightPanelApp = (): JSX.Element => {
                 </span>
               </MessageInfoBox>
             )}
-            {autoDraft && !autoDraft.context_is_enough && lowConfidenceWarningEnabled && (
+            {showLowConfidenceWarning && (
               <MessageInfoBox type="warning">
                 <span className={styles.error}>
                   This draft may be incomplete or inaccurate because not all the necessary information is available.
@@ -144,6 +155,7 @@ export const RightPanelApp = (): JSX.Element => {
                 setResponseContent={setResponse}
                 ongoingTask={ongoingTask}
                 ticketAnswerId={ticketAnswerId}
+                showLowConfidenceWarning={showLowConfidenceWarning}
               ></ResponseContainer>
             </div>
             <div className={styles.response_separator}></div>
