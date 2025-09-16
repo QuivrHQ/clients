@@ -80,6 +80,7 @@ jobs:
           VITE_ZENDESK_MODAL_LOCATION: ${{ vars.VITE_ZENDESK_MODAL_LOCATION }}
           VITE_POSTHOG_HOST: ${{ vars.VITE_POSTHOG_HOST }}
           VITE_POSTHOG_KEY: ${{ vars.VITE_POSTHOG_KEY }}
+          VITE_ZENDESK_API_KEY: "{{setting.zendesk_api_key}}"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -124,6 +125,7 @@ jobs:
           VITE_ZENDESK_MODAL_LOCATION: ${{ vars.VITE_ZENDESK_MODAL_LOCATION }}
           VITE_POSTHOG_HOST: ${{ vars.VITE_POSTHOG_HOST }}
           VITE_POSTHOG_KEY: ${{ vars.VITE_POSTHOG_KEY }}
+          VITE_ZENDESK_API_KEY: "{{setting.zendesk_api_key}}"
 
       - uses: actions/upload-artifact@v4
         with:
