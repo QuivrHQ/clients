@@ -36,7 +36,6 @@ export const ExecuteZendeskTaskProvider = ({ children }: { children: ReactNode }
   const [ticketAnswerId, setTicketAnswerId] = useState<string | undefined>(undefined)
   const [previousTask, setPreviousTask] = useState<{ task: ZendeskTask; chatId: string } | null>(null)
   const client = useClient() as ZAFClient
-  const generateV2Enabled = useFeatureFlagEnabled(featureFlags.GENERATE_V2)
 
   const submitTask = async (task: ZendeskTask, options: { iterationRequest?: string; onFinish?: () => void }) => {
     if (!quivrService) return
@@ -60,11 +59,8 @@ export const ExecuteZendeskTaskProvider = ({ children }: { children: ReactNode }
       const userInput = await getUserInput(client)
       const user = await getUser(client)
 
-      const executeTask = (
-        generateV2Enabled ? quivrService.executeZendeskTaskV2 : quivrService.executeZendeskTask
-      ).bind(quivrService)
 
-      await executeTask(
+      await quivrService.executeZendeskTaskV2(
         task,
         chatId,
         task === 'iterate' && iterationRequest ? iterationRequest : agentPrompt,
