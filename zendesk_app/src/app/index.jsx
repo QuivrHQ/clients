@@ -1,5 +1,6 @@
 import '@zendeskgarden/css-bedrock'
 import ReactDOM from 'react-dom/client'
+import * as Sentry from '@sentry/react'
 import App from './App.tsx'
 import { ClientProvider } from './contexts/ClientProvider.tsx'
 import { QuivrApiProvider } from './contexts/QuivrApiProvider.tsx'
@@ -7,6 +8,19 @@ import { ExecuteZendeskTaskProvider } from './contexts/ExecuteZendeskTaskProvide
 import { PostHogProvider } from 'posthog-js/react'
 
 import './index.css'
+
+Sentry.init({
+  dsn: import.meta.env.VITE_SENTRY_DSN,
+  integrations: [
+    Sentry.replayIntegration(),
+    Sentry.captureConsoleIntegration({
+      levels: ["error"],
+    }),
+  ],
+  replaysSessionSampleRate: 0,
+  replaysOnErrorSampleRate: 0.1,
+  environment: import.meta.env.VITE_ENVIRONMENT
+})
 
 // Get the current URL to determine if we're in editor mode
 const isEditorMode = window.location.pathname.includes('/editor')
