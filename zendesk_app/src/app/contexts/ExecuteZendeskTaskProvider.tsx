@@ -87,7 +87,7 @@ export const ExecuteZendeskTaskProvider = ({ children }: { children: ReactNode }
       )
       setPreviousTask({ task, chatId })
     } catch (error) {
-      console.error(error)
+      console.error('Error occurred while generating response.', error)
       setResponse('Error occurred while generating response.')
     } finally {
       clearInterval(loadingInterval)
