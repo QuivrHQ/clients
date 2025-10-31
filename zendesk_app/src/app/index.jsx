@@ -14,12 +14,14 @@ Sentry.init({
   integrations: [
     Sentry.replayIntegration(),
     Sentry.captureConsoleIntegration({
-      levels: ["error"],
+      levels: ['error']
     }),
+    Sentry.consoleLoggingIntegration({ levels: ['error'] })
   ],
   replaysSessionSampleRate: 0,
   replaysOnErrorSampleRate: 0.1,
-  environment: import.meta.env.VITE_ENVIRONMENT
+  environment: import.meta.env.VITE_ENVIRONMENT,
+  enableLogs: true
 })
 
 // Get the current URL to determine if we're in editor mode
