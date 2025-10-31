@@ -4,8 +4,7 @@ import { useQuivrApiContext } from '../hooks/useQuivrApiContext'
 import { useZendesk } from '../hooks/useZendesk'
 import { ZendeskTask } from '../types/zendesk'
 import { ZAFClient } from './ClientProvider'
-import { featureFlags } from '@constants/feature-flags'
-import { useFeatureFlagEnabled } from 'posthog-js/react'
+import * as Sentry from '@sentry/react'
 
 const agentPrompt = 'Vous êtes un assistant attentionné,  votre objectif est de satisfaire la demande du client.'
 
@@ -59,7 +58,6 @@ export const ExecuteZendeskTaskProvider = ({ children }: { children: ReactNode }
       const userInput = await getUserInput(client)
       const user = await getUser(client)
 
-
       await quivrService.executeZendeskTaskV2(
         task,
         chatId,
@@ -87,7 +85,9 @@ export const ExecuteZendeskTaskProvider = ({ children }: { children: ReactNode }
       )
       setPreviousTask({ task, chatId })
     } catch (error) {
-      console.error('Error occurred while generating response.', error)
+      console.error('An error occurred while generating response.', error)
+      Sentry.logger.trace(Sentry.logger.fmt`An error occurred while generating response: '${error}'`)
+
       setResponse('Error occurred while generating response.')
     } finally {
       clearInterval(loadingInterval)
