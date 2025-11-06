@@ -155,7 +155,7 @@ export class QuivrService {
             platform_user_id: user.id
           }
         }
-      }),
+      })
     })
 
     if (!response.body) {
@@ -192,7 +192,7 @@ export class QuivrService {
       }
     } catch (error) {
       console.error('Error processing stream:', error)
-      throw error;
+      throw error
     } finally {
       reader.releaseLock()
     }
@@ -247,7 +247,7 @@ export class QuivrService {
           onStreamError(parsedData.errors ?? null)
         }
       } catch (e) {
-        console.error('Error parsing incomplete data at stream end', e)
+        console.error('Error parsing incomplete data at stream end', e, buffer)
       }
     }
   }
