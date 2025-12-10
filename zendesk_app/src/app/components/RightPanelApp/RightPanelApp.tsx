@@ -22,9 +22,12 @@ import posthog from 'posthog-js'
 import { featureFlags } from '@constants/feature-flags'
 import { useFeatureFlagEnabled } from 'posthog-js/react'
 
+const PINKCONNECT_MARKER = '*** Message<span style="color: rgb(0,0,0);">:</span></div><div>'
+
 export const RightPanelApp = (): JSX.Element => {
   const { quivrService, ingestionStatus, setIngestionStatus, zendeskConnection } = useQuivrApiContext()
   const [iterationRequest, setIterationRequest] = useState('')
+  const [pinkConnectError, setPinkConnectError] = useState<string | null>(null)
   const { actionButtons, isChatEnabled } = useActionButtons()
   const {
     loading,
@@ -38,7 +41,7 @@ export const RightPanelApp = (): JSX.Element => {
   } = useExecuteZendeskTaskContext()
   const [ongoingTask, setOngoingTask] = useState(false)
   const [autoDraft, setAutoDraft] = useState<Autodraft | null>(null)
-  const { pasteInEditor, getTicketId, getUser } = useZendesk()
+  const { pasteInEditor, getTicketId, getUser, getUserInput, getLatestEndUserMessage } = useZendesk()
   const client = useClient() as ZAFClient
   const lowConfidenceWarningEnabled = useFeatureFlagEnabled(featureFlags.LOW_CONFIDENCE_WARNING)
   const showLowConfidenceWarning = Boolean(
@@ -86,7 +89,44 @@ export const RightPanelApp = (): JSX.Element => {
     }
   }
 
+  const handleFormatToPinkConnect = async () => {
+    setPinkConnectError(null)
+
+    const agentMessage = await getUserInput(client)
+    if (!agentMessage || agentMessage.trim() === '') {
+      setPinkConnectError('Please write your response in the reply box first.')
+      return
+    }
+
+    const latestEndUserMessage = await getLatestEndUserMessage(client)
+    if (!latestEndUserMessage?.message?.content) {
+      setPinkConnectError('No end-user message found.')
+      return
+    }
+
+    const template = latestEndUserMessage.message.content
+    const markerIndex = template.indexOf(PINKCONNECT_MARKER)
+
+    if (markerIndex === -1) {
+      setPinkConnectError('This is not a Veepee/PinkConnect message.')
+      return
+    }
+
+    const beforeMarker = template.substring(0, markerIndex + PINKCONNECT_MARKER.length)
+    const afterMarker = template.substring(markerIndex + PINKCONNECT_MARKER.length)
+    const formattedMessage = `${beforeMarker}\n\n${agentMessage}\n${afterMarker}`
+
+    await pasteInEditor(client, formattedMessage)
+  }
+
   const handleSubmitTask = async (action: ZendeskTask) => {
+    setPinkConnectError(null)
+
+    if (action === 'format_for_pinkconnect') {
+      await handleFormatToPinkConnect()
+      return
+    }
+
     setOngoingTask(true)
     await submitTask(action, { iterationRequest })
     setOngoingTask(false)
@@ -118,6 +158,7 @@ export const RightPanelApp = (): JSX.Element => {
             label="Copy Draft"
             color="black"
             onClick={() => {
+              setPinkConnectError(null)
               posthog.capture(trackingEvents.COPY_DRAFT, {
                 autosendable: autoDraft?.prediction?.is_autosendable,
                 source: copyDraftSource.BUTTON
@@ -129,6 +170,11 @@ export const RightPanelApp = (): JSX.Element => {
           />
           <SplitButton color="black" splitButtons={actionButtons} disabled={loading} onSubmit={handleSubmitTask} />
         </div>
+        {pinkConnectError && (
+          <MessageInfoBox type="warning">
+            <span className={styles.error}>{pinkConnectError}</span>
+          </MessageInfoBox>
+        )}
         {response && (
           <>
             {isError && (

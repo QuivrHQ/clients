@@ -31,6 +31,12 @@ const buttons = [
     task: 'summarize' as ZendeskTask,
     displayKey: 'display_summarize_button',
     iconName: 'chevronRight'
+  },
+  {
+    label: 'Format for PinkConnect',
+    task: 'format_for_pinkconnect' as ZendeskTask,
+    displayKey: 'display_pinkconnect_button',
+    iconName: 'chevronRight'
   }
 ]
 

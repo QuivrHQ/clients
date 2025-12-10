@@ -1,4 +1,11 @@
-export type ZendeskTask = 'iterate' | 'reformulate' | 'generate' | 'correct' | 'summarize' | 'translate'
+export type ZendeskTask =
+  | 'iterate'
+  | 'reformulate'
+  | 'generate'
+  | 'correct'
+  | 'summarize'
+  | 'translate'
+  | 'format_for_pinkconnect'
 
 export interface TicketIngestionProgress {
   total_tickets: number
@@ -22,6 +29,7 @@ export interface ZendeskConnection {
   display_correct_button: boolean
   display_summarize_button: boolean
   display_translate_button: boolean
+  display_pinkconnect_button: boolean
   enable_autodraft_in_reply_box: boolean
 }
 
