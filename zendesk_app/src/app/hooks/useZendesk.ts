@@ -12,6 +12,14 @@ export const useZendesk = () => {
     return client.get('ticket.comment').then((data) => data['ticket.comment'].text)
   }
 
+  async function setCommentType(client: ZAFClient, commentType: 'publicReply' | 'internalNote'): Promise<void> {
+    return client.set('ticket.comment.type', commentType)
+  }
+
+  async function setUserInput(client: ZAFClient, commentText: string): Promise<void> {
+    return client.set('ticket.comment.text', commentText, { html: true })
+  }
+
   async function getUserName(client: ZAFClient): Promise<string> {
     return client.get('currentUser').then((data) => data.currentUser.name)
   }
@@ -86,6 +94,8 @@ export const useZendesk = () => {
     getUserEmail,
     getRequesterEmail,
     getSubdomain,
+    setCommentType,
+    setUserInput,
     pasteInEditor,
     sendMessage,
     getLatestEndUserMessage
