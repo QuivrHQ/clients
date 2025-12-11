@@ -31,6 +31,7 @@ export interface ZendeskConnection {
   display_translate_button: boolean
   display_pinkconnect_button: boolean
   enable_autodraft_in_reply_box: boolean
+  autodraft_in_internal_note_composer: boolean
 }
 
 export interface ZendeskBrain {

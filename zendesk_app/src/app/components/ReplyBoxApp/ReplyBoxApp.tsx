@@ -19,35 +19,58 @@ export const ReplyBoxApp = (): JSX.Element => {
   const { actionButtons } = useActionButtons()
   const { quivrService, zendeskConnection } = useQuivrApiContext()
   const { loading, response, submitTask, setResponse } = useExecuteZendeskTaskContext()
-  const { getTicketId } = useZendesk()
+  const { getTicketId, setCommentType, setUserInput } = useZendesk()
+
+  useEffect(() => {
+    const setInput = async () => {
+      const htmlContent = await marked(normalizeNewlinesToHtml(response))
+      await setUserInput(client, htmlContent)
+    }
+
+    if (response && response !== '.' && response !== '..' && response !== '...') {
+      setInput()
+    }
+  }, [response, client])
 
   useEffect(() => {
     client.invoke('resize', { width: '200px', height: `${ACTION_BUTTON_HEIGHT * actionButtons.length + 8}px` })
   }, [client])
 
-  useEffect(() => {
-    if (response && response !== '.' && response !== '..' && response !== '...') {
-      client.set('ticket.comment.text', marked(normalizeNewlinesToHtml(response)))
-    }
-  }, [response, client])
 
   useEffect(() => {
     const getAutoDraft = async () => {
-      if (
-        quivrService &&
-        zendeskConnection?.enable_autodraft_in_reply_box &&
-        zendeskConnection?.helpdesk_brains.some((link) => link.auto_draft_front)
-      ) {
-        const ticketId = await getTicketId(client)
-        const autoDraft = await quivrService.getAutoDraft(ticketId)
-        if (autoDraft?.generated_answer) {
-          setResponse(autoDraft.generated_answer)
-        }
+      if (!quivrService || !zendeskConnection?.helpdesk_brains.some((link) => link.auto_draft_front)) {
+        return
+      }
+
+      const ticketId = await getTicketId(client)
+      const autoDraft = await quivrService.getAutoDraft(ticketId)
+
+
+      if (!autoDraft?.generated_answer) {
+        return
+      }
+
+      const htmlContent = await marked(normalizeNewlinesToHtml(autoDraft.generated_answer))
+
+      if (zendeskConnection?.autodraft_in_internal_note_composer) {
+        await setCommentType(client, 'internalNote')
+        await setUserInput(client, htmlContent)
+      }
+
+      if (zendeskConnection?.enable_autodraft_in_reply_box) {
+        await setCommentType(client, 'publicReply')
+        await setUserInput(client, htmlContent)
       }
     }
 
     getAutoDraft()
-  }, [quivrService, zendeskConnection?.enable_autodraft_in_reply_box, zendeskConnection?.helpdesk_brains])
+  }, [
+    quivrService,
+    zendeskConnection?.enable_autodraft_in_reply_box,
+    zendeskConnection?.autodraft_in_internal_note_composer,
+    zendeskConnection?.helpdesk_brains
+  ])
 
   return (
     <div className={`${styles.content_container} ${loading ? styles.loading : ''}`}>
