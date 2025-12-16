@@ -22,7 +22,7 @@ import posthog from 'posthog-js'
 import { featureFlags } from '@constants/feature-flags'
 import { useFeatureFlagEnabled } from 'posthog-js/react'
 
-const PINKCONNECT_MARKER = '*** Message<span style="color: rgb(0,0,0);">:</span></div><div>'
+const PINKCONNECT_MARKER = '*** Message:'
 
 export const RightPanelApp = (): JSX.Element => {
   const { quivrService, ingestionStatus, setIngestionStatus, zendeskConnection } = useQuivrApiContext()
