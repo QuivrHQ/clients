@@ -5,6 +5,7 @@ import { useQuivrApiContext } from '../../hooks/useQuivrApiContext'
 import QuivrButton from '../../shared/components/QuivrButton/QuivrButton'
 import TextAreaInput from '../../shared/components/TextAreaInput/TextAreaInput'
 import styles from './FeedbackModal.module.scss'
+import { logger } from '../../services/logger'
 
 const ratingDescriptions = ['Pas du tout pertinent', 'Un peu utile', 'Assez pertinent', 'Presque parfait', 'Parfait']
 
@@ -41,7 +42,11 @@ export const FeedbackModal = ({ ticketAnswerId, rating }: FeedbackModalProps): J
       setLoading(false)
       client.invoke('destroy')
     } catch (error) {
-      console.error('Error rating generated answer', error)
+      logger.error(error as Error, {
+        message: 'Error rating generated answer',
+        ticketAnswerId,
+        rating: localRating
+      })
     } finally {
       setLoading(false)
     }

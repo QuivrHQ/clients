@@ -82,6 +82,10 @@ jobs:
           VITE_POSTHOG_KEY: ${{ vars.VITE_POSTHOG_KEY }}
           VITE_ZENDESK_API_KEY: "{{setting.zendesk_api_key}}"
           VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
+          VITE_SENTRY_ORG: ${{ vars.VITE_SENTRY_ORG }}
+          VITE_SENTRY_PROJECT: ${{ vars.VITE_SENTRY_PROJECT }}
+          VITE_SENTRY_AUTH_TOKEN: ${{ secrets.VITE_SENTRY_AUTH_TOKEN }}
+          VITE_SENTRY_RELEASE: zendesk-app@${{ needs.release.outputs.version }}
           VITE_ENVIRONMENT: "preview"
 
       - uses: actions/upload-artifact@v4
@@ -129,6 +133,10 @@ jobs:
           VITE_POSTHOG_KEY: ${{ vars.VITE_POSTHOG_KEY }}
           VITE_ZENDESK_API_KEY: "{{setting.zendesk_api_key}}"
           VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
+          VITE_SENTRY_ORG: ${{ vars.VITE_SENTRY_ORG }}
+          VITE_SENTRY_PROJECT: ${{ vars.VITE_SENTRY_PROJECT }}
+          VITE_SENTRY_AUTH_TOKEN: ${{ secrets.VITE_SENTRY_AUTH_TOKEN }}
+          VITE_SENTRY_RELEASE: zendesk-app@${{ needs.release.outputs.version }}
           VITE_ENVIRONMENT: "production"
 
       - uses: actions/upload-artifact@v4
