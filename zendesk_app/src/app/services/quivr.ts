@@ -1,3 +1,4 @@
+import { logger } from './logger'
 import {
   Autodraft,
   TicketIngestionProgress,
@@ -262,10 +263,14 @@ export class QuivrService {
         },
         accepts: 'application/json'
       })
-
+      
       return response
     } catch (error) {
-      throw new Error('Failed to get auto draft')
+      logger.error(error as Error, {
+        message: 'Failed to get auto draft',
+        ticketId
+      })
+      return null
     }
   }
 

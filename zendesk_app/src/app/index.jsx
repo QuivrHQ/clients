@@ -21,6 +21,7 @@ Sentry.init({
   replaysSessionSampleRate: 0,
   replaysOnErrorSampleRate: 0.1,
   environment: import.meta.env.VITE_ENVIRONMENT,
+  release: import.meta.env.VITE_SENTRY_RELEASE || 'zendesk-app@development',
   enableLogs: true
 })
 

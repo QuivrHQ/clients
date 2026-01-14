@@ -15,6 +15,7 @@ import { useFeatureFlagEnabled } from 'posthog-js/react'
 import { featureFlags } from '@constants/feature-flags'
 import posthog from 'posthog-js'
 import { copyDraftSource, trackingEvents } from '@constants/tracking-events'
+import { logger } from '../../../../services/logger'
 
 const subdomainsEligibleToAutosend = ['getquivr', 'd3v-quivr', 'trusk']
 
@@ -114,7 +115,11 @@ export const ResponseContainer = ({
         support_agent_rating_score: value
       })
     } catch (error) {
-      console.error('Error rating generated answer', error)
+      logger.error(error as Error, {
+        message: 'Error rating generated answer',
+        ticketAnswerId,
+        ratingValue: value
+      })
     }
   }
 
@@ -129,7 +134,10 @@ export const ResponseContainer = ({
     try {
       latestEndUserMessage = autosendable ? await getLatestEndUserMessage(client) : null
     } catch (error) {
-      console.error('Error getting latest end user message', error)
+      logger.error(error as Error, {
+        message: 'Error getting latest end user message',
+        autosendable
+      })
       return
     }
 
@@ -177,7 +185,11 @@ export const ResponseContainer = ({
         false
       )
     } catch (error) {
-      console.error('Error sending prediction acceptance', error)
+      logger.error(error as Error, {
+        message: 'Error sending prediction acceptance',
+        predictionId: autoDraft.prediction.prediction_id,
+        ticketAnswerId: autoDraft.ticket_answer_id
+      })
     } finally {
       setIsAutosendableFeedbackOpen(false)
     }

@@ -13,6 +13,7 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    environment: preview
     defaults:
       run:
         working-directory: zendesk_app
@@ -36,6 +37,10 @@ jobs:
       - name: Build
         env:
           VITE_ZENDESK_API_KEY: "{{setting.zendesk_api_key}}"
+          VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
+          VITE_SENTRY_ORG: ${{ vars.VITE_SENTRY_ORG }}
+          VITE_SENTRY_PROJECT: ${{ vars.VITE_SENTRY_PROJECT }}
+          VITE_SENTRY_AUTH_TOKEN: ${{ secrets.VITE_SENTRY_AUTH_TOKEN }}
         run: npm run build
 
       - name: Validate

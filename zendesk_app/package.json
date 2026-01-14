@@ -33,6 +33,7 @@
     "styled-components": "^5.3.6"
   },
   "devDependencies": {
+    "@sentry/vite-plugin": "^4.6.1",
     "@testing-library/dom": "^10.1.0",
     "@testing-library/react": "^16.0.0",
     "@types/node": "^22.13.5",

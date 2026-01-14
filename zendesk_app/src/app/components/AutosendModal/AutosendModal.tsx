@@ -5,6 +5,7 @@ import { ZAFClient } from '../../contexts/ClientProvider'
 import { useClient } from '../../hooks/useClient'
 import { useQuivrApiContext } from '../../hooks/useQuivrApiContext'
 import { ZendeskConversationEntry, ZendeskMessage } from 'src/app/types/zendesk'
+import { logger } from '../../services/logger'
 
 export interface AutosendModalProps {
   ticketAnswerId: string
@@ -41,7 +42,12 @@ export const AutosendModal = ({
 
       await quivrService.updatePredictionAcceptance(predictionId, ticketAnswerId, isAccepted)
     } catch (error) {
-      console.error('Error sending prediction acceptance', error)
+      logger.error(error as Error, {
+        message: 'Error sending prediction acceptance',
+        predictionId,
+        ticketAnswerId,
+        isAccepted
+      })
     }
   }
 

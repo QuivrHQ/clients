@@ -19,3 +19,8 @@ dist-ssr
 *.sw?
 .ariana/
 .ariana.json
+
+# Environment files
+.env
+.env.*
+!.env.*.dist

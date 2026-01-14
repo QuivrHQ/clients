@@ -4,7 +4,7 @@ import { useQuivrApiContext } from '../hooks/useQuivrApiContext'
 import { useZendesk } from '../hooks/useZendesk'
 import { ZendeskTask } from '../types/zendesk'
 import { ZAFClient } from './ClientProvider'
-import * as Sentry from '@sentry/react'
+import { logger } from '../services/logger'
 
 const agentPrompt = 'Vous êtes un assistant attentionné,  votre objectif est de satisfaire la demande du client.'
 
@@ -85,8 +85,11 @@ export const ExecuteZendeskTaskProvider = ({ children }: { children: ReactNode }
       )
       setPreviousTask({ task, chatId })
     } catch (error) {
-      console.error('An error occurred while generating response.', error)
-      Sentry.logger.trace(Sentry.logger.fmt`An error occurred while generating response: '${error}'`)
+      logger.error(error as Error, {
+        message: 'An error occurred while generating response',
+        task,
+        ticketId: await getTicketId()
+      })
 
       setResponse('Error occurred while generating response.')
     } finally {
