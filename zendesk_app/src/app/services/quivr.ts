@@ -53,31 +53,6 @@ export class QuivrService {
     }
   }
 
-  async createZendeskConnection(subdomain: string, userEmail: string): Promise<string> {
-    try {
-      const response = await this.client.request({
-        url: `${this.apiUrl}/zendesk/`,
-        type: 'POST',
-        headers: {
-          Authorization: `Bearer ${this.quivrApiKey}`,
-          'Content-Type': 'application/json'
-        },
-        secure: true,
-        accepts: 'application/json',
-        data: JSON.stringify({
-          subdomain: `${subdomain}.zendesk.com`,
-          email: userEmail,
-          api_key: import.meta.env.VITE_ZENDESK_API_KEY,
-          time_range: 30
-        })
-      })
-
-      return response
-    } catch (error) {
-      throw new Error('Failed to create zendesk link')
-    }
-  }
-
   async getWorkflowStatus(workflowId: string): Promise<TicketIngestionProgress> {
     try {
       const response = await this.client.request({

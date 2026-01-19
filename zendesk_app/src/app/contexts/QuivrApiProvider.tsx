@@ -4,6 +4,7 @@ import { ZAFClient } from '../contexts/ClientProvider'
 import { TicketIngestionProgress, ZendeskConnection } from '../types/zendesk'
 import { useClient } from '../hooks/useClient'
 import { useZendesk } from '../hooks/useZendesk'
+import { logger } from '@services/logger'
 
 interface QuivrApiContextType {
   quivrService: QuivrService | null
@@ -40,21 +41,12 @@ export const QuivrApiProvider = ({ children }: ProviderProps) => {
       if (quivrService && !accountConnected) {
         setAccountConnected(true)
         const subdomain = await getSubdomain(client)
-        const userEmail = await getUserEmail(client)
         const timeoutId = setTimeout(async () => {
           quivrService.getZendeskConnection().then((response) => {
             setZendeskConnection(response)
             if (response === null) {
-              quivrService.createZendeskConnection(subdomain, userEmail).then(async (connectionId: string) => {
-                const intervalId = setInterval(async () => {
-                  const res: TicketIngestionProgress = await quivrService.getWorkflowStatus(connectionId)
-                  setIngestionStatus(res)
-                  if (res.status === 'COMPLETED') {
-                    clearInterval(intervalId)
-                  }
-                }, 1500)
-
-                return () => clearInterval(intervalId)
+              logger.error(`Failed to get zendesk connection.`, {
+                subdomain,
               })
             }
           })

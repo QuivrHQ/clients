@@ -8,10 +8,6 @@
       "quivr_api_token": {
         "label": "Quivr API Key",
         "description": "Your Quivr API key, found in the user section of [quivr.app](https://quivr.app)"
-      },
-      "zendesk_api_key": {
-        "label": "Zendesk API Key",
-        "description": "Your Zendesk API key, found in the user section of [zendesk.com](https://zendesk.com)"
       }
     }
   }
